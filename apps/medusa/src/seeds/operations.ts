@@ -28,5 +28,14 @@ export const sampleInventoryBySku: Record<string, number> = {
   "SAMPLE-TUR-70": 14,
   "SAMPLE-GIN-200": 40,
   "SAMPLE-TEA-70": 20,
-  "SAMPLE-GFT-04": 16
+  "SAMPLE-GFT-06": 16,
+  "SAMPLE-GFT-TRIO": 28,
+  "SAMPLE-GFT-CHAI": 22,
+  "SAMPLE-GFT-COAST": 18,
+  "SAMPLE-GFT-PANTRY": 14,
+  "SAMPLE-GFT-GOLD": 17,
+  "SAMPLE-GFT-CTG": 11,
+  "SAMPLE-GFT-SAMPLE": 35,
+  "SAMPLE-GFT-START": 19,
+  "SAMPLE-GFT-FEST": 8
 };

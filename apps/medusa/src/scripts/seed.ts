@@ -70,12 +70,22 @@ export default async function seedBanglaBlend({ container }: ExecArgs) {
   const products = sampleCatalog.filter((product) => !existingHandles.has(product.handle)).map((product) => ({
     title: product.title,
     handle: product.handle,
+    subtitle: product.subtitle,
     description: product.description,
+    thumbnail: product.thumbnail,
     status: ProductStatus.PUBLISHED,
     collection_id: currentCollections.find((collection) => collection.handle === product.collection)?.id,
     shipping_profile_id: profiles[0]!.id,
     sales_channels: [{ id: stores[0]!.default_sales_channel_id }],
-    metadata: { region: product.region, eligible_markets: product.markets, is_placeholder: true, verified: false },
+    metadata: {
+      region: product.region,
+      eligible_markets: product.markets,
+      product_badges: product.badges ?? [],
+      gift_type: product.giftType,
+      best_seller: product.bestSeller === true,
+      is_placeholder: true,
+      verified: false
+    },
     options: [{ title: "Size", values: [product.weight] }],
     variants: [{ title: product.weight, sku: product.sku, manage_inventory: true, options: { Size: product.weight }, prices: Object.entries(product.prices).map(([currency_code, amount]) => ({ currency_code, amount })) }]
   }));

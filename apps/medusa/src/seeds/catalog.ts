@@ -1,3 +1,20 @@
+interface SampleCatalogProduct {
+  title: string;
+  handle: string;
+  collection: string;
+  description: string;
+  subtitle?: string;
+  region: string;
+  sku: string;
+  weight: string;
+  prices: { bdt: number; gbp: number; usd: number };
+  markets: string[];
+  thumbnail?: string;
+  badges?: string[];
+  giftType?: "set" | "regional";
+  bestSeller?: boolean;
+}
+
 export const sampleCollections = [
   { title: "Originals", handle: "originals" },
   { title: "Reserve", handle: "reserve" },
@@ -7,13 +24,244 @@ export const sampleCollections = [
   { title: "Gifts", handle: "gifts" }
 ];
 
-export const sampleCatalog = [
-  { title: "Mezban Masala", handle: "mezban-masala", collection: "originals", description: "Sample product awaiting final formulation and editorial verification.", region: "Chattogram", sku: "SAMPLE-MEZ-80", weight: "80 g", prices: { bdt: 320, gbp: 9, usd: 11 }, markets: ["bd", "gb", "us"] },
-  { title: "Cox’s Bazar Fish Masala", handle: "coxs-bazar-fish-masala", collection: "originals", description: "Sample product awaiting final formulation and editorial verification.", region: "Cox’s Bazar", sku: "SAMPLE-FSH-80", weight: "80 g", prices: { bdt: 300, gbp: 9, usd: 11 }, markets: ["bd", "gb", "us"] },
-  { title: "Shorisha Ilish", handle: "shorisha-ilish", collection: "originals", description: "Sample product awaiting final formulation and editorial verification.", region: "Bangladesh", sku: "SAMPLE-ILI-80", weight: "80 g", prices: { bdt: 290, gbp: 8, usd: 10 }, markets: ["bd", "gb", "us"] },
-  { title: "Hathazari Red Chilli", handle: "hathazari-red-chili", collection: "reserve", description: "Draft Reserve product. Provenance is not published until verified.", region: "Hathazari", sku: "SAMPLE-HTZ-60", weight: "60 g", prices: { bdt: 420, gbp: 12, usd: 15 }, markets: ["bd", "gb"] },
-  { title: "Hill Tracts Turmeric", handle: "hill-tracts-turmeric", collection: "reserve", description: "Draft Reserve product. Provenance is not published until verified.", region: "Chittagong Hill Tracts", sku: "SAMPLE-TUR-70", weight: "70 g", prices: { bdt: 390, gbp: 11, usd: 14 }, markets: ["bd", "us"] },
-  { title: "Ginger Paste", handle: "ginger-paste", collection: "pantry", description: "Sample domestic-only chilled pantry product.", region: "Bangladesh", sku: "SAMPLE-GIN-200", weight: "200 g", prices: { bdt: 180, gbp: 6, usd: 8 }, markets: ["bd"] },
-  { title: "Tea Masala", handle: "tea-masala", collection: "tea-wellness", description: "Sample tea blend without medical or therapeutic claims.", region: "Bangladesh", sku: "SAMPLE-TEA-70", weight: "70 g", prices: { bdt: 260, gbp: 8, usd: 10 }, markets: ["bd", "gb", "us"] },
-  { title: "Taste of Bangladesh Gift", handle: "taste-of-bangladesh-gift", collection: "gifts", description: "Sample gift set with recipient options at checkout.", region: "Bangladesh", sku: "SAMPLE-GFT-04", weight: "Four-piece set", prices: { bdt: 1450, gbp: 34, usd: 42 }, markets: ["bd", "gb", "us"] }
+export const sampleCatalog: SampleCatalogProduct[] = [
+  {
+    title: "Mezban Masala",
+    handle: "mezban-masala",
+    collection: "originals",
+    description: "Sample product awaiting final formulation and editorial verification.",
+    region: "Chattogram",
+    sku: "SAMPLE-MEZ-80",
+    weight: "80 g",
+    prices: { bdt: 320, gbp: 9, usd: 11 },
+    markets: ["bd", "gb", "us"]
+  },
+  {
+    title: "Cox’s Bazar Fish Masala",
+    handle: "coxs-bazar-fish-masala",
+    collection: "originals",
+    description: "Sample product awaiting final formulation and editorial verification.",
+    region: "Cox’s Bazar",
+    sku: "SAMPLE-FSH-80",
+    weight: "80 g",
+    prices: { bdt: 300, gbp: 9, usd: 11 },
+    markets: ["bd", "gb", "us"]
+  },
+  {
+    title: "Shorisha Ilish",
+    handle: "shorisha-ilish",
+    collection: "originals",
+    description: "Sample product awaiting final formulation and editorial verification.",
+    region: "Bangladesh",
+    sku: "SAMPLE-ILI-80",
+    weight: "80 g",
+    prices: { bdt: 290, gbp: 8, usd: 10 },
+    markets: ["bd", "gb", "us"]
+  },
+  {
+    title: "Hathazari Red Chilli",
+    handle: "hathazari-red-chili",
+    collection: "reserve",
+    description: "Draft Reserve product. Provenance is not published until verified.",
+    region: "Hathazari",
+    sku: "SAMPLE-HTZ-60",
+    weight: "60 g",
+    prices: { bdt: 420, gbp: 12, usd: 15 },
+    markets: ["bd", "gb"]
+  },
+  {
+    title: "Hill Tracts Turmeric",
+    handle: "hill-tracts-turmeric",
+    collection: "reserve",
+    description: "Draft Reserve product. Provenance is not published until verified.",
+    region: "Chittagong Hill Tracts",
+    sku: "SAMPLE-TUR-70",
+    weight: "70 g",
+    prices: { bdt: 390, gbp: 11, usd: 14 },
+    markets: ["bd", "us"]
+  },
+  {
+    title: "Ginger Paste",
+    handle: "ginger-paste",
+    collection: "pantry",
+    description: "Sample domestic-only chilled pantry product.",
+    region: "Bangladesh",
+    sku: "SAMPLE-GIN-200",
+    weight: "200 g",
+    prices: { bdt: 180, gbp: 6, usd: 8 },
+    markets: ["bd"]
+  },
+  {
+    title: "Tea Masala",
+    handle: "tea-masala",
+    collection: "tea-wellness",
+    description: "Sample tea blend without medical or therapeutic claims.",
+    region: "Bangladesh",
+    sku: "SAMPLE-TEA-70",
+    weight: "70 g",
+    prices: { bdt: 260, gbp: 8, usd: 10 },
+    markets: ["bd", "gb", "us"]
+  },
+  {
+    title: "Taste of Bangladesh Gift",
+    handle: "taste-of-bangladesh-gift",
+    collection: "gifts",
+    subtitle: "Six Bangla Blend favourites in our signature keepsake box",
+    description:
+      "A generous introduction to the Bangla Blend pantry, packed with a personal note and prices kept out of sight.",
+    region: "Bangladesh",
+    sku: "SAMPLE-GFT-06",
+    weight: "Six-piece box",
+    prices: { bdt: 2450, gbp: 56, usd: 72 },
+    markets: ["bd", "gb", "us"],
+    thumbnail: "/images/gifts-hero.png",
+    badges: ["Bestseller", "Gift-ready"],
+    giftType: "set",
+    bestSeller: true
+  },
+  {
+    title: "Everyday Masala Trio",
+    handle: "everyday-masala-trio",
+    collection: "gifts",
+    subtitle: "Three workhorse blends for curries, grills and the everyday table",
+    description:
+      "Mezban Masala, Fish Masala and Shorisha Ilish gathered into an easy-to-give starter set.",
+    region: "Bangladesh",
+    sku: "SAMPLE-GFT-TRIO",
+    weight: "Three-piece set",
+    prices: { bdt: 920, gbp: 22, usd: 28 },
+    markets: ["bd", "gb", "us"],
+    thumbnail: "/images/products/mezban-masala.png",
+    badges: ["Bestseller", "Save ৳120"],
+    giftType: "set",
+    bestSeller: true
+  },
+  {
+    title: "Chai Adda Gift Set",
+    handle: "chai-adda-gift-set",
+    collection: "gifts",
+    subtitle: "Tea Masala, a brass spoon and two cups' worth of slow afternoons",
+    description:
+      "A warm, compact present for hosts, colleagues and anyone who believes the best conversations begin over cha.",
+    region: "Sylhet",
+    sku: "SAMPLE-GFT-CHAI",
+    weight: "Chai set",
+    prices: { bdt: 780, gbp: 19, usd: 24 },
+    markets: ["bd", "gb", "us"],
+    thumbnail: "/images/products/tea-masala.png",
+    badges: ["New", "Under ৳1,000"],
+    giftType: "set"
+  },
+  {
+    title: "Coastal Table Duo",
+    handle: "coastal-table-duo",
+    collection: "gifts",
+    subtitle: "Mustard-led and citrus-bright blends for fish and vegetables",
+    description:
+      "A regional pairing of Shorisha Ilish and Cox's Bazar Fish Masala for cooks drawn to Bangladesh's coast.",
+    region: "Coastal Bangladesh",
+    sku: "SAMPLE-GFT-COAST",
+    weight: "Two-piece set",
+    prices: { bdt: 690, gbp: 16, usd: 21 },
+    markets: ["bd", "gb", "us"],
+    thumbnail: "/images/products/shorisha-ilish.png",
+    badges: ["Regional gift", "Under ৳1,000"],
+    giftType: "regional"
+  },
+  {
+    title: "Bangla Pantry Refresh",
+    handle: "bangla-pantry-refresh",
+    collection: "gifts",
+    subtitle: "Six essential blends for a brighter, better-stocked spice shelf",
+    description:
+      "Our complete everyday masala edit, boxed for housewarmings, newlyweds and enthusiastic home cooks.",
+    region: "Bangladesh",
+    sku: "SAMPLE-GFT-PANTRY",
+    weight: "Six-piece set",
+    prices: { bdt: 2250, gbp: 51, usd: 66 },
+    markets: ["bd", "gb", "us"],
+    thumbnail: "/images/gifts-hero.png",
+    badges: ["Six-piece set", "Save ৳250"],
+    giftType: "set"
+  },
+  {
+    title: "Golden Pantry Trio",
+    handle: "golden-pantry-trio",
+    collection: "gifts",
+    subtitle: "Turmeric, ginger and chilli for everyday depth and warmth",
+    description:
+      "A vividly coloured trio of useful pantry staples, arranged in a reusable Bangla Blend carton.",
+    region: "Chittagong Hill Tracts",
+    sku: "SAMPLE-GFT-GOLD",
+    weight: "Three-piece set",
+    prices: { bdt: 1080, gbp: 25, usd: 32 },
+    markets: ["bd", "gb", "us"],
+    thumbnail: "/images/products/hill-tracts-turmeric.png",
+    badges: ["Regional gift", "Gift-ready"],
+    giftType: "regional"
+  },
+  {
+    title: "Chattogram Feast Box",
+    handle: "chattogram-feast-box",
+    collection: "gifts",
+    subtitle: "Bold blends built for mezban, fish curries and celebratory cooking",
+    description:
+      "A flavour-forward regional box for the cook who likes depth, chilli warmth and a table full of people.",
+    region: "Chattogram",
+    sku: "SAMPLE-GFT-CTG",
+    weight: "Four-piece set",
+    prices: { bdt: 1780, gbp: 41, usd: 52 },
+    markets: ["bd", "gb", "us"],
+    thumbnail: "/images/products/coxs-bazar-fish-masala.png",
+    badges: ["Regional gift", "Four-piece set"],
+    giftType: "regional"
+  },
+  {
+    title: "Host's Spice Sampler",
+    handle: "hosts-spice-sampler",
+    collection: "gifts",
+    subtitle: "Five small-batch masala sachets for curious cooks",
+    description:
+      "A compact thank-you gift with just enough of each blend to cook, compare and find a new favourite.",
+    region: "Bangladesh",
+    sku: "SAMPLE-GFT-SAMPLE",
+    weight: "Five-sachet set",
+    prices: { bdt: 550, gbp: 14, usd: 18 },
+    markets: ["bd", "gb", "us"],
+    thumbnail: "/images/gifts-hero.png",
+    badges: ["Under ৳1,000", "Easy to send"],
+    giftType: "set"
+  },
+  {
+    title: "Masala-Grind Starter Set",
+    handle: "masala-grind-starter-set",
+    collection: "gifts",
+    subtitle: "Whole spices, three signature blends and a small brass spoon",
+    description:
+      "A tactile kitchen gift for cooks learning how to toast, bloom and layer spices with confidence.",
+    region: "Bangladesh",
+    sku: "SAMPLE-GFT-START",
+    weight: "Starter set",
+    prices: { bdt: 1380, gbp: 32, usd: 41 },
+    markets: ["bd", "gb", "us"],
+    thumbnail: "/images/gifts-hero.png",
+    badges: ["New", "Cook's gift"],
+    giftType: "set"
+  },
+  {
+    title: "Festival Table Collection",
+    handle: "festival-table-collection",
+    collection: "gifts",
+    subtitle: "Eight blends for feasts, family recipes and generous tables",
+    description:
+      "Our largest gift box, created for weddings, Eid visits, milestone celebrations and serious home cooks.",
+    region: "Bangladesh",
+    sku: "SAMPLE-GFT-FEST",
+    weight: "Eight-piece set",
+    prices: { bdt: 3250, gbp: 74, usd: 95 },
+    markets: ["bd", "gb", "us"],
+    thumbnail: "/images/gifts-hero.png",
+    badges: ["Premium gift", "Eight-piece set"],
+    giftType: "set"
+  }
 ];

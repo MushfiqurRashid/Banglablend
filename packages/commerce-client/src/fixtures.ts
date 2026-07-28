@@ -8,7 +8,7 @@ export const markets: Market[] = [
     currency: "BDT",
     enabled: true,
     domestic: true,
-    dutiesMessage: "Domestic delivery options are shown at checkout."
+    dutiesMessage: "Domestic delivery options are shown at checkout.",
   },
   {
     code: "gb",
@@ -17,7 +17,7 @@ export const markets: Market[] = [
     currency: "GBP",
     enabled: true,
     domestic: false,
-    dutiesMessage: "Import duties and taxes may be collected by local authorities."
+    dutiesMessage: "Import duties and taxes may be collected by local authorities.",
   },
   {
     code: "us",
@@ -26,7 +26,7 @@ export const markets: Market[] = [
     currency: "USD",
     enabled: true,
     domestic: false,
-    dutiesMessage: "Import duties and taxes may apply to your delivery."
+    dutiesMessage: "Import duties and taxes may apply to your delivery.",
   },
   {
     code: "ca",
@@ -35,7 +35,7 @@ export const markets: Market[] = [
     currency: "CAD",
     enabled: false,
     domestic: false,
-    dutiesMessage: "This market will open after delivery and customs approval."
+    dutiesMessage: "This market will open after delivery and customs approval.",
   },
   {
     code: "eu",
@@ -44,7 +44,7 @@ export const markets: Market[] = [
     currency: "EUR",
     enabled: false,
     domestic: false,
-    dutiesMessage: "This market will open after delivery and customs approval."
+    dutiesMessage: "This market will open after delivery and customs approval.",
   },
   {
     code: "au",
@@ -53,7 +53,7 @@ export const markets: Market[] = [
     currency: "AUD",
     enabled: false,
     domestic: false,
-    dutiesMessage: "This market will open after biosecurity and delivery approval."
+    dutiesMessage: "This market will open after biosecurity and delivery approval.",
   },
   {
     code: "me",
@@ -62,14 +62,14 @@ export const markets: Market[] = [
     currency: "AED",
     enabled: false,
     domestic: false,
-    dutiesMessage: "This market will open after delivery and customs approval."
-  }
+    dutiesMessage: "This market will open after delivery and customs approval.",
+  },
 ];
 
 const prices = (bdt: number, international: number) => ({
   bd: { amount: bdt, currencyCode: "BDT" as const },
   gb: { amount: Math.ceil(international * 0.78), currencyCode: "GBP" as const },
-  us: { amount: international, currencyCode: "USD" as const }
+  us: { amount: international, currencyCode: "USD" as const },
 });
 
 export const sampleProducts: Product[] = [
@@ -78,86 +78,136 @@ export const sampleProducts: Product[] = [
     handle: "mezban-masala",
     title: "Mezban Masala",
     subtitle: "A bold, slow-cooked Chattogram-inspired blend",
-    description: "Deep chilli warmth, roasted spice and a lingering savory finish for celebratory beef curries and hearty vegetable dishes.",
+    description:
+      "Deep chilli warmth, roasted spice and a lingering savory finish for celebratory beef curries and hearty vegetable dishes.",
     collection: "originals",
     region: "Chattogram",
     images: [],
     badges: ["Signature blend", "International selection"],
     variants: [
-      { id: "variant_sample_mezban_80", title: "80 g", sku: "SAMPLE-MEZ-80", price: prices(320, 9).bd, inventoryQuantity: 30 },
-      { id: "variant_sample_mezban_160", title: "160 g", sku: "SAMPLE-MEZ-160", price: prices(570, 15).bd, inventoryQuantity: 20 }
+      {
+        id: "variant_sample_mezban_80",
+        title: "80 g",
+        sku: "SAMPLE-MEZ-80",
+        price: prices(320, 9).bd,
+        inventoryQuantity: 30,
+      },
+      {
+        id: "variant_sample_mezban_160",
+        title: "160 g",
+        sku: "SAMPLE-MEZ-160",
+        price: prices(570, 15).bd,
+        inventoryQuantity: 20,
+      },
     ],
     eligibleMarkets: ["bd", "gb", "us"],
-    ingredients: "Chilli, coriander, cumin and warming spices. Final formulation pending verification.",
+    ingredients:
+      "Chilli, coriander, cumin and warming spices. Final formulation pending verification.",
     storage: "Store sealed in a cool, dry place.",
     shelfLife: "Draft product specification.",
     flavor: { heat: 4, aroma: 5, sweetness: 1, smokiness: 3, earthiness: 4, intensity: 5 },
     isPlaceholder: true,
-    verified: false
+    verified: false,
   },
   {
     id: "prod_sample_fish",
     handle: "coxs-bazar-fish-masala",
     title: "Cox’s Bazar Fish Masala",
     subtitle: "Bright spice for fish, prawns and vegetables",
-    description: "A citrus-bright, gently warming blend designed for quick weekday curries and coastal-inspired cooking.",
+    description:
+      "A citrus-bright, gently warming blend designed for quick weekday curries and coastal-inspired cooking.",
     collection: "originals",
     region: "Cox’s Bazar",
     images: [],
     badges: ["Signature blend"],
-    variants: [{ id: "variant_sample_fish_80", title: "80 g", sku: "SAMPLE-FSH-80", price: prices(300, 9).bd, inventoryQuantity: 24 }],
+    variants: [
+      {
+        id: "variant_sample_fish_80",
+        title: "80 g",
+        sku: "SAMPLE-FSH-80",
+        price: prices(300, 9).bd,
+        inventoryQuantity: 24,
+      },
+    ],
     eligibleMarkets: ["bd", "gb", "us"],
     flavor: { heat: 3, aroma: 4, sweetness: 1, smokiness: 1, earthiness: 2, intensity: 4 },
     isPlaceholder: true,
-    verified: false
+    verified: false,
   },
   {
     id: "prod_sample_ilish",
     handle: "shorisha-ilish",
     title: "Shorisha Ilish",
     subtitle: "Mustard-led and made for the Bengali table",
-    description: "A mustard-forward blend with chilli warmth and aromatic depth, created for fish and vegetable preparations.",
+    description:
+      "A mustard-forward blend with chilli warmth and aromatic depth, created for fish and vegetable preparations.",
     collection: "originals",
     region: "Bangladesh",
     images: [],
     badges: ["Everyday favorite"],
-    variants: [{ id: "variant_sample_ilish_80", title: "80 g", sku: "SAMPLE-ILI-80", price: prices(290, 9).bd, inventoryQuantity: 32 }],
+    variants: [
+      {
+        id: "variant_sample_ilish_80",
+        title: "80 g",
+        sku: "SAMPLE-ILI-80",
+        price: prices(290, 9).bd,
+        inventoryQuantity: 32,
+      },
+    ],
     eligibleMarkets: ["bd", "gb", "us"],
     flavor: { heat: 3, aroma: 4, sweetness: 1, smokiness: 1, earthiness: 3, intensity: 4 },
     isPlaceholder: true,
-    verified: false
+    verified: false,
   },
   {
     id: "prod_sample_chili",
     handle: "hathazari-red-chili",
     title: "Hathazari Red Chilli",
     subtitle: "A Reserve ingredient awaiting provenance verification",
-    description: "A limited-production red chilli draft with a clear, persistent heat and vivid aroma.",
+    description:
+      "A limited-production red chilli draft with a clear, persistent heat and vivid aroma.",
     collection: "reserve",
     region: "Hathazari",
     images: [],
     badges: ["Reserve", "Draft provenance"],
-    variants: [{ id: "variant_sample_chili_60", title: "60 g", sku: "SAMPLE-HTZ-60", price: prices(420, 12).bd, inventoryQuantity: 12 }],
+    variants: [
+      {
+        id: "variant_sample_chili_60",
+        title: "60 g",
+        sku: "SAMPLE-HTZ-60",
+        price: prices(420, 12).bd,
+        inventoryQuantity: 12,
+      },
+    ],
     eligibleMarkets: ["bd", "gb"],
     flavor: { heat: 5, aroma: 4, sweetness: 1, smokiness: 2, earthiness: 2, intensity: 5 },
     isPlaceholder: true,
-    verified: false
+    verified: false,
   },
   {
     id: "prod_sample_turmeric",
     handle: "hill-tracts-turmeric",
     title: "Hill Tracts Turmeric",
     subtitle: "Golden, earthy and aromatic",
-    description: "A Reserve turmeric product concept. Origin, harvest and analytical details remain unpublished until verified.",
+    description:
+      "A Reserve turmeric product concept. Origin, harvest and analytical details remain unpublished until verified.",
     collection: "reserve",
     region: "Chittagong Hill Tracts",
     images: [],
     badges: ["Reserve", "Draft provenance"],
-    variants: [{ id: "variant_sample_turmeric_70", title: "70 g", sku: "SAMPLE-TUR-70", price: prices(390, 11).bd, inventoryQuantity: 14 }],
+    variants: [
+      {
+        id: "variant_sample_turmeric_70",
+        title: "70 g",
+        sku: "SAMPLE-TUR-70",
+        price: prices(390, 11).bd,
+        inventoryQuantity: 14,
+      },
+    ],
     eligibleMarkets: ["bd", "us"],
     flavor: { heat: 1, aroma: 4, sweetness: 2, smokiness: 1, earthiness: 5, intensity: 4 },
     isPlaceholder: true,
-    verified: false
+    verified: false,
   },
   {
     id: "prod_sample_ginger",
@@ -169,41 +219,325 @@ export const sampleProducts: Product[] = [
     region: "Bangladesh",
     images: [],
     badges: ["Bangladesh only", "Chilled"],
-    variants: [{ id: "variant_sample_ginger_200", title: "200 g", sku: "SAMPLE-GIN-200", price: prices(180, 6).bd, inventoryQuantity: 40 }],
+    variants: [
+      {
+        id: "variant_sample_ginger_200",
+        title: "200 g",
+        sku: "SAMPLE-GIN-200",
+        price: prices(180, 6).bd,
+        inventoryQuantity: 40,
+      },
+    ],
     eligibleMarkets: ["bd"],
     isPlaceholder: true,
-    verified: false
+    verified: false,
   },
   {
     id: "prod_sample_tea",
     handle: "tea-masala",
     title: "Tea Masala",
     subtitle: "Warm spice for everyday tea rituals",
-    description: "A fragrant tea blend with ginger-led warmth. No medical or therapeutic claims are made.",
+    description:
+      "A fragrant tea blend with ginger-led warmth. No medical or therapeutic claims are made.",
     collection: "tea-wellness",
     region: "Bangladesh",
     images: [],
     badges: ["Tea & Wellness"],
-    variants: [{ id: "variant_sample_tea_70", title: "70 g", sku: "SAMPLE-TEA-70", price: prices(260, 8).bd, inventoryQuantity: 20 }],
+    variants: [
+      {
+        id: "variant_sample_tea_70",
+        title: "70 g",
+        sku: "SAMPLE-TEA-70",
+        price: prices(260, 8).bd,
+        inventoryQuantity: 20,
+      },
+    ],
     eligibleMarkets: ["bd", "gb", "us"],
     isPlaceholder: true,
-    verified: false
+    verified: false,
   },
   {
     id: "prod_sample_gift",
     handle: "taste-of-bangladesh-gift",
     title: "Taste of Bangladesh Gift",
-    subtitle: "A considered introduction to the collection",
-    description: "Four draft spice products in gift-ready packaging with a personal note and optional hidden prices.",
+    subtitle: "Six Bangla Blend favourites in our signature keepsake box",
+    description:
+      "A generous introduction to the Bangla Blend pantry, packed with a personal note and prices kept out of sight.",
     collection: "gifts",
     region: "Bangladesh",
+    thumbnail: "/images/gifts-hero.png",
+    thumbnailAlt: "An open Bangla Blend gift box filled with spice tins and masala pouches",
     images: [],
-    badges: ["Gift-ready", "International selection"],
-    variants: [{ id: "variant_sample_gift_4", title: "Four-piece set", sku: "SAMPLE-GFT-04", price: prices(1450, 42).bd, inventoryQuantity: 16 }],
+    badges: ["Bestseller", "Gift-ready"],
+    variants: [
+      {
+        id: "variant_sample_gift_6",
+        title: "Six-piece box",
+        sku: "SAMPLE-GFT-06",
+        price: prices(2450, 72).bd,
+        inventoryQuantity: 16,
+      },
+    ],
     eligibleMarkets: ["bd", "gb", "us"],
+    bestSeller: true,
+    giftType: "set",
+    createdAt: "2026-07-25T00:00:00.000Z",
     isPlaceholder: true,
-    verified: false
-  }
+    verified: false,
+  },
+  {
+    id: "prod_sample_gift_trio",
+    handle: "everyday-masala-trio",
+    title: "Everyday Masala Trio",
+    subtitle: "Three workhorse blends for curries, grills and the everyday table",
+    description:
+      "Mezban Masala, Fish Masala and Shorisha Ilish gathered into an easy-to-give starter set.",
+    collection: "gifts",
+    region: "Bangladesh",
+    thumbnail: "/images/products/mezban-masala.png",
+    thumbnailAlt: "Bangla Blend Mezban Masala from the Everyday Masala Trio",
+    images: [],
+    badges: ["Bestseller", "Save ৳120"],
+    variants: [
+      {
+        id: "variant_sample_gift_trio",
+        title: "Three-piece set",
+        sku: "SAMPLE-GFT-TRIO",
+        price: prices(920, 28).bd,
+        inventoryQuantity: 28,
+      },
+    ],
+    eligibleMarkets: ["bd", "gb", "us"],
+    bestSeller: true,
+    giftType: "set",
+    createdAt: "2026-07-21T00:00:00.000Z",
+    isPlaceholder: true,
+    verified: false,
+  },
+  {
+    id: "prod_sample_gift_chai",
+    handle: "chai-adda-gift-set",
+    title: "Chai Adda Gift Set",
+    subtitle: "Tea Masala, a brass spoon and two cups' worth of slow afternoons",
+    description:
+      "A warm, compact present for hosts, colleagues and anyone who believes the best conversations begin over cha.",
+    collection: "gifts",
+    region: "Sylhet",
+    thumbnail: "/images/products/tea-masala.png",
+    thumbnailAlt: "Bangla Blend Tea Masala from the Chai Adda Gift Set",
+    images: [],
+    badges: ["New", "Under ৳1,000"],
+    variants: [
+      {
+        id: "variant_sample_gift_chai",
+        title: "Chai set",
+        sku: "SAMPLE-GFT-CHAI",
+        price: prices(780, 24).bd,
+        inventoryQuantity: 22,
+      },
+    ],
+    eligibleMarkets: ["bd", "gb", "us"],
+    giftType: "set",
+    createdAt: "2026-07-28T00:00:00.000Z",
+    isPlaceholder: true,
+    verified: false,
+  },
+  {
+    id: "prod_sample_gift_coastal",
+    handle: "coastal-table-duo",
+    title: "Coastal Table Duo",
+    subtitle: "Mustard-led and citrus-bright blends for fish and vegetables",
+    description:
+      "A regional pairing of Shorisha Ilish and Cox's Bazar Fish Masala for cooks drawn to Bangladesh's coast.",
+    collection: "gifts",
+    region: "Coastal Bangladesh",
+    thumbnail: "/images/products/shorisha-ilish.png",
+    thumbnailAlt: "Bangla Blend Shorisha Ilish from the Coastal Table Duo",
+    images: [],
+    badges: ["Regional gift", "Under ৳1,000"],
+    variants: [
+      {
+        id: "variant_sample_gift_coastal",
+        title: "Two-piece set",
+        sku: "SAMPLE-GFT-COAST",
+        price: prices(690, 21).bd,
+        inventoryQuantity: 18,
+      },
+    ],
+    eligibleMarkets: ["bd", "gb", "us"],
+    giftType: "regional",
+    createdAt: "2026-07-19T00:00:00.000Z",
+    isPlaceholder: true,
+    verified: false,
+  },
+  {
+    id: "prod_sample_gift_pantry",
+    handle: "bangla-pantry-refresh",
+    title: "Bangla Pantry Refresh",
+    subtitle: "Six essential blends for a brighter, better-stocked spice shelf",
+    description:
+      "Our complete everyday masala edit, boxed for housewarmings, newlyweds and enthusiastic home cooks.",
+    collection: "gifts",
+    region: "Bangladesh",
+    thumbnail: "/images/gifts-hero.png",
+    thumbnailAlt: "Six spice tins in a Bangla Blend gift box",
+    images: [],
+    badges: ["Six-piece set", "Save ৳250"],
+    variants: [
+      {
+        id: "variant_sample_gift_pantry",
+        title: "Six-piece set",
+        sku: "SAMPLE-GFT-PANTRY",
+        price: prices(2250, 66).bd,
+        inventoryQuantity: 14,
+      },
+    ],
+    eligibleMarkets: ["bd", "gb", "us"],
+    giftType: "set",
+    createdAt: "2026-07-18T00:00:00.000Z",
+    isPlaceholder: true,
+    verified: false,
+  },
+  {
+    id: "prod_sample_gift_golden",
+    handle: "golden-pantry-trio",
+    title: "Golden Pantry Trio",
+    subtitle: "Turmeric, ginger and chilli for everyday depth and warmth",
+    description:
+      "A vividly coloured trio of useful pantry staples, arranged in a reusable Bangla Blend carton.",
+    collection: "gifts",
+    region: "Chittagong Hill Tracts",
+    thumbnail: "/images/products/hill-tracts-turmeric.png",
+    thumbnailAlt: "Bangla Blend Hill Tracts Turmeric from the Golden Pantry Trio",
+    images: [],
+    badges: ["Regional gift", "Gift-ready"],
+    variants: [
+      {
+        id: "variant_sample_gift_golden",
+        title: "Three-piece set",
+        sku: "SAMPLE-GFT-GOLD",
+        price: prices(1080, 32).bd,
+        inventoryQuantity: 17,
+      },
+    ],
+    eligibleMarkets: ["bd", "gb", "us"],
+    giftType: "regional",
+    createdAt: "2026-07-22T00:00:00.000Z",
+    isPlaceholder: true,
+    verified: false,
+  },
+  {
+    id: "prod_sample_gift_chattogram",
+    handle: "chattogram-feast-box",
+    title: "Chattogram Feast Box",
+    subtitle: "Bold blends built for mezban, fish curries and celebratory cooking",
+    description:
+      "A flavour-forward regional box for the cook who likes depth, chilli warmth and a table full of people.",
+    collection: "gifts",
+    region: "Chattogram",
+    thumbnail: "/images/products/coxs-bazar-fish-masala.png",
+    thumbnailAlt: "Bangla Blend Cox's Bazar Fish Masala from the Chattogram Feast Box",
+    images: [],
+    badges: ["Regional gift", "Four-piece set"],
+    variants: [
+      {
+        id: "variant_sample_gift_chattogram",
+        title: "Four-piece set",
+        sku: "SAMPLE-GFT-CTG",
+        price: prices(1780, 52).bd,
+        inventoryQuantity: 11,
+      },
+    ],
+    eligibleMarkets: ["bd", "gb", "us"],
+    giftType: "regional",
+    createdAt: "2026-07-20T00:00:00.000Z",
+    isPlaceholder: true,
+    verified: false,
+  },
+  {
+    id: "prod_sample_gift_sampler",
+    handle: "hosts-spice-sampler",
+    title: "Host's Spice Sampler",
+    subtitle: "Five small-batch masala sachets for curious cooks",
+    description:
+      "A compact thank-you gift with just enough of each blend to cook, compare and find a new favourite.",
+    collection: "gifts",
+    region: "Bangladesh",
+    thumbnail: "/images/gifts-hero.png",
+    thumbnailAlt: "Small masala pouches arranged in a Bangla Blend gift box",
+    images: [],
+    badges: ["Under ৳1,000", "Easy to send"],
+    variants: [
+      {
+        id: "variant_sample_gift_sampler",
+        title: "Five-sachet set",
+        sku: "SAMPLE-GFT-SAMPLE",
+        price: prices(550, 18).bd,
+        inventoryQuantity: 35,
+      },
+    ],
+    eligibleMarkets: ["bd", "gb", "us"],
+    giftType: "set",
+    createdAt: "2026-07-26T00:00:00.000Z",
+    isPlaceholder: true,
+    verified: false,
+  },
+  {
+    id: "prod_sample_gift_starter",
+    handle: "masala-grind-starter-set",
+    title: "Masala-Grind Starter Set",
+    subtitle: "Whole spices, three signature blends and a small brass spoon",
+    description:
+      "A tactile kitchen gift for cooks learning how to toast, bloom and layer spices with confidence.",
+    collection: "gifts",
+    region: "Bangladesh",
+    thumbnail: "/images/gifts-hero.png",
+    thumbnailAlt: "Masala tins, spice pouches and a brass spoon in a gift box",
+    images: [],
+    badges: ["New", "Cook's gift"],
+    variants: [
+      {
+        id: "variant_sample_gift_starter",
+        title: "Starter set",
+        sku: "SAMPLE-GFT-START",
+        price: prices(1380, 41).bd,
+        inventoryQuantity: 19,
+      },
+    ],
+    eligibleMarkets: ["bd", "gb", "us"],
+    giftType: "set",
+    createdAt: "2026-07-29T00:00:00.000Z",
+    isPlaceholder: true,
+    verified: false,
+  },
+  {
+    id: "prod_sample_gift_festival",
+    handle: "festival-table-collection",
+    title: "Festival Table Collection",
+    subtitle: "Eight blends for feasts, family recipes and generous tables",
+    description:
+      "Our largest gift box, created for weddings, Eid visits, milestone celebrations and serious home cooks.",
+    collection: "gifts",
+    region: "Bangladesh",
+    thumbnail: "/images/gifts-hero.png",
+    thumbnailAlt: "A large Bangla Blend festival gift box with spice tins and pouches",
+    images: [],
+    badges: ["Premium gift", "Eight-piece set"],
+    variants: [
+      {
+        id: "variant_sample_gift_festival",
+        title: "Eight-piece set",
+        sku: "SAMPLE-GFT-FEST",
+        price: prices(3250, 95).bd,
+        inventoryQuantity: 8,
+      },
+    ],
+    eligibleMarkets: ["bd", "gb", "us"],
+    giftType: "set",
+    createdAt: "2026-07-17T00:00:00.000Z",
+    isPlaceholder: true,
+    verified: false,
+  },
 ];
 
 export function withMarketPrices(products: Product[], marketCode: string): Product[] {
@@ -215,10 +549,10 @@ export function withMarketPrices(products: Product[], marketCode: string): Produ
       ...variant,
       price: {
         amount: Math.ceil(
-          market.currency === "GBP" ? variant.price.amount / 38 : variant.price.amount / 32
+          market.currency === "GBP" ? variant.price.amount / 38 : variant.price.amount / 32,
         ),
-        currencyCode: market.currency
-      }
-    }))
+        currencyCode: market.currency,
+      },
+    })),
   }));
 }

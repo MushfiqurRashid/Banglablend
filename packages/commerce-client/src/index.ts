@@ -172,12 +172,16 @@ export class CommerceUnavailableError extends Error {
   }
 }
 
+function fallbackProducts(config: CommerceConfig, query: string) {
+  return withMarketPrices(sampleProducts, config.market).filter((product) =>
+    `${product.title} ${product.description}`.toLowerCase().includes(query.toLowerCase()),
+  );
+}
+
 export async function listProducts(config: CommerceConfig, query = ""): Promise<Product[]> {
   if (!config.backendUrl || !config.publishableKey) {
     if (config.allowDevelopmentFallback) {
-      return withMarketPrices(sampleProducts, config.market).filter((product) =>
-        `${product.title} ${product.description}`.toLowerCase().includes(query.toLowerCase()),
-      );
+      return fallbackProducts(config, query);
     }
     throw new CommerceUnavailableError();
   }
@@ -187,20 +191,31 @@ export async function listProducts(config: CommerceConfig, query = ""): Promise<
   url.searchParams.set("fields", "+variants.calculated_price,+metadata,+tags");
   if (config.regionId) url.searchParams.set("region_id", config.regionId);
   if (query) url.searchParams.set("q", query);
-  const response = await fetch(url, {
-    headers: { "x-publishable-api-key": config.publishableKey },
-    cache: "no-store",
-  });
-  if (!response.ok) throw new CommerceUnavailableError(`Medusa returned ${response.status}.`);
-  const payload = (await response.json()) as MedusaProductResponse;
-  return payload.products
-    .map(adaptProduct)
-    .filter((product) => product.eligibleMarkets.includes(config.market))
-    .filter(
-      (product) =>
-        (product.verified === true && product.isPlaceholder !== true) ||
-        (config.allowDevelopmentFallback === true && product.isPlaceholder === true),
+
+  try {
+    const response = await fetch(url, {
+      headers: { "x-publishable-api-key": config.publishableKey },
+      cache: "no-store",
+    });
+    if (!response.ok) throw new CommerceUnavailableError(`Medusa returned ${response.status}.`);
+    const payload = (await response.json()) as MedusaProductResponse;
+    return payload.products
+      .map(adaptProduct)
+      .filter((product) => product.eligibleMarkets.includes(config.market))
+      .filter(
+        (product) =>
+          (product.verified === true && product.isPlaceholder !== true) ||
+          (config.allowDevelopmentFallback === true && product.isPlaceholder === true),
+      );
+  } catch (error) {
+    if (config.allowDevelopmentFallback) return fallbackProducts(config, query);
+    if (error instanceof CommerceUnavailableError) throw error;
+    throw new CommerceUnavailableError(
+      error instanceof Error
+        ? `The commerce service could not be reached: ${error.message}`
+        : undefined,
     );
+  }
 }
 
 export async function getProduct(
