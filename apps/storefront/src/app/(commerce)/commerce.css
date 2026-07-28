@@ -127,6 +127,37 @@
   text-transform: uppercase;
 }
 
+.shop-hero-media {
+  position: relative;
+  min-height: clamp(16rem, 29vw, 24rem);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  background: #3a2a1f;
+}
+
+.shop-hero-media img {
+  object-fit: cover;
+  transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.shop-hero-media:hover img {
+  transform: scale(1.02);
+}
+
+.shop-hero-media > span {
+  position: absolute;
+  right: 0.8rem;
+  bottom: 0.8rem;
+  padding: 0.55rem 0.72rem;
+  color: var(--color-white);
+  background: rgb(38 56 23 / 0.9);
+  font-size: 0.58rem;
+  font-weight: 760;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  backdrop-filter: blur(7px);
+}
+
 .shop-category-band {
   border-bottom: 1px solid var(--color-border);
   background: var(--color-parchment);
@@ -1713,7 +1744,8 @@
   .shop-hero-copy h1 {
     font-size: 4rem;
   }
-  .shop-hero-placeholder {
+  .shop-hero-placeholder,
+  .shop-hero-media {
     min-height: 13rem;
   }
   .shop-category-shortcuts {

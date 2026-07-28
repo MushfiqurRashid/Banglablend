@@ -51,8 +51,8 @@ const storyCards = [
   {
     id: "our-impact",
     title: "Our Impact",
-    image: "/images/our-story-impact.png",
-    imageAlt: "Illustrative editorial scene of a woman harvesting leafy crops in a field",
+    image: "/images/campaign/chilli-sourcing.jpg",
+    imageAlt: "A Bangladeshi grower gathering sun-dried red chillies",
     copy: "We are building toward thoughtful partnerships, stronger support for traditional food heritage and meaningful opportunities in rural communities.",
     cta: "See our impact",
     href: "/our-story/our-impact",

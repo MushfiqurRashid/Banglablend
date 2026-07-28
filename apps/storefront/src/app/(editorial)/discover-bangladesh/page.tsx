@@ -70,11 +70,11 @@ const topics: Topic[] = [
     title: "Farmer & Sourcing Stories",
     description: "Meet the people behind our ingredients and learn how we source with care.",
     href: "/discover-bangladesh/farmer-sourcing-stories",
-    image: "/images/our-story-impact.png",
-    imageAlt: "A farmer harvesting leafy greens in Bangladesh",
+    image: "/images/campaign/chilli-sourcing.jpg",
+    imageAlt: "A Bangladeshi grower gathering sun-dried red chillies",
     action: "Explore stories",
     icon: Sprout,
-    imagePosition: "center 46%",
+    imagePosition: "center 54%",
   },
   {
     title: "Cooking Guides",
@@ -103,11 +103,11 @@ const topics: Topic[] = [
     description:
       "Go behind the scenes of Bangla Blend—our process, people and passion for regional food.",
     href: "/discover-bangladesh/behind-bangla-blend",
-    image: "/images/home-hero-hathajari.jpg",
-    imageAlt: "Bangla Blend Hathazari chilli with spices and a Bengali meal",
+    image: "/images/campaign/pantry-lineup.jpg",
+    imageAlt: "A full lineup of Bangla Blend small-batch masala jars",
     action: "Explore stories",
     icon: Heart,
-    imagePosition: "72% center",
+    imagePosition: "center",
   },
 ];
 

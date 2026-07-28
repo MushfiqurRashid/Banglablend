@@ -25,26 +25,26 @@ const categories = [
   {
     title: "Originals",
     href: "/shop/originals",
-    image: "/images/hero-spice-still-life.png",
-    position: "30% center",
+    image: "/images/campaign/pantry-lineup.jpg",
+    position: "center",
   },
   {
     title: "Build a Box",
     href: "/shop/build-a-box",
-    image: "/images/hero-spice-still-life.png",
-    position: "74% center",
+    image: "/images/gifts/signature-keepsake-box.jpg",
+    position: "center 64%",
   },
   {
     title: "New Arrivals",
     href: "/shop/new-arrivals",
-    image: "/images/shorisha-ilish-recipe.png",
-    position: "center",
+    image: "/images/products/shahi-garam-masala-lifestyle.jpg",
+    position: "center 52%",
   },
   {
     title: "Best Sellers",
     href: "/shop/best-sellers",
-    image: "/images/bangladesh-river-landscape.png",
-    position: "center",
+    image: "/images/products/mezban-masala-lifestyle.jpg",
+    position: "center 56%",
   },
 ];
 

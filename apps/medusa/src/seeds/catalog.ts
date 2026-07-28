@@ -21,7 +21,7 @@ export const sampleCollections = [
   { title: "Pantry", handle: "pantry" },
   { title: "Tea & Wellness", handle: "tea-wellness" },
   { title: "Lifestyle Accessories", handle: "lifestyle-accessories" },
-  { title: "Gifts", handle: "gifts" }
+  { title: "Gifts", handle: "gifts" },
 ];
 
 export const sampleCatalog: SampleCatalogProduct[] = [
@@ -34,7 +34,7 @@ export const sampleCatalog: SampleCatalogProduct[] = [
     sku: "SAMPLE-MEZ-80",
     weight: "80 g",
     prices: { bdt: 320, gbp: 9, usd: 11 },
-    markets: ["bd", "gb", "us"]
+    markets: ["bd", "gb", "us"],
   },
   {
     title: "Cox’s Bazar Fish Masala",
@@ -45,7 +45,33 @@ export const sampleCatalog: SampleCatalogProduct[] = [
     sku: "SAMPLE-FSH-80",
     weight: "80 g",
     prices: { bdt: 300, gbp: 9, usd: 11 },
-    markets: ["bd", "gb", "us"]
+    markets: ["bd", "gb", "us"],
+  },
+  {
+    title: "Shahi Garam Masala",
+    handle: "shahi-garam-masala",
+    collection: "originals",
+    subtitle: "A fragrant finishing blend for rice, curries and slow-cooked dishes",
+    description: "Sample product awaiting final formulation and editorial verification.",
+    region: "Bangladesh",
+    sku: "SAMPLE-SHA-80",
+    weight: "80 g",
+    prices: { bdt: 340, gbp: 8, usd: 10 },
+    markets: ["bd", "gb", "us"],
+    badges: ["New", "Signature blend"],
+  },
+  {
+    title: "White Pepper Powder",
+    handle: "white-pepper-powder",
+    collection: "reserve",
+    subtitle: "Clean, gentle pepper heat for light sauces, soups and marinades",
+    description: "Sample product awaiting final origin and specification verification.",
+    region: "Origin pending verification",
+    sku: "SAMPLE-WPP-70",
+    weight: "70 g",
+    prices: { bdt: 450, gbp: 10, usd: 13 },
+    markets: ["bd", "gb", "us"],
+    badges: ["New", "Pantry essential"],
   },
   {
     title: "Shorisha Ilish",
@@ -56,7 +82,7 @@ export const sampleCatalog: SampleCatalogProduct[] = [
     sku: "SAMPLE-ILI-80",
     weight: "80 g",
     prices: { bdt: 290, gbp: 8, usd: 10 },
-    markets: ["bd", "gb", "us"]
+    markets: ["bd", "gb", "us"],
   },
   {
     title: "Hathazari Red Chilli",
@@ -67,7 +93,7 @@ export const sampleCatalog: SampleCatalogProduct[] = [
     sku: "SAMPLE-HTZ-60",
     weight: "60 g",
     prices: { bdt: 420, gbp: 12, usd: 15 },
-    markets: ["bd", "gb"]
+    markets: ["bd", "gb"],
   },
   {
     title: "Hill Tracts Turmeric",
@@ -78,7 +104,7 @@ export const sampleCatalog: SampleCatalogProduct[] = [
     sku: "SAMPLE-TUR-70",
     weight: "70 g",
     prices: { bdt: 390, gbp: 11, usd: 14 },
-    markets: ["bd", "us"]
+    markets: ["bd", "us"],
   },
   {
     title: "Ginger Paste",
@@ -89,7 +115,7 @@ export const sampleCatalog: SampleCatalogProduct[] = [
     sku: "SAMPLE-GIN-200",
     weight: "200 g",
     prices: { bdt: 180, gbp: 6, usd: 8 },
-    markets: ["bd"]
+    markets: ["bd"],
   },
   {
     title: "Tea Masala",
@@ -100,24 +126,24 @@ export const sampleCatalog: SampleCatalogProduct[] = [
     sku: "SAMPLE-TEA-70",
     weight: "70 g",
     prices: { bdt: 260, gbp: 8, usd: 10 },
-    markets: ["bd", "gb", "us"]
+    markets: ["bd", "gb", "us"],
   },
   {
     title: "Taste of Bangladesh Gift",
     handle: "taste-of-bangladesh-gift",
     collection: "gifts",
-    subtitle: "Six Bangla Blend favourites in our signature keepsake box",
+    subtitle: "Three Bangla Blend signatures in our keepsake box",
     description:
-      "A generous introduction to the Bangla Blend pantry, packed with a personal note and prices kept out of sight.",
+      "Cox's Bazar Fish Masala, Chatgaiya Mezban Masala and Shahi Garam Masala, packed with a wooden spoon and space for a personal note.",
     region: "Bangladesh",
-    sku: "SAMPLE-GFT-06",
-    weight: "Six-piece box",
+    sku: "SAMPLE-GFT-03",
+    weight: "Three-piece keepsake box",
     prices: { bdt: 2450, gbp: 56, usd: 72 },
     markets: ["bd", "gb", "us"],
-    thumbnail: "/images/gifts-hero.png",
+    thumbnail: "/images/gifts/signature-keepsake-box.jpg",
     badges: ["Bestseller", "Gift-ready"],
     giftType: "set",
-    bestSeller: true
+    bestSeller: true,
   },
   {
     title: "Everyday Masala Trio",
@@ -125,16 +151,16 @@ export const sampleCatalog: SampleCatalogProduct[] = [
     collection: "gifts",
     subtitle: "Three workhorse blends for curries, grills and the everyday table",
     description:
-      "Mezban Masala, Fish Masala and Shorisha Ilish gathered into an easy-to-give starter set.",
+      "Cox's Bazar Fish Masala, Chatgaiya Mezban Masala and Shahi Garam Masala gathered into an easy-to-give starter set.",
     region: "Bangladesh",
     sku: "SAMPLE-GFT-TRIO",
     weight: "Three-piece set",
     prices: { bdt: 920, gbp: 22, usd: 28 },
     markets: ["bd", "gb", "us"],
-    thumbnail: "/images/products/mezban-masala.png",
+    thumbnail: "/images/gifts/presentation-trio.jpg",
     badges: ["Bestseller", "Save ৳120"],
     giftType: "set",
-    bestSeller: true
+    bestSeller: true,
   },
   {
     title: "Chai Adda Gift Set",
@@ -150,7 +176,7 @@ export const sampleCatalog: SampleCatalogProduct[] = [
     markets: ["bd", "gb", "us"],
     thumbnail: "/images/products/tea-masala.png",
     badges: ["New", "Under ৳1,000"],
-    giftType: "set"
+    giftType: "set",
   },
   {
     title: "Coastal Table Duo",
@@ -166,7 +192,7 @@ export const sampleCatalog: SampleCatalogProduct[] = [
     markets: ["bd", "gb", "us"],
     thumbnail: "/images/products/shorisha-ilish.png",
     badges: ["Regional gift", "Under ৳1,000"],
-    giftType: "regional"
+    giftType: "regional",
   },
   {
     title: "Bangla Pantry Refresh",
@@ -182,7 +208,7 @@ export const sampleCatalog: SampleCatalogProduct[] = [
     markets: ["bd", "gb", "us"],
     thumbnail: "/images/gifts-hero.png",
     badges: ["Six-piece set", "Save ৳250"],
-    giftType: "set"
+    giftType: "set",
   },
   {
     title: "Golden Pantry Trio",
@@ -198,7 +224,7 @@ export const sampleCatalog: SampleCatalogProduct[] = [
     markets: ["bd", "gb", "us"],
     thumbnail: "/images/products/hill-tracts-turmeric.png",
     badges: ["Regional gift", "Gift-ready"],
-    giftType: "regional"
+    giftType: "regional",
   },
   {
     title: "Chattogram Feast Box",
@@ -214,7 +240,7 @@ export const sampleCatalog: SampleCatalogProduct[] = [
     markets: ["bd", "gb", "us"],
     thumbnail: "/images/products/coxs-bazar-fish-masala.png",
     badges: ["Regional gift", "Four-piece set"],
-    giftType: "regional"
+    giftType: "regional",
   },
   {
     title: "Host's Spice Sampler",
@@ -230,7 +256,7 @@ export const sampleCatalog: SampleCatalogProduct[] = [
     markets: ["bd", "gb", "us"],
     thumbnail: "/images/gifts-hero.png",
     badges: ["Under ৳1,000", "Easy to send"],
-    giftType: "set"
+    giftType: "set",
   },
   {
     title: "Masala-Grind Starter Set",
@@ -246,7 +272,7 @@ export const sampleCatalog: SampleCatalogProduct[] = [
     markets: ["bd", "gb", "us"],
     thumbnail: "/images/gifts-hero.png",
     badges: ["New", "Cook's gift"],
-    giftType: "set"
+    giftType: "set",
   },
   {
     title: "Festival Table Collection",
@@ -262,6 +288,6 @@ export const sampleCatalog: SampleCatalogProduct[] = [
     markets: ["bd", "gb", "us"],
     thumbnail: "/images/gifts-hero.png",
     badges: ["Premium gift", "Eight-piece set"],
-    giftType: "set"
-  }
+    giftType: "set",
+  },
 ];

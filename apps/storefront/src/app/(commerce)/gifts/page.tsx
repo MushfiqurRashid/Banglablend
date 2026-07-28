@@ -79,8 +79,8 @@ export default async function GiftsPage() {
 
             <div className="gift-hero-media">
               <Image
-                src="/images/gifts-hero.png"
-                alt="An open Bangla Blend gift box filled with spice tins, masala pouches and a brass spoon"
+                src="/images/gifts/signature-keepsake-box.jpg"
+                alt="An open black Bangla Blend keepsake box with three spice jars and a wooden spoon"
                 fill
                 priority
                 sizes="(max-width: 900px) 100vw, 58vw"

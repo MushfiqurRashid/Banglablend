@@ -5,14 +5,41 @@ export interface ProductMedia {
   alt: string;
 }
 
-const localProductImages: Partial<Record<string, string>> = {
-  "mezban-masala": "/images/products/mezban-masala.png",
-  "coxs-bazar-fish-masala": "/images/products/coxs-bazar-fish-masala.png",
-  "shorisha-ilish": "/images/products/shorisha-ilish.png",
-  "hathazari-red-chili": "/images/products/hathazari-red-chili.png",
-  "hill-tracts-turmeric": "/images/products/hill-tracts-turmeric.png",
-  "ginger-paste": "/images/products/ginger-paste.png",
-  "tea-masala": "/images/products/tea-masala.png",
+const localProductImages: Partial<Record<string, string[]>> = {
+  "mezban-masala": ["/images/products/mezban-masala-lifestyle.jpg"],
+  "coxs-bazar-fish-masala": [
+    "/images/products/coxs-bazar-fish-masala-lifestyle.jpg",
+    "/images/products/coxs-bazar-fish-masala-coastal.jpg",
+  ],
+  "shahi-garam-masala": [
+    "/images/products/shahi-garam-masala-lifestyle.jpg",
+    "/images/products/shahi-garam-masala-detail.jpg",
+  ],
+  "white-pepper-powder": [
+    "/images/products/white-pepper-powder.jpg",
+    "/images/products/pepper-pair.jpg",
+  ],
+  "shorisha-ilish": ["/images/products/shorisha-ilish.png"],
+  "hathazari-red-chili": ["/images/products/hathazari-red-chilli-lifestyle.jpg"],
+  "hill-tracts-turmeric": ["/images/products/hill-tracts-turmeric.png"],
+  "ginger-paste": ["/images/products/ginger-paste.png"],
+  "tea-masala": ["/images/products/tea-masala.png"],
+  "taste-of-bangladesh-gift": [
+    "/images/gifts/signature-keepsake-box.jpg",
+    "/images/gifts/presentation-trio.jpg",
+  ],
+  "everyday-masala-trio": [
+    "/images/gifts/presentation-trio.jpg",
+    "/images/campaign/shop-signature-lineup.jpg",
+  ],
+  "chattogram-feast-box": [
+    "/images/gifts/presentation-trio.jpg",
+    "/images/gifts/signature-keepsake-box.jpg",
+  ],
+  "masala-grind-starter-set": [
+    "/images/gifts/signature-keepsake-box.jpg",
+    "/images/gifts/presentation-trio.jpg",
+  ],
 };
 
 const collectionFallbacks: Record<Product["collection"], string> = {
@@ -25,13 +52,17 @@ const collectionFallbacks: Record<Product["collection"], string> = {
 };
 
 export function getProductMedia(product: Product): ProductMedia[] {
+  const local = (localProductImages[product.handle] ?? []).map((url, index) => ({
+    url,
+    alt: `${product.title} by Bangla Blend${index === 0 ? "" : `, view ${index + 1}`}`,
+  }));
   const supplied = [
     ...(product.thumbnail
       ? [{ url: product.thumbnail, alt: product.thumbnailAlt ?? product.title }]
       : []),
     ...product.images,
   ];
-  const unique = supplied.filter(
+  const unique = [...local, ...supplied].filter(
     (item, index, items) =>
       item.url && items.findIndex((candidate) => candidate.url === item.url) === index,
   );
@@ -45,7 +76,7 @@ export function getProductMedia(product: Product): ProductMedia[] {
 
   return [
     {
-      url: localProductImages[product.handle] ?? collectionFallbacks[product.collection],
+      url: collectionFallbacks[product.collection],
       alt: `${product.title} by Bangla Blend`,
     },
   ];
