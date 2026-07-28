@@ -1,0 +1,8 @@
+{
+  "searchableAttributes": ["title", "excerpt", "keywords"],
+  "filterableAttributes": ["source", "type", "language", "eligibleMarkets"],
+  "sortableAttributes": ["title"],
+  "displayedAttributes": ["id", "type", "title", "slug", "excerpt", "image", "language", "eligibleMarkets"],
+  "typoTolerance": { "enabled": true },
+  "pagination": { "maxTotalHits": 1000 }
+}

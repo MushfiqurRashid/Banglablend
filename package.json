@@ -1,0 +1,51 @@
+{
+  "name": "bangla-blend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.28.2",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "@types/react": "19.2.17",
+      "@types/react-dom": "19.2.3"
+    }
+  },
+  "scripts": {
+    "dev": "turbo dev --parallel",
+    "dev:storefront": "corepack pnpm --filter @bangla-blend/storefront dev",
+    "dev:medusa": "corepack pnpm --filter @bangla-blend/medusa dev",
+    "dev:studio": "corepack pnpm --filter @bangla-blend/studio dev",
+    "build": "turbo build",
+    "build:storefront": "corepack pnpm --filter @bangla-blend/storefront build",
+    "build:medusa": "corepack pnpm --filter @bangla-blend/medusa build",
+    "build:studio": "corepack pnpm --filter @bangla-blend/studio build",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "test": "corepack pnpm test:unit && turbo test",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "test:e2e": "node scripts/run-e2e.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check:production": "node scripts/verify-production-config.mjs",
+    "seed": "corepack pnpm --filter @bangla-blend/medusa seed",
+    "seed:superadmin": "corepack pnpm --filter @bangla-blend/medusa seed:superadmin",
+    "db:migrate": "corepack pnpm --filter @bangla-blend/medusa db:migrate",
+    "search:index": "corepack pnpm --filter @bangla-blend/medusa search:index"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@playwright/test": "^1.56.1",
+    "@types/node": "^24.10.1",
+    "eslint": "^9.39.1",
+    "prettier": "^3.7.4",
+    "prettier-plugin-tailwindcss": "^0.7.2",
+    "turbo": "^2.10.5",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.4",
+    "vitest": "^4.0.15"
+  }
+}
