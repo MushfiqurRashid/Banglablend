@@ -1,36 +1,38 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ChevronDown, ArrowUpRight } from "lucide-react";
 
 interface MegaMenuProps {
   label: string;
   href: string;
-  title: string;
-  description: string;
-  links: Array<{ label: string; href: string }>;
-  featureTitle: string;
-  featureHref: string;
+  links: Array<{ label: string; href: string; image: string }>;
 }
 
-export function MegaMenu({ label, href, title, description, links, featureTitle, featureHref }: MegaMenuProps) {
+export function MegaMenu({ label, href, links }: MegaMenuProps) {
   return (
     <div className="nav-item">
       <Link className="nav-trigger" href={href} aria-haspopup="true">
-        {label}<ChevronDown size={13} aria-hidden="true" />
+        {label}
+        <ChevronDown size={13} aria-hidden="true" />
       </Link>
       <div className="mega-menu">
-        <div className="shell mega-inner">
-          <div>
-            <p className="mega-title">{title}</p>
-            <p className="lead">{description}</p>
-            <Link className="text-link" href={href}>View all <ArrowUpRight size={14} /></Link>
-          </div>
+        <div className="mega-inner">
           <ul className="mega-links">
-            {links.map((item) => <li key={item.href}><Link href={item.href}>{item.label}</Link></li>)}
+            {links.map((item) => (
+              <li key={item.href}>
+                <Link href={item.href}>
+                  <span className="mega-link-media" aria-hidden="true">
+                    <Image src={item.image} alt="" fill sizes="52px" />
+                  </span>
+                  <span className="mega-link-label">{item.label}</span>
+                  <ArrowUpRight size={15} aria-hidden="true" />
+                </Link>
+              </li>
+            ))}
           </ul>
-          <Link className="mega-feature" href={featureHref}>
-            <span className="eyebrow" style={{ color: "inherit" }}>Featured</span>
-            <h3>{featureTitle}</h3>
-            <p>Follow flavor into a product, a recipe and the place that inspired it.</p>
+          <Link className="mega-view-all" href={href}>
+            View all {label}
+            <ArrowUpRight size={14} aria-hidden="true" />
           </Link>
         </div>
       </div>

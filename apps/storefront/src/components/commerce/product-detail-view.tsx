@@ -18,6 +18,7 @@ import { ProductPurchase } from "./product-purchase";
 import { ProductRecommendationCard } from "./product-recommendation-card";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { PageContainer } from "@/components/layout/page-container";
+import { WhyBanglaBlend } from "@/components/marketing/why-bangla-blend";
 import { siteConfig } from "@/config/site";
 import {
   formatCollection,
@@ -203,6 +204,8 @@ export function ProductDetailView({
           </aside>
         </section>
       </PageContainer>
+
+      <WhyBanglaBlend />
 
       <script
         type="application/ld+json"

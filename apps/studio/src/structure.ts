@@ -11,8 +11,8 @@ export const deskStructure: StructureResolver = (S) =>
     .title("Bangla Blend")
     .items([
       singleton(S, "Site settings", "siteSettings", "siteSettings"),
-      singleton(S, "Homepage — English", "homepage", "homepage-en"),
-      singleton(S, "Homepage — Bangla", "homepage", "homepage-bn"),
+      singleton(S, "Homepage: English", "homepage", "homepage-en"),
+      singleton(S, "Homepage: Bangla", "homepage", "homepage-bn"),
       S.divider(),
       group(S, "Commerce storytelling", ["productEditorial", "giftEditorial", "sourcingStory"]),
       group(S, "Places and provenance", ["division", "region", "ingredient", "farmer", "producer"]),

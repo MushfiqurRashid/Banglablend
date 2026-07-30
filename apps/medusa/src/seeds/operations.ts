@@ -7,7 +7,7 @@ export const sampleCategories = [
     metadata: { isPlaceholder: true, verified: false },
   },
   {
-    name: "Single-origin ingredients",
+    name: "Ingredients from one origin",
     handle: "single-origin-ingredients",
     is_active: true,
     is_internal: false,
@@ -44,7 +44,7 @@ export const samplePromotions = [
     campaign: {
       name: "Sample welcome campaign",
       campaign_identifier: "sample-welcome",
-      description: "Development-only draft promotion.",
+      description: "Draft promotion for development environments.",
     },
   },
 ] as const;
@@ -60,23 +60,14 @@ export const sampleCustomers = [
 ];
 
 export const sampleInventoryBySku: Record<string, number> = {
-  "SAMPLE-MEZ-80": 30,
-  "SAMPLE-FSH-80": 24,
-  "SAMPLE-SHA-80": 26,
-  "SAMPLE-WPP-70": 18,
-  "SAMPLE-ILI-80": 32,
-  "SAMPLE-HTZ-60": 12,
-  "SAMPLE-TUR-70": 14,
-  "SAMPLE-GIN-200": 40,
-  "SAMPLE-TEA-70": 20,
-  "SAMPLE-GFT-03": 16,
-  "SAMPLE-GFT-TRIO": 28,
-  "SAMPLE-GFT-CHAI": 22,
-  "SAMPLE-GFT-COAST": 18,
-  "SAMPLE-GFT-PANTRY": 14,
-  "SAMPLE-GFT-GOLD": 17,
-  "SAMPLE-GFT-CTG": 11,
-  "SAMPLE-GFT-SAMPLE": 35,
-  "SAMPLE-GFT-START": 19,
-  "SAMPLE-GFT-FEST": 8,
+  "SAMPLE-MEZ-75": 30,
+  "SAMPLE-MEZ-100": 20,
+  "SAMPLE-BLK-75": 20,
+  "SAMPLE-WPP-75": 18,
+  "SAMPLE-FSH-75": 24,
+  "SAMPLE-FSH-100": 18,
+  "SAMPLE-HTZ-100": 12,
+  "SAMPLE-HTZ-125": 10,
+  "SAMPLE-SHA-75": 26,
+  "SAMPLE-SHA-100": 20,
 };

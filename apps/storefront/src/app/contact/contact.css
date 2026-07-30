@@ -162,8 +162,7 @@
 }
 
 .contact-form-panel h2,
-.contact-info-card > h2,
-.contact-find-copy h2 {
+.contact-info-card > h2 {
   color: #29231f;
   font-size: clamp(1.45rem, 2.2vw, 2rem);
   font-weight: 600;
@@ -248,8 +247,7 @@
   font-size: 0.7rem;
 }
 
-.contact-submit-button,
-.contact-button {
+.contact-submit-button {
   display: inline-flex;
   min-height: 2.8rem;
   align-items: center;
@@ -272,8 +270,7 @@
     transform 180ms ease;
 }
 
-.contact-submit-button:hover,
-.contact-button:hover {
+.contact-submit-button:hover {
   background: var(--contact-olive-hover);
   transform: translateY(-2px);
 }
@@ -408,102 +405,6 @@
   transform: translateX(0);
 }
 
-.contact-find {
-  display: grid;
-  min-height: clamp(14rem, 20vw, 18rem);
-  grid-template-columns: minmax(0, 1.72fr) minmax(18rem, 0.78fr);
-  overflow: hidden;
-  border: 1px solid var(--contact-border);
-  background: rgb(255 255 255 / 0.38);
-}
-
-.contact-map-illustration {
-  position: relative;
-  min-height: 100%;
-  overflow: hidden;
-  border-right: 1px solid var(--contact-border);
-}
-
-.contact-map-illustration svg {
-  width: 100%;
-  height: 100%;
-  min-height: 14rem;
-}
-
-.contact-map-pin {
-  position: absolute;
-  top: 45%;
-  left: 51%;
-  display: grid;
-  width: 3.2rem;
-  height: 3.2rem;
-  place-items: center;
-  border-radius: 50% 50% 50% 0;
-  color: #fff;
-  background: var(--contact-olive);
-  box-shadow: 0 8px 25px rgb(41 54 25 / 0.22);
-  transform: translate(-50%, -50%) rotate(-45deg);
-}
-
-.contact-map-pin svg {
-  width: 1.7rem;
-  min-height: 0;
-  transform: rotate(45deg);
-}
-
-.contact-map-label {
-  position: absolute;
-  top: calc(45% + 2.3rem);
-  left: 51%;
-  padding: 0.2rem 0.45rem;
-  border-radius: 0.1rem;
-  color: #5b534b;
-  background: rgb(255 253 248 / 0.84);
-  font-size: 0.67rem;
-  font-weight: 700;
-  transform: translateX(-50%);
-}
-
-.contact-find-copy {
-  position: relative;
-  display: flex;
-  align-items: center;
-  padding: clamp(1.6rem, 3vw, 3rem);
-  isolation: isolate;
-}
-
-.contact-find-copy > div {
-  position: relative;
-  z-index: 2;
-}
-
-.contact-find-copy p {
-  max-width: 19rem;
-  margin-block: 0.8rem 1rem;
-  color: #4b443e;
-  font-size: 0.78rem;
-  line-height: 1.65;
-}
-
-.contact-find-leaf {
-  position: absolute;
-  z-index: 0;
-  right: -1.5rem;
-  bottom: -1.4rem;
-  color: rgb(91 110 67 / 0.22);
-  pointer-events: none;
-  transform: rotate(-22deg);
-}
-
-.contact-button-outline {
-  color: var(--contact-olive);
-  background: transparent;
-}
-
-.contact-button-outline:hover {
-  color: #fff;
-}
-
 @media (max-width: 1000px) {
   .contact-primary-grid {
     grid-template-columns: 1fr;
@@ -553,15 +454,6 @@
     background: linear-gradient(180deg, #f8f4ed, transparent);
   }
 
-  .contact-find {
-    grid-template-columns: 1fr;
-  }
-
-  .contact-map-illustration {
-    min-height: 16rem;
-    border-right: 0;
-    border-bottom: 1px solid var(--contact-border);
-  }
 }
 
 @media (max-width: 600px) {
@@ -598,9 +490,6 @@
     border-bottom: 0;
   }
 
-  .contact-find-copy {
-    min-height: 14rem;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

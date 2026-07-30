@@ -252,7 +252,7 @@ const AuditPage = () => {
     <div className="flex flex-col gap-y-4 pb-8">
       <PageHeader
         title="Administrator audit history"
-        subtitle="Search and inspect append-only evidence for governed product, setting, inquiry, gift-order, and operational changes. Audit records cannot be edited or deleted here."
+        subtitle="Search and inspect the permanent record of governed product, setting, inquiry, gift order, and operational changes. Audit records cannot be edited or deleted here."
         badge="Immutable evidence"
         actions={
           <>
@@ -281,7 +281,7 @@ const AuditPage = () => {
             </Heading>
             <Text className="text-ui-fg-subtle mt-1 max-w-4xl">
               Correct the source record through its supported workflow. The audit trail preserves
-              what happened, who acted, and the available before-and-after snapshots. Secret setting
+              what happened, who acted, and the available previous and updated snapshots. Secret setting
               values are redacted before an audit record is written.
             </Text>
           </div>
@@ -421,7 +421,7 @@ const AuditPage = () => {
 
       {selected ? <AuditDetail audit={selected} onClose={() => setSelected(undefined)} /> : null}
 
-      {loading ? <LoadingState label="Loading append-only audit evidence..." /> : null}
+      {loading ? <LoadingState label="Loading permanent audit evidence..." /> : null}
 
       {!loading && data ? (
         <Container className="overflow-hidden p-0">

@@ -294,7 +294,7 @@ export function CatalogEditor({
       );
       if (invalidCountry) {
         throw new Error(
-          `"${invalidCountry}" is not an ISO two-letter country code (for example, BD or GB).`,
+          `"${invalidCountry}" is not an ISO country code made of two letters (for example, BD or GB).`,
         );
       }
 
@@ -456,7 +456,7 @@ export function CatalogEditor({
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
         <Container className="xl:col-span-2">
-          <Heading level="h2">Customer-facing catalog</Heading>
+          <Heading level="h2">Customer catalog</Heading>
           <Text className="text-ui-fg-subtle mt-1">
             These fields flow directly into product listings and the product detail page.
           </Text>
@@ -513,7 +513,7 @@ export function CatalogEditor({
                 onChange={(event) => set("region", event.target.value)}
               />
             </Field>
-            <Field label="Badges" help="Comma-separated, for example: Bestseller, Gift-ready">
+            <Field label="Badges" help="Separate each badge with a comma. For example: Bestseller, Ready to gift">
               <Input
                 maxLength={1000}
                 value={form.badges}
@@ -538,7 +538,7 @@ export function CatalogEditor({
                 onChange={(event) => set("storage", event.target.value)}
               />
             </Field>
-            <Field label="Shelf-life copy">
+            <Field label="Shelf life copy">
               <Textarea
                 maxLength={1000}
                 rows={3}
@@ -598,7 +598,7 @@ export function CatalogEditor({
               checked={form.bestSeller}
               onCheckedChange={(checked) => set("bestSeller", checked)}
               label="Best seller"
-              help="Makes the product eligible for best-seller merchandising."
+              help="Makes the product eligible for bestselling product merchandising."
             />
             <div>
               <Text size="small" weight="plus">
@@ -759,7 +759,7 @@ export function CatalogEditor({
             />
           </div>
           <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Field label="Supported country codes" help="Comma-separated ISO two-letter codes.">
+            <Field label="Supported country codes" help="Separate ISO two letter codes with commas.">
               <Input
                 maxLength={320}
                 value={form.supportedCountries}
@@ -839,7 +839,7 @@ export function CatalogEditor({
         <Container>
           <Heading level="h2">Origin and verification</Heading>
           <Text className="text-ui-fg-subtle mt-1">
-            Internal provenance details support review; only approved customer-facing claims should
+            Internal provenance details support review; only approved claims for customers should
             be published.
           </Text>
           <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">

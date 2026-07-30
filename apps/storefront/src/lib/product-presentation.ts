@@ -6,39 +6,29 @@ export interface ProductMedia {
 }
 
 const localProductImages: Partial<Record<string, string[]>> = {
-  "mezban-masala": ["/images/products/mezban-masala-lifestyle.jpg"],
+  "mezban-masala": [
+    "/images/products/mezban-masala-product.png",
+    "/images/products/mezban-masala-lifestyle.jpg",
+  ],
+  "black-pepper": ["/images/products/black-pepper-product.png"],
   "coxs-bazar-fish-masala": [
+    "/images/products/coxs-bazar-fish-masala-product.png",
     "/images/products/coxs-bazar-fish-masala-lifestyle.jpg",
     "/images/products/coxs-bazar-fish-masala-coastal.jpg",
   ],
   "shahi-garam-masala": [
+    "/images/products/shahi-garam-masala-product.png",
     "/images/products/shahi-garam-masala-lifestyle.jpg",
     "/images/products/shahi-garam-masala-detail.jpg",
   ],
   "white-pepper-powder": [
+    "/images/products/white-pepper-powder-product.png",
     "/images/products/white-pepper-powder.jpg",
     "/images/products/pepper-pair.jpg",
   ],
-  "shorisha-ilish": ["/images/products/shorisha-ilish.png"],
-  "hathazari-red-chili": ["/images/products/hathazari-red-chilli-lifestyle.jpg"],
-  "hill-tracts-turmeric": ["/images/products/hill-tracts-turmeric.png"],
-  "ginger-paste": ["/images/products/ginger-paste.png"],
-  "tea-masala": ["/images/products/tea-masala.png"],
-  "taste-of-bangladesh-gift": [
-    "/images/gifts/signature-keepsake-box.jpg",
-    "/images/gifts/presentation-trio.jpg",
-  ],
-  "everyday-masala-trio": [
-    "/images/gifts/presentation-trio.jpg",
-    "/images/campaign/shop-signature-lineup.jpg",
-  ],
-  "chattogram-feast-box": [
-    "/images/gifts/presentation-trio.jpg",
-    "/images/gifts/signature-keepsake-box.jpg",
-  ],
-  "masala-grind-starter-set": [
-    "/images/gifts/signature-keepsake-box.jpg",
-    "/images/gifts/presentation-trio.jpg",
+  "hathazari-red-chili": [
+    "/images/products/hathazari-red-chilli-product.png",
+    "/images/products/hathazari-red-chilli-lifestyle.jpg",
   ],
 };
 

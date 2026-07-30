@@ -3,6 +3,9 @@ import { ContainerRegistrationKeys, ProductStatus } from "@medusajs/framework/ut
 import {
   createCollectionsWorkflow,
   createCustomersWorkflow,
+  createProductVariantsWorkflow,
+  deleteProductsWorkflow,
+  deleteProductVariantsWorkflow,
   createInventoryLevelsWorkflow,
   createProductCategoriesWorkflow,
   createProductsWorkflow,
@@ -10,15 +13,23 @@ import {
   createRegionsWorkflow,
   createShippingOptionsWorkflow,
   createStockLocationsWorkflow,
-  linkSalesChannelsToStockLocationWorkflow
+  linkSalesChannelsToStockLocationWorkflow,
+  setProductProductOptionsWorkflow,
+  updateProductsWorkflow
 } from "@medusajs/medusa/core-flows";
-import { sampleCatalog, sampleCollections } from "../seeds/catalog";
+import {
+  retiredSampleProductHandles,
+  sampleCatalog,
+  sampleCollections
+} from "../seeds/catalog";
 import { sampleRegions, sampleShippingOptions } from "../seeds/markets";
 import { sampleCategories, sampleCustomers, sampleInventoryBySku, samplePromotions } from "../seeds/operations";
 import { defaultAdminSettings } from "../seeds/admin-settings";
 import { ADMIN_CONTROL_MODULE } from "../modules/admin-control";
 import type AdminControlModuleService from "../modules/admin-control/service";
 import { wrapSettingValue } from "../modules/admin-control/value";
+
+const CATALOG_REVISION = "bd-price-list-2026-07-29";
 
 export default async function seedBanglaBlend({ container }: ExecArgs) {
   const logger = container.resolve(ContainerRegistrationKeys.LOGGER);
@@ -65,7 +76,128 @@ export default async function seedBanglaBlend({ container }: ExecArgs) {
   const { data: stores } = await query.graph({ entity: "store", fields: ["default_sales_channel_id"] });
   const { data: profiles } = await query.graph({ entity: "shipping_profile", fields: ["id", "type"] });
   if (!stores[0]?.default_sales_channel_id || !profiles[0]?.id) throw new Error("Run the Medusa initial store setup so a sales channel and shipping profile exist before seeding products.");
-  const { data: existingProducts } = await query.graph({ entity: "product", fields: ["id", "handle"] });
+  const { data: existingProducts } = await query.graph({
+    entity: "product",
+    fields: [
+      "id",
+      "handle",
+      "metadata",
+      "options.id",
+      "options.title",
+      "options.values.value",
+      "variants.id",
+      "variants.sku"
+    ]
+  });
+  const existingProductsByHandle = new Map(
+    existingProducts.map((product) => [product.handle, product])
+  );
+  const retiredHandles = new Set<string>(retiredSampleProductHandles);
+  const retiredProducts = existingProducts.filter((product) => retiredHandles.has(product.handle));
+
+  if (retiredProducts.length) {
+    await deleteProductsWorkflow(container).run({
+      input: { ids: retiredProducts.map((product) => product.id) }
+    });
+  }
+
+  for (const product of sampleCatalog) {
+    const existingProduct = existingProductsByHandle.get(product.handle);
+    if (!existingProduct) continue;
+
+    const existingVariants = (existingProduct.variants ?? []) as {
+      id: string;
+      sku: string | null;
+    }[];
+    const existingSkus = existingVariants
+      .map((variant) => variant.sku)
+      .filter((sku): sku is string => Boolean(sku))
+      .sort();
+    const desiredSkus = product.variants.map((variant) => variant.sku).sort();
+    const variantsMatch =
+      existingSkus.length === desiredSkus.length &&
+      existingSkus.every((sku, index) => sku === desiredSkus[index]);
+    const needsVariantSync =
+      existingProduct.metadata?.catalog_revision !== CATALOG_REVISION ||
+      !variantsMatch;
+
+    if (needsVariantSync) {
+      const variantIds = existingVariants.map((variant) => variant.id);
+      if (variantIds.length) {
+        await deleteProductVariantsWorkflow(container).run({
+          input: { ids: variantIds }
+        });
+      }
+      const sizeOption = (
+        (existingProduct.options ?? []) as {
+          id: string;
+          title: string;
+          values?: { value: string }[];
+        }[]
+      ).find((option) => option.title === "Size");
+      if (!sizeOption) {
+        throw new Error(`Product ${product.handle} is missing its Size option.`);
+      }
+      const existingOptionValues = new Set(
+        (sizeOption.values ?? []).map((optionValue) => optionValue.value)
+      );
+      const optionValuesToAdd = product.variants
+        .map((variant) => variant.title)
+        .filter((value) => !existingOptionValues.has(value));
+      if (optionValuesToAdd.length) {
+        await setProductProductOptionsWorkflow(container).run({
+          input: {
+            product_id: existingProduct.id,
+            update: [{
+              product_option_id: sizeOption.id,
+              add: optionValuesToAdd.map((value) => ({ value }))
+            }]
+          }
+        });
+      }
+      await createProductVariantsWorkflow(container).run({
+        input: {
+          product_variants: product.variants.map((variant) => ({
+            product_id: existingProduct.id,
+            title: variant.title,
+            sku: variant.sku,
+            manage_inventory: true,
+            options: { Size: variant.title },
+            prices: Object.entries(variant.prices).map(([currency_code, amount]) => ({
+              currency_code,
+              amount
+            }))
+          }))
+        }
+      });
+    }
+
+    await updateProductsWorkflow(container).run({
+      input: {
+        selector: { id: existingProduct.id },
+        update: {
+          title: product.title,
+          subtitle: product.subtitle,
+          description: product.description,
+          thumbnail: product.thumbnail,
+          status: ProductStatus.PUBLISHED,
+          collection_id: currentCollections.find(
+            (collection) => collection.handle === product.collection
+          )?.id,
+          metadata: {
+            region: product.region,
+            eligible_markets: product.markets,
+            product_badges: product.badges,
+            best_seller: product.bestSeller === true,
+            catalog_revision: CATALOG_REVISION,
+            is_placeholder: false,
+            verified: true
+          }
+        }
+      }
+    });
+  }
+
   const existingHandles = new Set(existingProducts.map((product) => product.handle));
   const products = sampleCatalog.filter((product) => !existingHandles.has(product.handle)).map((product) => ({
     title: product.title,
@@ -80,14 +212,26 @@ export default async function seedBanglaBlend({ container }: ExecArgs) {
     metadata: {
       region: product.region,
       eligible_markets: product.markets,
-      product_badges: product.badges ?? [],
-      gift_type: product.giftType,
+      product_badges: product.badges,
       best_seller: product.bestSeller === true,
-      is_placeholder: true,
-      verified: false
+      catalog_revision: CATALOG_REVISION,
+      is_placeholder: false,
+      verified: true
     },
-    options: [{ title: "Size", values: [product.weight] }],
-    variants: [{ title: product.weight, sku: product.sku, manage_inventory: true, options: { Size: product.weight }, prices: Object.entries(product.prices).map(([currency_code, amount]) => ({ currency_code, amount })) }]
+    options: [{
+      title: "Size",
+      values: product.variants.map((variant) => variant.title)
+    }],
+    variants: product.variants.map((variant) => ({
+      title: variant.title,
+      sku: variant.sku,
+      manage_inventory: true,
+      options: { Size: variant.title },
+      prices: Object.entries(variant.prices).map(([currency_code, amount]) => ({
+        currency_code,
+        amount
+      }))
+    }))
   }));
   if (products.length) await createProductsWorkflow(container).run({ input: { products } });
 

@@ -4,6 +4,9 @@
   --discover-paper: #fbf9f5;
   --discover-border: #d8d2c8;
   --discover-serif: Georgia, "Times New Roman", serif;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
   background: var(--discover-paper);
 }
 
@@ -85,6 +88,8 @@
 }
 
 .discover-featured-section {
+  max-width: 100%;
+  overflow: hidden;
   padding-block: clamp(1.65rem, 3.25vw, 3rem) clamp(1.8rem, 3.25vw, 3.1rem);
 }
 
@@ -132,10 +137,13 @@
 
 .discover-featured-carousel {
   position: relative;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .discover-featured-rail {
   display: grid;
+  max-width: 100%;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: clamp(0.65rem, 1.15vw, 1rem);
   scrollbar-color: var(--discover-olive) transparent;
@@ -502,12 +510,16 @@
   }
 
   .discover-hero-media {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
     min-height: 19rem;
     aspect-ratio: 16 / 8.3;
   }
 
   .discover-featured-rail {
     overflow-x: auto;
+    max-width: none;
     grid-template-columns: none;
     grid-auto-columns: minmax(17rem, 44vw);
     grid-auto-flow: column;
@@ -559,8 +571,9 @@
   }
 
   .discover-hero-media {
-    min-height: 15.5rem;
-    aspect-ratio: 4 / 2.7;
+    height: clamp(15.5rem, 67.5vw, 20rem);
+    min-height: 0;
+    aspect-ratio: auto;
   }
 
   .discover-featured-section {
@@ -615,6 +628,16 @@
     min-height: 2.35rem;
     padding-inline: 0.75rem;
     font-size: 0.62rem;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 500px) and (max-width: 900px) {
+  .discover-hero-copy {
+    padding-block: 1.5rem;
+  }
+
+  .discover-hero-media {
+    min-height: 14rem;
   }
 }
 

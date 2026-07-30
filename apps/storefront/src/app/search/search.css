@@ -1,5 +1,5 @@
-.search-modal { position: fixed; z-index: 110; inset: 0; overflow-y: auto; color: var(--color-ink); background: rgb(246 239 228 / 0.98); backdrop-filter: blur(20px); }
-.search-modal-top { display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: center; padding: 1.2rem var(--page-gutter); border-bottom: 1px solid var(--color-border); }
+.search-modal { position: fixed; z-index: 190; inset: 0; width: 100%; height: 100dvh; overflow-x: hidden; overflow-y: auto; color: var(--color-ink); background: rgb(246 239 228 / 0.98); backdrop-filter: blur(20px); overscroll-behavior: contain; }
+.search-modal-top { position: sticky; z-index: 2; top: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1rem; align-items: center; padding: max(1rem, env(safe-area-inset-top)) var(--page-gutter) 1rem; border-bottom: 1px solid var(--color-border); background: rgb(246 239 228 / 0.96); backdrop-filter: blur(18px); }
 .search-input-wrap { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 1rem; max-width: 70rem; }
 .search-input-wrap input { width: 100%; border: 0; outline: 0; color: var(--color-ink); background: transparent; font-family: var(--font-heading); font-size: clamp(1.5rem, 4vw, 3rem); }
 .search-input-wrap > span { color: var(--color-muted); font-size: 0.62rem; letter-spacing: 0.1em; }
@@ -18,4 +18,18 @@
 .search-results { margin-top: 3rem; grid-template-columns: repeat(3, 1fr); }
 .search-result { min-height: 14rem; }
 .search-result h3 { margin-top: 2rem; }
-@media (max-width: 700px) { .predictive-results, .search-results { grid-template-columns: 1fr; } .search-page-form { grid-template-columns: auto 1fr; } .search-page-form .button { grid-column: 1 / -1; } }
+@media (max-width: 700px) {
+  .search-input-wrap { gap: 0.65rem; }
+  .search-input-wrap input { font-size: clamp(1.05rem, 5vw, 1.5rem); }
+  .search-input-wrap > span { display: none; }
+  .search-modal-body { padding-block: 2rem max(2rem, env(safe-area-inset-bottom)); }
+  .predictive-results, .search-results { grid-template-columns: 1fr; }
+  .search-page-form { grid-template-columns: auto minmax(0, 1fr); }
+  .search-page-form .button { grid-column: 1 / -1; }
+  .search-result-head { align-items: flex-start; flex-direction: column; }
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .search-modal-top { padding-block: 0.55rem; }
+  .search-modal-body { padding-block: 1.25rem; }
+}

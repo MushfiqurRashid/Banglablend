@@ -21,8 +21,8 @@ export default async function orderPlacedHandler({ event, container }: Subscribe
   await createEmailAdapter().send({
     to: order.email,
     subject: `Bangla Blend order ${reference} received`,
-    html: `<p>Thank you. We received Bangla Blend order <strong>${reference}</strong>.</p><p>Order total: ${total}</p><p>Payment and fulfillment updates will follow after server-side verification. A payment-provider redirect alone never confirms payment.</p>`,
-    text: `Thank you. We received Bangla Blend order ${reference}.\nOrder total: ${total}\n\nPayment and fulfillment updates will follow after server-side verification. A payment-provider redirect alone never confirms payment.`,
+    html: `<p>Thank you. We received Bangla Blend order <strong>${reference}</strong>.</p><p>Order total: ${total}</p><p>Payment and fulfillment updates will follow after our server verifies the transaction. A redirect from the payment provider never confirms payment on its own.</p>`,
+    text: `Thank you. We received Bangla Blend order ${reference}.\nOrder total: ${total}\n\nPayment and fulfillment updates will follow after our server verifies the transaction. A redirect from the payment provider never confirms payment on its own.`,
     idempotencyKey: `bangla-blend-order-received-${order.id}`
   });
   logger.info(`Order confirmation accepted for order ${order.id}.`);

@@ -84,7 +84,7 @@ const DataPage = () => {
       {
         title: "Catalog and merchandising",
         description:
-          "Customer-facing products and the structures that organize, price, and promote them.",
+          "Products shown to customers and the structures that organize, price, and promote them.",
         owner: "Medusa commerce",
         resources: [
           internal(
@@ -96,7 +96,7 @@ const DataPage = () => {
           ),
           internal(
             "Products",
-            "Native product, variant, option, media, price, sales-channel, and stock management.",
+            "Native product, variant, option, media, price, sales channel, and stock management.",
             "/products",
             "Core CRUD",
             ["variants", "sku", "media", "pricing"],
@@ -109,7 +109,7 @@ const DataPage = () => {
           ),
           internal(
             "Categories",
-            "Create and organize the hierarchical customer-facing category tree.",
+            "Create and organize the category tree shown to customers.",
             "/categories",
             "Core CRUD",
           ),
@@ -127,13 +127,13 @@ const DataPage = () => {
           ),
           internal(
             "Product types",
-            "Maintain internal product-type classification.",
+            "Maintain internal product type classification.",
             "/settings/product-types",
             "Core CRUD",
           ),
           internal(
             "Price lists",
-            "Manage scheduled, customer-specific, and market-specific price overrides.",
+            "Manage scheduled price overrides tailored to individual customers and markets.",
             "/price-lists",
             "Core CRUD",
             ["prices", "currency"],
@@ -160,7 +160,7 @@ const DataPage = () => {
         resources: [
           internal(
             "Inventory",
-            "Inventory items, attributes, stock levels, and location-specific availability.",
+            "Inventory items, attributes, stock levels, and availability by location.",
             "/inventory",
             "Core CRUD",
             ["stock", "levels"],
@@ -210,7 +210,7 @@ const DataPage = () => {
           ),
           internal(
             "Return reasons",
-            "Approved customer-facing and operational reasons for returns.",
+            "Approved reasons for returns shown to customers and operations teams.",
             "/settings/return-reasons",
             "Core CRUD",
           ),
@@ -237,7 +237,7 @@ const DataPage = () => {
           ),
           internal(
             "Customers",
-            "Customer profiles, addresses, groups, metadata, and customer-owned order history.",
+            "Customer profiles, addresses, groups, metadata, and personal order history.",
             "/customers",
             "Core CRUD",
           ),
@@ -284,7 +284,7 @@ const DataPage = () => {
           ),
           internal(
             "Administrator audit",
-            "Append-only before-and-after evidence for governed administrative changes.",
+            "Permanent records showing the previous and updated state of governed administrative changes.",
             "/superadmin/audit",
             "Immutable",
             ["history", "activity"],
@@ -297,7 +297,7 @@ const DataPage = () => {
           ),
           internal(
             "Roles",
-            "Assign least-privilege native Medusa roles when RBAC is enabled.",
+            "Assign native Medusa roles with only the access each person needs when RBAC is enabled.",
             "/settings/roles",
             "RBAC",
           ),
@@ -309,13 +309,13 @@ const DataPage = () => {
           ),
           internal(
             "Publishable API keys",
-            "Manage storefront-safe API keys and their sales-channel scope.",
+            "Manage API keys approved for storefront use and their sales channel access.",
             "/settings/publishable-api-keys",
             "Rotate / revoke",
           ),
           internal(
             "Secret API keys",
-            "Create, rotate, and revoke server-side Admin API credentials.",
+            "Create, rotate, and revoke Admin API credentials managed by the server.",
             "/settings/secret-api-keys",
             "Sensitive",
           ),
@@ -348,7 +348,7 @@ const DataPage = () => {
           {
             title: "Customer storefront",
             description:
-              "Verify published catalog, editorial content, customer journeys, and market-specific behavior.",
+              "Verify published catalog, editorial content, customer journeys, and behavior in each market.",
             href: integrations.storefront.url,
             badge: integrations.storefront.configured ? "Configured" : "Needs setup",
             external: true,
@@ -356,7 +356,7 @@ const DataPage = () => {
           },
           internal(
             "Translations",
-            "Manage Medusa-owned translations and locales when the translation feature is enabled.",
+            "Manage translations and locales through Medusa when the translation feature is enabled.",
             "/settings/translations",
             "Feature gated",
           ),
@@ -543,7 +543,7 @@ const DataPage = () => {
                 [
                   "Orders, payments, refunds, returns, and fulfillment history",
                   "Cancel, refund, return, exchange, fulfill, reconcile",
-                  "Financial and customer-service history must remain traceable.",
+                  "Financial and customer service history must remain traceable.",
                 ],
                 [
                   "Payment callback and idempotency evidence",
@@ -553,7 +553,7 @@ const DataPage = () => {
                 [
                   "Administrator audit records",
                   "Search and inspect",
-                  "The evidence trail is append-only and cannot audit its own deletion.",
+                  "The evidence trail is permanent and cannot audit its own deletion.",
                 ],
                 [
                   "Passwords, auth identities, sessions, tokens, and secret keys",
@@ -563,7 +563,7 @@ const DataPage = () => {
                 [
                   "Migrations, module links, events, and workflow state",
                   "Deploy, retry, or repair through engineering runbooks",
-                  "Framework-owned rows require transactional invariants and versioned code.",
+                  "Rows managed by the framework require transactional invariants and versioned code.",
                 ],
                 [
                   "Meilisearch documents",

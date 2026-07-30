@@ -106,6 +106,27 @@ function adaptProduct(product: MedusaProduct): Product {
     const fallback = url === thumbnail ? (thumbnailAlt ?? fallbackAlt) : fallbackAlt;
     return [{ url, alt: imageAltFromMetadata(metadata, url, index, fallback) }];
   });
+  const variants = (product.variants ?? [])
+    .map((variant) => {
+      const calculated = variant.calculated_price;
+      const price = variant.prices?.[0];
+      const currency = (calculated?.currency_code ?? price?.currency_code ?? "bdt").toUpperCase();
+      return {
+        id: variant.id,
+        title: variant.title,
+        sku: variant.sku ?? undefined,
+        inventoryQuantity: variant.inventory_quantity,
+        price: {
+          amount: calculated?.calculated_amount ?? price?.amount ?? 0,
+          currencyCode: isCurrency(currency) ? currency : "BDT",
+        },
+      };
+    })
+    .sort(
+      (left, right) =>
+        left.price.amount - right.price.amount ||
+        left.title.localeCompare(right.title, "en", { numeric: true }),
+    );
   return {
     id: product.id,
     handle: product.handle,
@@ -133,21 +154,7 @@ function adaptProduct(product: MedusaProduct): Product {
       ]),
     ),
     eligibleMarkets: eligible,
-    variants: (product.variants ?? []).map((variant) => {
-      const calculated = variant.calculated_price;
-      const price = variant.prices?.[0];
-      const currency = (calculated?.currency_code ?? price?.currency_code ?? "bdt").toUpperCase();
-      return {
-        id: variant.id,
-        title: variant.title,
-        sku: variant.sku ?? undefined,
-        inventoryQuantity: variant.inventory_quantity,
-        price: {
-          amount: calculated?.calculated_amount ?? price?.amount ?? 0,
-          currencyCode: isCurrency(currency) ? currency : "BDT",
-        },
-      };
-    }),
+    variants,
     ingredients: typeof metadata.ingredients === "string" ? metadata.ingredients : undefined,
     storage: typeof metadata.storage === "string" ? metadata.storage : undefined,
     shelfLife: typeof metadata.shelf_life === "string" ? metadata.shelf_life : undefined,

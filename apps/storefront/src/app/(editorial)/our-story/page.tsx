@@ -7,7 +7,6 @@ import {
   HandHeart,
   Heart,
   Leaf,
-  ShieldCheck,
   Users,
   Utensils,
 } from "lucide-react";
@@ -18,14 +17,13 @@ import "./our-story.css";
 export const metadata: Metadata = {
   title: "Our Story",
   description:
-    "Meet Bangla Blend and explore the philosophy, impact commitments and standards behind the brand.",
+    "Meet Bangla Blend and explore the philosophy, people and impact commitments behind the brand.",
 };
 
 const storyTabs = [
   { label: "About Bangla Blend", id: "about-bangla-blend" },
   { label: "Our Philosophy", id: "our-philosophy" },
   { label: "Our Impact", id: "our-impact" },
-  { label: "Our Standards", id: "our-standards" },
   { label: "Meet Annapurna", id: "meet-annapurna" },
 ];
 
@@ -37,12 +35,12 @@ const principles = [
   },
   {
     title: "Made with care",
-    copy: "Small-batch blending and thoughtful preparation guide how we develop every recipe.",
+    copy: "Blending in careful batches and thoughtful preparation guide how we develop every recipe.",
     icon: Heart,
   },
   {
     title: "Made to connect",
-    copy: "Food can bring people together—at home, across generations and around the world.",
+    copy: "Food can bring people together at home, across generations and around the world.",
     icon: Users,
   },
 ];
@@ -52,28 +50,18 @@ const storyCards = [
     id: "our-impact",
     title: "Our Impact",
     image: "/images/campaign/chilli-sourcing.jpg",
-    imageAlt: "A Bangladeshi grower gathering sun-dried red chillies",
+    imageAlt: "A Bangladeshi grower gathering red chillies dried in the sun",
     copy: "We are building toward thoughtful partnerships, stronger support for traditional food heritage and meaningful opportunities in rural communities.",
     cta: "See our impact",
     href: "/our-story/our-impact",
     icon: HandHeart,
   },
   {
-    id: "our-standards",
-    title: "Our Standards",
-    image: "/images/our-story-standards.png",
-    imageAlt: "Bowls of whole spices arranged for blending",
-    copy: "Our standards guide how we assess ingredient selection, blending and packaging, with clear product records and consistency as priorities.",
-    cta: "Our standards",
-    href: "/our-story/our-standards",
-    icon: ShieldCheck,
-  },
-  {
     id: "meet-annapurna",
     title: "Meet Annapurna",
     image: "/images/our-story-annapurna.png",
     imageAlt: "An illustrated woman holding a bowl in a warm kitchen scene",
-    copy: "Annapurna represents abundance, nourishment and the spirit of sharing food with love—the heart of Bangla Blend.",
+    copy: "Annapurna represents abundance, nourishment and the spirit of sharing food with love. That spirit is at the heart of Bangla Blend.",
     cta: "Meet Annapurna",
     href: "/our-story/meet-annapurna",
     icon: Utensils,
@@ -83,7 +71,7 @@ const storyCards = [
     title: "From Our Notes",
     image: "/images/our-story-notes.png",
     imageAlt: "An open recipe notebook beside a cup of tea and whole spices",
-    copy: "Thoughts from our kitchen table—food stories, seasonal inspiration, new launches and everything we are discovering along the way.",
+    copy: "Thoughts from our kitchen table, including food stories, seasonal inspiration, new launches and everything we are discovering along the way.",
     cta: "Read our notes",
     href: "/journal",
     icon: BookOpen,
@@ -201,7 +189,7 @@ export default function OurStoryPage() {
           <div className="story-philosophy-copy">
             <h2 id="our-philosophy-title">Our Philosophy</h2>
             <p>
-              Great food begins with respect—for the land, the ingredient and the hands that grow
+              Great food begins with respect for the land, the ingredient and the hands that grow
               it. We believe flavour should be expressive, carefully made and meaningful.
             </p>
             <Link className="story-cta" href="/our-story/our-philosophy">

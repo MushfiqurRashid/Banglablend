@@ -13,11 +13,11 @@ interface ApprovedRoutes {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes = [
-    "", "/shop", "/shop/all", "/shop/originals", "/shop/reserve", "/shop/pantry", "/shop/tea-wellness", "/shop/lifestyle-accessories", "/shop/best-sellers", "/shop/new-arrivals", "/shop/build-a-box",
+    "", "/shop", "/shop/all", "/shop/originals", "/shop/reserve", "/shop/pantry", "/shop/tea-wellness", "/shop/lifestyle-accessories", "/shop/best-sellers", "/shop/new-arrivals",
     "/gifts", "/gifts/gift-sets", "/gifts/regional-gifts", "/gifts/corporate",
     "/discover-bangladesh", ...journalCategories.map((category) => `/discover-bangladesh/${category.slug}`),
     "/recipes", "/recipes/by-region", "/recipes/by-product", "/recipes/traditional", "/recipes/everyday-cooking",
-    "/our-story", "/wholesale", "/faq", "/contact"
+    "/our-story", "/about-bangla-blend", "/wholesale", "/faq", "/contact"
   ];
   const approved = await sanityFetch<ApprovedRoutes>(APPROVED_SITEMAP_QUERY);
   const contentRoutes = [

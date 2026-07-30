@@ -1,22 +1,14 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ShieldCheck } from "lucide-react";
-import { getRecipe, getRecipes, type EditorialRecipe, type RecipeIngredient } from "@/lib/sanity/editorial";
-import { RecipeCard } from "@/components/editorial/recipe-card";
-import { Breadcrumbs } from "@/components/layout/breadcrumbs";
+import { ComingSoonPage } from "@/components/editorial/coming-soon-page";
 import { PageContainer } from "@/components/layout/page-container";
 import { Section } from "@/components/layout/section";
+import { recipeComingSoonPages } from "@/config/coming-soon";
+import { getRecipe, type RecipeIngredient } from "@/lib/sanity/editorial";
 import { siteConfig } from "@/config/site";
 import "../../editorial.css";
-
-const libraryViews = {
-  "by-region": { title: "Recipes by region", introduction: "Explore recipes through the places and regional food traditions connected to them.", filter: (recipe: EditorialRecipe) => recipe.hasRegion },
-  "by-product": { title: "Recipes by product", introduction: "Find practical ways to cook with Bangla Blend originals, pantry staples and tea blends.", filter: (recipe: EditorialRecipe) => recipe.hasProducts },
-  traditional: { title: "Traditional recipes", introduction: "Dishes connected to established Bengali food traditions, presented with context and careful testing.", filter: (recipe: EditorialRecipe) => recipe.librarySections.includes("traditional") },
-  "everyday-cooking": { title: "Everyday cooking", introduction: "Flexible, approachable recipes made for the rhythm of the everyday kitchen.", filter: (recipe: EditorialRecipe) => recipe.librarySections.includes("everyday-cooking") }
-} satisfies Record<string, { title: string; introduction: string; filter: (recipe: EditorialRecipe) => boolean }>;
 
 function amount(value?: number, unit?: string) {
   return [value, unit].filter((part) => part !== undefined && part !== "").join(" ");
@@ -28,19 +20,21 @@ function ingredientJson(ingredient: RecipeIngredient) {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const libraryView = libraryViews[slug as keyof typeof libraryViews];
-  if (libraryView) return { title: libraryView.title, description: libraryView.introduction };
+  const comingSoonPage = recipeComingSoonPages[slug as keyof typeof recipeComingSoonPages];
+  if (comingSoonPage) {
+    return {
+      title: `${comingSoonPage.title} — Coming Soon`,
+      description: comingSoonPage.description,
+    };
+  }
   const recipe = await getRecipe(slug);
   return { title: recipe?.title ?? "Recipe not found", description: recipe?.excerpt, robots: { index: recipe?.verified === true, follow: recipe?.verified === true } };
 }
 
 export default async function RecipePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const libraryView = libraryViews[slug as keyof typeof libraryViews];
-  if (libraryView) {
-    const filteredRecipes = (await getRecipes()).filter(libraryView.filter);
-    return <><header className="page-hero"><PageContainer><Breadcrumbs items={[{ label: "Recipe Library", href: "/recipes" }, { label: libraryView.title }]} /><span className="eyebrow">Recipe Library</span><h1>{libraryView.title}</h1><p className="lead">{libraryView.introduction}</p></PageContainer></header><Section><PageContainer><nav className="filter-chips" aria-label="Browse the recipe library"><Link className="filter-chip" href="/recipes">All recipes</Link>{Object.entries(libraryViews).map(([viewSlug, view]) => <Link className={`filter-chip${viewSlug === slug ? " active" : ""}`} href={`/recipes/${viewSlug}`} key={viewSlug}>{view.title.replace("Recipes ", "").replace("recipes", "")}</Link>)}</nav>{filteredRecipes.length ? <div className="editorial-grid">{filteredRecipes.map((recipe) => <RecipeCard key={recipe.slug} recipe={recipe} />)}</div> : <div className="empty-state"><h3>No reviewed recipes in this view yet</h3><p>Recipes will appear here once their connections and cooking guidance are approved.</p></div>}</PageContainer></Section></>;
-  }
+  const comingSoonPage = recipeComingSoonPages[slug as keyof typeof recipeComingSoonPages];
+  if (comingSoonPage) return <ComingSoonPage {...comingSoonPage} />;
 
   const recipe = await getRecipe(slug);
   if (!recipe) notFound();

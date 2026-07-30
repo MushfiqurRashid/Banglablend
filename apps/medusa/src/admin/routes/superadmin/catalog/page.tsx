@@ -374,7 +374,7 @@ const CatalogWorkspace = () => {
             <div>
               <Heading level="h2">Products</Heading>
               <Text size="small" className="text-ui-fg-subtle mt-1">
-                Showing {rangeStart.toLocaleString()}–{rangeEnd.toLocaleString()} of{" "}
+                Showing {rangeStart.toLocaleString()} to {rangeEnd.toLocaleString()} of{" "}
                 {data.count.toLocaleString()} matching catalog records
               </Text>
             </div>

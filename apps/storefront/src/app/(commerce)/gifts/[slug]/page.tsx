@@ -3,9 +3,11 @@ import { notFound } from "next/navigation";
 import { getActiveMarket, getStoreProduct, getStoreProducts } from "@/lib/commerce/server";
 import { ProductGrid } from "@/components/commerce/product-grid";
 import { ProductDetailView } from "@/components/commerce/product-detail-view";
+import { ComingSoonPage } from "@/components/editorial/coming-soon-page";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { PageContainer } from "@/components/layout/page-container";
 import { Section } from "@/components/layout/section";
+import { giftComingSoonPages } from "@/config/coming-soon";
 import { titleFromSlug } from "@/lib/utils";
 import "../../commerce.css";
 
@@ -13,6 +15,13 @@ const listingSlugs = new Set(["gift-sets", "regional-gifts", "all", "regional", 
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
+  const comingSoonPage = giftComingSoonPages[slug as keyof typeof giftComingSoonPages];
+  if (comingSoonPage) {
+    return {
+      title: `${comingSoonPage.title} — Coming Soon`,
+      description: comingSoonPage.description,
+    };
+  }
   if (listingSlugs.has(slug)) return { title: `${titleFromSlug(slug)} Gifts` };
   const product = await getStoreProduct(slug);
   return { title: product?.title ?? "Gift not found", description: product?.description, alternates: product ? { canonical: `/gifts/${product.handle}` } : undefined };
@@ -20,6 +29,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function GiftPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+  const comingSoonPage = giftComingSoonPages[slug as keyof typeof giftComingSoonPages];
+  if (comingSoonPage) return <ComingSoonPage {...comingSoonPage} />;
   if (listingSlugs.has(slug)) {
     const products = (await getStoreProducts()).filter((product) => product.collection === "gifts" && (slug === "regional-gifts" || slug === "regional" ? product.giftType === "regional" : true));
     const title = slug === "gift-sets" || slug === "all" ? "Gift sets" : slug === "regional-gifts" || slug === "regional" ? "Regional gifts" : "Occasion gifts";

@@ -20,7 +20,7 @@ export const recipes = [
   {
     title: "Shorisha Ilish",
     slug: "shorisha-ilish",
-    excerpt: "A mustard-rich fish preparation presented as a working recipe for review.",
+    excerpt: "A fish preparation rich with mustard, presented as a working recipe for review.",
     region: "Bangladesh",
     prepTime: 20,
     cookTime: 25,
@@ -133,7 +133,7 @@ export const articles = [
     readingTime: 6,
     image: "/images/bangladesh-river-landscape.png",
     body: [
-      "Rivers, coasts, hills, cities and agricultural landscapes all influence what is available to cook and how food traditions develop. Regional flavour is therefore a relationship between place, people and practice—not a decorative label.",
+      "Rivers, coasts, hills, cities and agricultural landscapes all influence what is available to cook and how food traditions develop. Regional flavour is a relationship between place, people and practice. It is not simply a decorative label.",
       "Our regional stories connect dishes with reviewed sources, contributor knowledge and clearly identified locations. When the evidence is incomplete, the detail stays in editorial review.",
       "The aim is a growing map of Bangladesh that welcomes complexity and helps readers follow a flavour into a recipe, ingredient or product."
     ]
@@ -149,7 +149,7 @@ export const articles = [
     image: "/images/shorisha-ilish-recipe.png",
     body: [
       "Mustard can enter a kitchen as seed, oil or paste, with each form bringing a different kind of heat and aroma. The result depends on variety, freshness, preparation and the other ingredients around it.",
-      "A useful ingredient story separates broadly applicable cooking guidance from claims about a specific harvest or source. Product-level origin and processing details are published only when their records have been verified.",
+      "A useful ingredient story separates broadly applicable cooking guidance from claims about a specific harvest or source. Origin and processing details for individual products are published only when their records have been verified.",
       "For cooks meeting mustard anew, small adjustments and careful tasting are more useful than rigid rules."
     ]
   },
@@ -179,7 +179,7 @@ export const articles = [
     image: "/images/bangladesh-river-landscape.png",
     body: [
       "Bangla Blend treats regional storytelling as a publishing responsibility. A compelling anecdote, familiar phrase or supplier note is a useful lead, but it is not automatically a fact ready for customers.",
-      "Each place-based claim should carry a source, a verification state and an editor. First-person stories require consent, while product provenance must agree with the commerce record.",
+      "Each claim tied to a place should carry a source, a verification state and an editor. Personal stories require consent, while product provenance must agree with the commerce record.",
       "The result is a slower but more trustworthy kind of storytelling: useful context without borrowed authority, invented detail or decorative nostalgia."
     ]
   },
@@ -225,7 +225,7 @@ export const articles = [
     body: [
       "A Bangla Blend product page should not be the end of the journey. It should help a cook understand the flavour, find an appropriate recipe and see the place or practice that informed it.",
       "Those connections are maintained as structured references. Product facts remain in commerce data, while recipes and stories can be reviewed and updated independently in the editorial system.",
-      "The customer receives a joined-up experience without one system pretending to be the authority for every kind of information."
+      "The customer receives a connected experience without one system pretending to be the authority for every kind of information."
     ]
   }
 ];

@@ -38,7 +38,7 @@ export const APPROVED_SITEMAP_QUERY = `{
   "recipes": *[_type == "recipe" && verification.status == "verified" && verification.verified == true && defined(summary) && defined(heroImage.asset) && count(ingredients) > 0 && count(steps) > 0].slug.current,
   "articles": *[_type == "journalArticle" && verification.status == "verified" && verification.verified == true && defined(summary) && defined(heroImage.asset) && defined(publishedAt) && count(body) > 0]{"slug": slug.current, "category": category->slug.current},
   "legal": *[_type == "legalPage" && verification.status == "verified" && verification.verified == true && legalApprovalRecorded == true].slug.current,
-  "story": *[_type == "standardPage" && verification.status == "verified" && verification.verified == true && slug.current in ["about-bangla-blend", "our-philosophy", "our-impact", "our-standards", "meet-annapurna"]].slug.current
+  "story": *[_type == "standardPage" && verification.status == "verified" && verification.verified == true && slug.current in ["about-bangla-blend", "our-philosophy", "our-impact", "meet-annapurna"]].slug.current
 }`;
 
 export const LEGAL_PAGE_QUERY = `*[_type == "legalPage" && slug.current == $slug && verification.status == "verified" && verification.verified == true && legalApprovalRecorded == true][0]{

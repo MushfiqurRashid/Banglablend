@@ -2,21 +2,14 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import type { LucideIcon } from "lucide-react";
 import {
-  BadgeCheck,
   ChevronLeft,
   ChevronRight,
-  Coffee,
-  Gift,
   Heart,
   LayoutGrid,
-  Leaf,
   List,
-  Package,
   SlidersHorizontal,
   Sparkles,
-  Tag,
   X
 } from "lucide-react";
 import type { Product } from "@bangla-blend/types";
@@ -25,21 +18,6 @@ import { AddToCartButton } from "./add-to-cart-button";
 import { ProductVisual } from "./product-visual";
 
 const PAGE_SIZE = 8;
-
-const categoryCards: Array<{
-  title: string;
-  copy: string;
-  href: string;
-  icon: LucideIcon;
-}> = [
-  { title: "Originals", copy: "Signature blends", href: "/shop/originals", icon: Leaf },
-  { title: "Reserve", copy: "Single-origin spices", href: "/shop/reserve", icon: Sparkles },
-  { title: "Pantry", copy: "Everyday essentials", href: "/shop/pantry", icon: Package },
-  { title: "Tea & Wellness", copy: "Teas and infusions", href: "/shop/tea-wellness", icon: Coffee },
-  { title: "Build a Box", copy: "Create your own box", href: "/shop/build-a-box", icon: Gift },
-  { title: "Best Sellers", copy: "Customer favourites", href: "/shop/best-sellers", icon: Tag },
-  { title: "New Arrivals", copy: "Freshly added", href: "/shop/new-arrivals", icon: BadgeCheck }
-];
 
 const collectionLabels: Record<Product["collection"], string> = {
   originals: "Originals",
@@ -82,6 +60,13 @@ export function ShopCatalog({ products }: { products: Product[] }) {
   const currency = products[0]?.variants[0]?.price.currencyCode ?? "BDT";
   const regions = useMemo(
     () => Array.from(new Set(products.map((product) => product.region).filter((region): region is string => Boolean(region)))).sort(),
+    [products]
+  );
+  const availableCollections = useMemo(
+    () =>
+      (Object.keys(collectionLabels) as Product["collection"][]).filter((collection) =>
+        products.some((product) => product.collection === collection)
+      ),
     [products]
   );
 
@@ -174,18 +159,6 @@ export function ShopCatalog({ products }: { products: Product[] }) {
 
   return (
     <>
-      <section className="shop-category-band" aria-label="Shop by category">
-        <div className="shell shop-category-shortcuts">
-          {categoryCards.map(({ title, copy, href, icon: Icon }) => (
-            <Link className="shop-category-shortcut" href={href} key={href}>
-              <Icon size={27} strokeWidth={1.45} />
-              <strong>{title}</strong>
-              <span>{copy}</span>
-            </Link>
-          ))}
-        </div>
-      </section>
-
       <section className="shop-catalog-section">
         <div className="shell shop-catalog-layout">
           <button
@@ -216,7 +189,7 @@ export function ShopCatalog({ products }: { products: Product[] }) {
             <details className="shop-filter-group" open>
               <summary>Category</summary>
               <div className="shop-filter-options">
-                {(Object.keys(collectionLabels) as Product["collection"][]).map((collection) => {
+                {availableCollections.map((collection) => {
                   const count = products.filter((product) => product.collection === collection).length;
                   return (
                     <label key={collection}>
@@ -381,7 +354,7 @@ export function ShopCatalog({ products }: { products: Product[] }) {
                   {filterCount ? <span>{filterCount}</span> : null}
                 </button>
                 <p>
-                  Showing {rangeStart}–{rangeEnd} of {visibleProducts.length} products
+                  Showing {rangeStart} to {rangeEnd} of {visibleProducts.length} products
                 </p>
               </div>
               <div className="shop-results-controls">

@@ -13,7 +13,7 @@ const featuredStories = [
       "Discover the heritage of Chattogram’s communal feast and the flavours that bring people together.",
     href: "/discover-bangladesh/regional-flavours",
     image: "/images/recipe-mezban-gosh.png",
-    imageAlt: "A brass bowl filled with rich Chattogram-style mezban beef",
+    imageAlt: "A brass bowl filled with rich Chattogram mezban beef",
   },
   {
     category: "Ingredient Stories",
@@ -27,7 +27,7 @@ const featuredStories = [
   {
     category: "Food Heritage",
     title: "How Geography Shaped Bengali Cuisine",
-    description: "Rivers, deltas, land and monsoon—the natural forces that shape what we eat.",
+    description: "Rivers, deltas, land and monsoon are the natural forces that shape what we eat.",
     href: "/discover-bangladesh/food-heritage",
     image: "/images/bangladesh-river-landscape.png",
     imageAlt: "A boat on a river flowing through rural Bangladesh",

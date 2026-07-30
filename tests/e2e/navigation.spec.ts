@@ -13,12 +13,22 @@ test("primary navigation exposes both commerce and culture", async ({ page, isMo
     await expect(menu.getByRole("link", { name: "View all Shop" })).toBeVisible();
     await menu.getByText("Discover Bangladesh", { exact: true }).click();
     await expect(menu.getByRole("link", { name: "View all Discover Bangladesh" })).toBeVisible();
-    await expect(menu.getByRole("combobox", { name: /deliver to/i })).toBeVisible();
+    await expect(menu.getByRole("combobox", { name: /delivery destination/i })).toBeVisible();
     return;
   }
 
   const navigation = page.getByRole("navigation", { name: "Main navigation" });
-  await expect(navigation.getByRole("link", { name: "Shop", exact: true })).toBeVisible();
+  const shopLink = navigation.getByRole("link", { name: "Shop", exact: true });
+  await expect(shopLink).toBeVisible();
   await expect(navigation.getByRole("link", { name: "Discover Bangladesh", exact: true })).toBeVisible();
-  await expect(page.getByRole("combobox", { name: /deliver to/i })).toBeVisible();
+  await shopLink.hover();
+  const shopDropdown = shopLink.locator("..").locator(".mega-menu");
+  await expect(shopDropdown).toBeVisible();
+  await expect(shopDropdown.getByRole("link", { name: "Shop All" })).toBeVisible();
+  const dropdownBox = await shopDropdown.boundingBox();
+  const viewport = page.viewportSize();
+  expect(dropdownBox).not.toBeNull();
+  expect(viewport).not.toBeNull();
+  expect(dropdownBox!.width).toBeLessThan(viewport!.width / 2);
+  await expect(page.getByRole("combobox", { name: /delivery destination/i })).toBeVisible();
 });

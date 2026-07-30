@@ -30,7 +30,7 @@ export async function GET(req: AuthenticatedMedusaRequest, res: MedusaResponse) 
 export async function POST(req: AuthenticatedMedusaRequest, res: MedusaResponse) {
   const parsed = updateSchema.safeParse(req.body);
   if (!parsed.success) {
-    return res.status(400).json({ message: "Invalid gift-order update.", errors: parsed.error.flatten() });
+    return res.status(400).json({ message: "Invalid gift order update.", errors: parsed.error.flatten() });
   }
   const service = req.scope.resolve<GiftingModuleService>(GIFTING_MODULE);
   const parsedOrderId = orderIdSchema.safeParse(req.params.orderId);

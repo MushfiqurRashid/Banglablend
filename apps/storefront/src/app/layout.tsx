@@ -10,6 +10,7 @@ import { getActiveMarket } from "@/lib/commerce/server";
 import { siteConfig } from "@/config/site";
 import { CookieBanner } from "@/components/layout/cookie-banner";
 import { PageTransition } from "@/components/layout/page-transition";
+import { HomeFaqSection } from "@/components/marketing/home-faq-section";
 import "./globals.css";
 import "./search/search.css";
 
@@ -18,13 +19,13 @@ const notoSansBengali = Noto_Sans_Bengali({ subsets: ["bengali"], variable: "--f
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
-  title: { default: `${siteConfig.name} — ${siteConfig.tagline}`, template: `%s — ${siteConfig.name}` },
+  title: { default: `${siteConfig.name}: ${siteConfig.tagline}`, template: `%s | ${siteConfig.name}` },
   description: siteConfig.description,
   icons: {
     icon: [{ url: "/images/bangla-blend-logo-final-v3.png", type: "image/png" }],
     apple: "/images/bangla-blend-logo-final-v3.png"
   },
-  openGraph: { type: "website", siteName: siteConfig.name, title: `${siteConfig.name} — ${siteConfig.tagline}`, description: siteConfig.description },
+  openGraph: { type: "website", siteName: siteConfig.name, title: `${siteConfig.name}: ${siteConfig.tagline}`, description: siteConfig.description },
   robots: { index: true, follow: true }
 };
 
@@ -40,13 +41,18 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     logo: new URL("/images/bangla-blend-logo-final-v3.png", siteConfig.url).toString()
   };
   return (
-    <html lang="en" className={`${dmSans.variable} ${notoSansBengali.variable}`}>
+    <html
+      lang="en"
+      className={`${dmSans.variable} ${notoSansBengali.variable}`}
+      data-scroll-behavior="smooth"
+    >
       <body>
         <a className="skip-link" href="#main-content">Skip to content</a>
         <AppProviders initialMarket={market.code}>
           <AnnouncementBar market={market.code} />
           <DesktopHeader />
           <main id="main-content"><PageTransition>{children}</PageTransition></main>
+          <HomeFaqSection />
           <NewsletterSection />
           <Footer />
           <CartDrawer />

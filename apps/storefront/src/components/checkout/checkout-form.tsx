@@ -124,7 +124,7 @@ export function CheckoutForm({ market, availability }: { market: Market; availab
       <aside className="checkout-review">
         <span className="eyebrow">Review</span><h3>Order summary</h3>
         {cart?.items.length ? <div className="checkout-summary-lines">{cart.items.map((line) => <div key={line.id}><span>{line.quantity} × {line.title}</span><strong>{formatMoney(line.total, cart.currencyCode.toUpperCase())}</strong></div>)}<div className="checkout-summary-total"><span>Current total</span><strong>{formatMoney(cart.total, cart.currencyCode.toUpperCase())}</strong></div><p>Delivery and final taxes update from the address and method selected.</p></div> : <p>Your cart summary could not be loaded. Return to the cart before submitting.</p>}
-        <ul><li><Truck size={17} /> Destination-aware delivery</li><li><Gift size={17} /> Separate recipient details</li><li><LockKeyhole size={17} /> Server-validated payment</li></ul>
+        <ul><li><Truck size={17} /> Delivery matched to your destination</li><li><Gift size={17} /> Separate recipient details</li><li><LockKeyhole size={17} /> Payment verified by our server</li></ul>
         {!market.domestic ? <p className="duties-box">{market.dutiesMessage}</p> : null}
         <label className="check-row terms"><input type="checkbox" {...register("termsAccepted")} /><span>I agree to the <Link href="/legal/terms-and-conditions" target="_blank" rel="noopener noreferrer">terms and conditions</Link>.</span></label>
         {errors.termsAccepted ? <span className="field-error">Please accept the terms.</span> : null}

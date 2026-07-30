@@ -3,7 +3,7 @@ import { isUnsafeCrossSiteRequest } from "@/lib/security/request";
 
 export function proxy(request: NextRequest) {
   const externallyAuthenticated = request.nextUrl.pathname.startsWith("/api/payments/sslcommerz/") || request.nextUrl.pathname === "/api/revalidate/sanity";
-  if (!externallyAuthenticated && isUnsafeCrossSiteRequest(request)) return NextResponse.json({ error: "Cross-site request rejected." }, { status: 403 });
+  if (!externallyAuthenticated && isUnsafeCrossSiteRequest(request)) return NextResponse.json({ error: "Request from another site rejected." }, { status: 403 });
   const requestId = crypto.randomUUID();
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-request-id", requestId);

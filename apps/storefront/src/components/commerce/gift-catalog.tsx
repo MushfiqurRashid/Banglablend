@@ -105,7 +105,7 @@ export function GiftCatalog({ products }: { products: Product[] }) {
           >
             <Gift size={27} strokeWidth={1.45} />
             <strong>All gifts</strong>
-            <span>See every gift-ready set</span>
+            <span>See every set ready for gifting</span>
           </button>
           <button
             type="button"
@@ -122,7 +122,7 @@ export function GiftCatalog({ products }: { products: Product[] }) {
             onClick={() => chooseShortcut("1000-2000")}
           >
             <PackageOpen size={27} strokeWidth={1.45} />
-            <strong>৳1,000–৳2,000</strong>
+            <strong>৳1,000 to ৳2,000</strong>
             <span>Generous sets for any occasion</span>
           </button>
           <button
@@ -218,7 +218,7 @@ export function GiftCatalog({ products }: { products: Product[] }) {
                 {[
                   ["all", "All prices"],
                   ["under-1000", "Under ৳1,000"],
-                  ["1000-2000", "৳1,000–৳2,000"],
+                  ["1000-2000", "৳1,000 to ৳2,000"],
                   ["over-2000", "Over ৳2,000"],
                 ].map(([value, label]) => (
                   <label key={value}>
@@ -283,7 +283,7 @@ export function GiftCatalog({ products }: { products: Product[] }) {
                   {filterCount ? <span>{filterCount}</span> : null}
                 </button>
                 <p aria-live="polite">
-                  Showing {rangeStart}–{rangeEnd} of {visibleProducts.length} gifts
+                  Showing {rangeStart} to {rangeEnd} of {visibleProducts.length} gifts
                 </p>
               </div>
               <div className="shop-results-controls">

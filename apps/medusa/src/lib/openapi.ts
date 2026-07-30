@@ -12,7 +12,7 @@ export const openApiDocument = {
   info: {
     title: "Bangla Blend API",
     version: "0.1.0",
-    description: "Interactive contract for Bangla Blend's custom Medusa store, administration, gifting, inquiry, payment-audit, and payment-webhook endpoints. Standard commerce resources are provided by Medusa."
+    description: "Interactive contract for Bangla Blend's custom Medusa store, administration, gifting, inquiry, payment audit, and payment webhook endpoints. Standard commerce resources are provided by Medusa."
   },
   servers: [
     { url: "http://localhost:9000", description: "Local Medusa backend" }
@@ -27,7 +27,7 @@ export const openApiDocument = {
       post: {
         tags: ["Store"],
         summary: "Submit an inquiry",
-        description: "Accepts contact, newsletter, wholesale, and corporate-gifting inquiries.",
+        description: "Accepts contact, newsletter, wholesale, and corporate gifting inquiries.",
         operationId: "createInquiry",
         requestBody: {
           required: true,
@@ -204,7 +204,7 @@ export const openApiDocument = {
       post: {
         tags: ["Payments"],
         summary: "Handle the customer success redirect",
-        description: "Redirects to the storefront's pending-verification success page. This redirect does not mark an order paid.",
+        description: "Redirects to the storefront success page while verification is pending. This redirect does not mark an order paid.",
         operationId: "handleSslCommerzSuccess",
         responses: { "303": { description: "Redirect to storefront success page" } }
       }

@@ -71,7 +71,7 @@ const topics: Topic[] = [
     description: "Meet the people behind our ingredients and learn how we source with care.",
     href: "/discover-bangladesh/farmer-sourcing-stories",
     image: "/images/campaign/chilli-sourcing.jpg",
-    imageAlt: "A Bangladeshi grower gathering sun-dried red chillies",
+    imageAlt: "A Bangladeshi grower gathering red chillies dried in the sun",
     action: "Explore stories",
     icon: Sprout,
     imagePosition: "center 54%",
@@ -101,10 +101,10 @@ const topics: Topic[] = [
   {
     title: "Behind Bangla Blend",
     description:
-      "Go behind the scenes of Bangla Blend—our process, people and passion for regional food.",
+      "Go behind the scenes of Bangla Blend and meet the people behind our process and passion for regional food.",
     href: "/discover-bangladesh/behind-bangla-blend",
     image: "/images/campaign/pantry-lineup.jpg",
-    imageAlt: "A full lineup of Bangla Blend small-batch masala jars",
+    imageAlt: "A full lineup of Bangla Blend masala jars made in small batches",
     action: "Explore stories",
     icon: Heart,
     imagePosition: "center",
@@ -121,8 +121,8 @@ export default function DiscoverBangladeshPage() {
             <h1 id="discover-page-title">Discover Bangladesh</h1>
             <span className="discover-title-rule" aria-hidden="true" />
             <p>
-              From centuries-old food heritage to the people and ingredients that shape our kitchens
-              today—explore the stories, traditions and techniques that make Bangladeshi food so
+              From centuries of food heritage to the people and ingredients that shape our kitchens
+              today. Explore the stories, traditions and techniques that make Bangladeshi food so
               rich and diverse.
             </p>
           </div>

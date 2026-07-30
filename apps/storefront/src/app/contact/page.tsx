@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
-  ArrowUpRight,
   Clock3,
   Handshake,
   Leaf,
@@ -17,7 +16,6 @@ import {
 import { ContactForm } from "@/components/forms/contact-form";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { PageContainer } from "@/components/layout/page-container";
-import { siteConfig } from "@/config/site";
 import "./contact.css";
 
 export const metadata: Metadata = {
@@ -66,57 +64,15 @@ function ContactOrnament() {
   );
 }
 
-function ContactMapIllustration() {
-  return (
-    <div
-      className="contact-map-illustration"
-      role="img"
-      aria-label="Stylised location map for Dhaka, Bangladesh"
-    >
-      <svg viewBox="0 0 900 320" aria-hidden="true" preserveAspectRatio="xMidYMid slice">
-        <rect width="900" height="320" fill="#eee7dc" />
-        <path
-          d="M0 225C115 201 181 248 294 216C405 184 474 199 563 242C675 296 764 251 900 263V320H0Z"
-          fill="#dce8e5"
-        />
-        <g fill="#e4dac9">
-          <path d="M38 34h138v66H38zM210 20h118v82H210zM366 31h128v58H366z" />
-          <path d="M538 25h138v83H538zM714 35h148v55H714z" />
-          <path d="M60 134h108v61H60zM208 129h144v67H208zM402 121h118v74H402z" />
-          <path d="M558 138h130v55H558zM725 119h113v79H725z" />
-        </g>
-        <g fill="none" stroke="#fffdf8" strokeWidth="16" strokeLinecap="round">
-          <path d="M-25 77C117 88 198 124 297 162C398 201 499 193 609 157C713 122 800 126 926 152" />
-          <path d="M146-32C190 49 220 109 234 170C245 220 226 272 203 345" />
-          <path d="M576-25C543 68 526 130 538 196C548 252 595 293 646 345" />
-        </g>
-        <g fill="none" stroke="#c9bfae" strokeWidth="3" strokeLinecap="round">
-          <path d="M-10 42L373 317M73 321L454-5M298 322L725-18M471 324L889 49" />
-          <path d="M-15 185L916 51M6 284L899 185M29 115L874 306" />
-        </g>
-        <g fill="#6f8060">
-          <circle cx="92" cy="155" r="8" />
-          <circle cx="704" cy="74" r="7" />
-          <circle cx="785" cy="220" r="9" />
-        </g>
-      </svg>
-      <span className="contact-map-pin" aria-hidden="true">
-        <MapPin size={31} strokeWidth={1.8} />
-      </span>
-      <span className="contact-map-label">Dhaka</span>
-    </div>
-  );
-}
-
 export default function ContactPage() {
   const contactDetails = [
     {
-      title: "Head Office",
+      title: "Office Location",
       content: (
         <>
-          Dhaka, Bangladesh
+          Road 23, Gulshan 1
           <br />
-          Visits by appointment
+          Dhaka 1212, Bangladesh
         </>
       ),
       href: undefined,
@@ -136,8 +92,8 @@ export default function ContactPage() {
     },
     {
       title: "Email",
-      content: siteConfig.contactEmail,
-      href: `mailto:${siteConfig.contactEmail}`,
+      content: "banglablend@gmail.com",
+      href: "mailto:banglablend@gmail.com",
       icon: Mail,
     },
     {
@@ -164,7 +120,7 @@ export default function ContactPage() {
             <ContactOrnament />
             <p>
               We’d love to hear from you. Whether you have a question about our products, an order,
-              a partnership opportunity or anything else—we’re here to help.
+              a partnership opportunity or anything else. We’re here to help.
             </p>
           </div>
           <div className="contact-hero-media">
@@ -218,25 +174,6 @@ export default function ContactPage() {
           ))}
         </nav>
 
-        <section className="contact-find" aria-labelledby="find-us-title">
-          <ContactMapIllustration />
-          <div className="contact-find-copy">
-            <Leaf className="contact-find-leaf" size={126} strokeWidth={0.75} aria-hidden="true" />
-            <div>
-              <h2 id="find-us-title">Find us</h2>
-              <p>Connect with our team in Dhaka. Meetings are arranged by appointment.</p>
-              <a
-                className="contact-button contact-button-outline"
-                href="https://www.google.com/maps/search/?api=1&query=Dhaka%2C+Bangladesh"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Get directions
-                <ArrowUpRight size={15} aria-hidden="true" />
-              </a>
-            </div>
-          </div>
-        </section>
       </PageContainer>
     </div>
   );

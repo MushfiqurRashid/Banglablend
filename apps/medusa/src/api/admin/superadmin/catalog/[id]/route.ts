@@ -41,14 +41,14 @@ const marketSchema = z.object({
     context.addIssue({
       code: "custom",
       path: ["international_available"],
-      message: "A domestic-only product cannot be internationally available."
+      message: "A product limited to domestic sales cannot be internationally available."
     });
   }
   if (profile.domestic_only === true && profile.export_ready === true) {
     context.addIssue({
       code: "custom",
       path: ["export_ready"],
-      message: "A domestic-only product cannot be marked export-ready."
+      message: "A product limited to domestic sales cannot be marked ready for export."
     });
   }
 });

@@ -61,7 +61,7 @@ function getRequiredProductionValue(name: string, developmentDefault: string) {
   const value = process.env[name]?.trim();
 
   if (process.env.NODE_ENV === "production" && (!value || value === developmentDefault)) {
-    throw new Error(`${name} must be explicitly set to a non-development value in production.`);
+    throw new Error(`${name} must be explicitly set to a value that is not used for development in production.`);
   }
 
   return value || developmentDefault;

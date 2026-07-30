@@ -15,5 +15,5 @@ export default async function CheckoutPage() {
     codEnabled: process.env.MEDUSA_COD_ENABLED === "true",
     sslcommerzEnabled: process.env.SSLCOMMERZ_ENABLED === "true" || developmentPreview
   };
-  return <><header className="page-hero"><PageContainer><span className="eyebrow">Secure checkout</span><h1>Delivery and payment</h1><p className="lead">Ordering for yourself or sending a gift, near or far—the recipient and billing details can stay separate.</p></PageContainer></header><section className="section"><PageContainer><CheckoutForm market={market} availability={availability} /></PageContainer></section></>;
+  return <><header className="page-hero"><PageContainer><span className="eyebrow">Secure checkout</span><h1>Delivery and payment</h1><p className="lead">Whether you are ordering for yourself or sending a gift, the recipient and billing details can stay separate.</p></PageContainer></header><section className="section"><PageContainer><CheckoutForm market={market} availability={availability} /></PageContainer></section></>;
 }

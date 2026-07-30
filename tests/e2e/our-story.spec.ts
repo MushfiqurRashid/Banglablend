@@ -42,7 +42,6 @@ test("our story page presents its sections, imagery and supporting navigation", 
     page.locator("#about-bangla-blend img"),
     page.locator("#our-philosophy img"),
     page.locator("#our-impact img"),
-    page.locator("#our-standards img"),
     page.locator("#meet-annapurna img"),
     page.locator("#from-our-notes img"),
   ];
@@ -56,7 +55,6 @@ test("our story page presents its sections, imagery and supporting navigation", 
     ["About Bangla Blend", "about-bangla-blend"],
     ["Our Philosophy", "our-philosophy"],
     ["Our Impact", "our-impact"],
-    ["Our Standards", "our-standards"],
     ["Meet Annapurna", "meet-annapurna"],
   ] as const;
 
@@ -74,7 +72,6 @@ test("our story page presents its sections, imagery and supporting navigation", 
     [page.locator("#about-bangla-blend"), "Our journey", "/our-story/about-bangla-blend"],
     [page.locator("#our-philosophy"), "Our philosophy", "/our-story/our-philosophy"],
     [page.locator("#our-impact"), "See our impact", "/our-story/our-impact"],
-    [page.locator("#our-standards"), "Our standards", "/our-story/our-standards"],
     [page.locator("#meet-annapurna"), "Meet Annapurna", "/our-story/meet-annapurna"],
     [page.locator("#from-our-notes"), "Read our notes", "/journal"],
   ] as const;
@@ -123,4 +120,14 @@ test("our story page presents its sections, imagery and supporting navigation", 
     .getByRole("link", { name: "See our impact", exact: true })
     .click();
   await expect(page).toHaveURL(/\/our-story\/our-impact$/);
+});
+
+test("our standards and its legacy alias are removed", async ({ request }) => {
+  const [standards, legacyAlias] = await Promise.all([
+    request.get("/our-story/our-standards"),
+    request.get("/quality-and-standards"),
+  ]);
+
+  expect(standards.status()).toBe(404);
+  expect(legacyAlias.status()).toBe(404);
 });

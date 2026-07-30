@@ -9,21 +9,29 @@ import { SearchCommand } from "@/components/search/search-command";
 import { LanguageSelector } from "./language-selector";
 
 const shopLinks = [
-  ["Shop All", "/shop/all"], ["Originals", "/shop/originals"], ["Reserve", "/shop/reserve"],
-  ["Pantry", "/shop/pantry"], ["Tea & Wellness", "/shop/tea-wellness"],
-  ["Lifestyle Accessories", "/shop/lifestyle-accessories"], ["Best Sellers", "/shop/best-sellers"],
-  ["New Arrivals", "/shop/new-arrivals"], ["Build a Box", "/shop/build-a-box"]
-] satisfies Array<readonly [string, string]>;
-const mappedShopLinks = shopLinks.map(([label, href]) => ({ label, href }));
-const giftLinks = ([
-  ["Gift Sets", "/gifts/gift-sets"], ["Regional Gifts", "/gifts/regional-gifts"], ["Corporate Gifting", "/gifts/corporate"]
-] satisfies Array<readonly [string, string]>).map(([label, href]) => ({ label, href }));
-const discoverLinks = ([
-  ["Food Heritage", "/discover-bangladesh/food-heritage"], ["Regional Flavours", "/discover-bangladesh/regional-flavours"],
-  ["Ingredient Stories", "/discover-bangladesh/ingredient-stories"], ["Farmer & Sourcing Stories", "/discover-bangladesh/farmer-sourcing-stories"],
-  ["Cooking Guides", "/discover-bangladesh/cooking-guides"], ["Festivals & Seasons", "/discover-bangladesh/festivals-seasons"],
-  ["Behind Bangla Blend", "/discover-bangladesh/behind-bangla-blend"]
-] satisfies Array<readonly [string, string]>).map(([label, href]) => ({ label, href }));
+  { label: "Shop All", href: "/shop/all", image: "/images/hero-spice-still-life.png" },
+  { label: "Originals", href: "/shop/originals", image: "/images/home-hero-hathajari.jpg" },
+  { label: "Reserve", href: "/shop/reserve", image: "/images/recipe-mezban-gosh.png" },
+  { label: "Pantry", href: "/shop/pantry", image: "/images/recipe-chana-dal-bhuna.png" },
+  { label: "Tea & Wellness", href: "/shop/tea-wellness", image: "/images/recipe-masala-chai.png" },
+  { label: "Lifestyle Accessories", href: "/shop/lifestyle-accessories", image: "/images/gifts-hero.png" },
+  { label: "Best Sellers", href: "/shop/best-sellers", image: "/images/shorisha-ilish-recipe.png" },
+  { label: "New Arrivals", href: "/shop/new-arrivals", image: "/images/recipe-grilled-hilsa.png" },
+];
+const giftLinks = [
+  { label: "Gift Sets", href: "/gifts/gift-sets", image: "/images/gifts-hero.png" },
+  { label: "Regional Gifts", href: "/gifts/regional-gifts", image: "/images/bangladesh-river-landscape.png" },
+  { label: "Corporate Gifting", href: "/gifts/corporate", image: "/images/our-story-craft.png" },
+];
+const discoverLinks = [
+  { label: "Food Heritage", href: "/discover-bangladesh/food-heritage", image: "/images/home-hero-hathajari.jpg" },
+  { label: "Regional Flavours", href: "/discover-bangladesh/regional-flavours", image: "/images/bangladesh-river-landscape.png" },
+  { label: "Ingredient Stories", href: "/discover-bangladesh/ingredient-stories", image: "/images/hero-spice-still-life.png" },
+  { label: "Farmer & Sourcing Stories", href: "/discover-bangladesh/farmer-sourcing-stories", image: "/images/our-story-annapurna.png" },
+  { label: "Cooking Guides", href: "/discover-bangladesh/cooking-guides", image: "/images/recipe-grilled-hilsa.png" },
+  { label: "Festivals & Seasons", href: "/discover-bangladesh/festivals-seasons", image: "/images/recipe-masala-chai.png" },
+  { label: "Behind Bangla Blend", href: "/discover-bangladesh/behind-bangla-blend", image: "/images/our-story-craft.png" },
+];
 
 export function DesktopHeader() {
   return (
@@ -32,16 +40,15 @@ export function DesktopHeader() {
         <Brand />
         <MobileMenu />
         <nav className="desktop-nav" aria-label="Main navigation">
-          <MegaMenu label="Shop" href="/shop" title="Begin with flavor" description="Signature blends, Reserve ingredients and practical pantry staples." links={mappedShopLinks} featureTitle="The Originals" featureHref="/shop/originals" />
-          <MegaMenu label="Gifts" href="/gifts" title="Give with meaning" description="Gift sets for people, places and organizations—sent near or far." links={giftLinks} featureTitle="Regional Gifts" featureHref="/gifts/regional-gifts" />
-          <MegaMenu label="Discover Bangladesh" href="/discover-bangladesh" title="Follow food into story" description="Food heritage, regional flavours, ingredients, people and practical cooking." links={discoverLinks} featureTitle="Food Heritage" featureHref="/discover-bangladesh/food-heritage" />
-          <Link className="nav-link" href="/recipes">Recipes</Link>
+          <MegaMenu label="Shop" href="/shop" links={shopLinks} />
+          <MegaMenu label="Gifts" href="/gifts" links={giftLinks} />
+          <MegaMenu label="Discover Bangladesh" href="/discover-bangladesh" links={discoverLinks} />
           <Link className="nav-link" href="/our-story">Our Story</Link>
         </nav>
         <div className="header-actions">
           <DestinationSelector />
           <span className="desktop-only"><LanguageSelector /></span>
-          <SearchCommand />
+          <span className="header-search"><SearchCommand /></span>
           <Link href="/account" className="icon-button account-action" aria-label="Account"><UserRound size={19} /></Link>
           <CartButton icon={<ShoppingBag size={19} />} />
         </div>

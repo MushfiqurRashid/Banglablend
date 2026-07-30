@@ -2,20 +2,31 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { journalCategories } from "@/lib/sanity/fallback-content";
 import { getArticles } from "@/lib/sanity/editorial";
+import { ComingSoonPage } from "@/components/editorial/coming-soon-page";
 import { ArticleCard } from "@/components/editorial/article-card";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { PageContainer } from "@/components/layout/page-container";
 import { Section } from "@/components/layout/section";
+import { discoverComingSoonPages } from "@/config/coming-soon";
 import "../../editorial.css";
 
 export async function generateMetadata({ params }: { params: Promise<{ category: string }> }): Promise<Metadata> {
   const { category: slug } = await params;
+  const comingSoonPage = discoverComingSoonPages[slug as keyof typeof discoverComingSoonPages];
+  if (comingSoonPage) {
+    return {
+      title: `${comingSoonPage.title} — Coming Soon`,
+      description: comingSoonPage.description,
+    };
+  }
   const category = journalCategories.find((item) => item.slug === slug);
   return { title: category?.title ?? "Discover Bangladesh", description: category?.description, robots: { index: Boolean(category), follow: Boolean(category) } };
 }
 
 export default async function DiscoverCategoryPage({ params }: { params: Promise<{ category: string }> }) {
   const { category: slug } = await params;
+  const comingSoonPage = discoverComingSoonPages[slug as keyof typeof discoverComingSoonPages];
+  if (comingSoonPage) return <ComingSoonPage {...comingSoonPage} />;
   const category = journalCategories.find((item) => item.slug === slug);
   if (!category) {
     const article = (await getArticles()).find((item) => item.slug === slug);

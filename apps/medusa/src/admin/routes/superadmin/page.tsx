@@ -360,7 +360,7 @@ const SuperadminDashboard = () => {
             />
             <ResourceCard
               title="Admin users & roles"
-              description="Invite staff, assign least-privilege roles, review access, and keep superadmin membership restricted."
+              description="Invite staff, assign roles with only the access they need, review permissions, and keep superadmin membership restricted."
               href={adminPath("/settings/users")}
               badge={`${data.metrics.admin_users} users`}
             />
@@ -372,7 +372,7 @@ const SuperadminDashboard = () => {
             />
             <ResourceCard
               title="Audit trail"
-              description="Review append-only evidence for product, setting, inquiry, and gift-order changes made by administrators."
+              description="Review the permanent record of product, setting, inquiry, and gift order changes made by administrators."
               href={adminPath("/superadmin/audit")}
               badge="Immutable"
             />
