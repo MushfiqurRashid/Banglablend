@@ -75,13 +75,13 @@ const processSteps = [
   {
     icon: Droplets,
     number: "02",
-    title: "Cleaning",
+    title: "Cleaning and Drying",
     copy: "Ingredients are inspected and prepared with attention to cleanliness and consistency.",
   },
   {
     icon: CookingPot,
     number: "03",
-    title: "Processing & blending",
+    title: "Blending",
     copy: "Recipes are processed and blended in measured batches to protect their intended character.",
   },
   {
@@ -224,7 +224,7 @@ export function ImpactPage() {
         <PageContainer>
           <header className="impact-centered-heading impact-process-heading">
             <span className="impact-page-eyebrow">From ingredient to jar</span>
-            <h2 id="cleaning-processing-title">Cleaning and Processing</h2>
+            <h2 id="cleaning-processing-title">Our Sourcing Journey</h2>
             <p>
               A clear sequence designed to protect product character and make every stage easier
               to understand.

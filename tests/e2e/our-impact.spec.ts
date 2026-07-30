@@ -24,13 +24,24 @@ test("Our Impact uses the requested section sequence and color treatments", asyn
   await expect(
     processSection.getByRole("heading", {
       level: 2,
-      name: "Cleaning and Processing",
+      name: "Our Sourcing Journey",
       exact: true,
     }),
   ).toBeVisible();
   await expect(
-    processSection.getByRole("heading", { name: /our sourcing/i }),
-  ).toHaveCount(0);
+    processSection.getByRole("heading", {
+      level: 3,
+      name: "Cleaning and Drying",
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(
+    processSection.getByRole("heading", {
+      level: 3,
+      name: "Blending",
+      exact: true,
+    }),
+  ).toBeVisible();
 
   const processBackground = await processSection.evaluate(
     (element) => getComputedStyle(element).backgroundColor,
