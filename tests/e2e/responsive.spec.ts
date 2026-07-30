@@ -128,6 +128,42 @@ test("mobile navigation fills the usable viewport and remains scrollable", async
   expect(box!.height).toBeCloseTo(390, 0);
 });
 
+test("footer stays compact and uses a clear responsive column grid", async ({ page }) => {
+  await acceptEssentialCookies(page);
+
+  const footerLayouts = [
+    { width: 1440, height: 900, columns: 6, maxFooterHeight: 450 },
+    { width: 768, height: 1024, columns: 3, maxFooterHeight: 800 },
+    { width: 844, height: 390, columns: 3, maxFooterHeight: 800 },
+    { width: 390, height: 844, columns: 2, maxFooterHeight: 950 },
+    { width: 320, height: 568, columns: 2, maxFooterHeight: 1_000 },
+  ] as const;
+
+  for (const layout of footerLayouts) {
+    await page.setViewportSize(layout);
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+
+    const footerMetrics = await page.locator(".site-footer").evaluate((footer) => {
+      const top = footer.querySelector<HTMLElement>(".footer-top");
+      const footerBox = footer.getBoundingClientRect();
+
+      return {
+        height: Math.round(footerBox.height),
+        columnCount: top
+          ? getComputedStyle(top).gridTemplateColumns.split(" ").filter(Boolean).length
+          : 0,
+        left: footerBox.left,
+        right: footerBox.right,
+      };
+    });
+
+    expect(footerMetrics.height).toBeLessThanOrEqual(layout.maxFooterHeight);
+    expect(footerMetrics.columnCount).toBe(layout.columns);
+    expect(footerMetrics.left).toBeGreaterThanOrEqual(-1);
+    expect(footerMetrics.right).toBeLessThanOrEqual(layout.width + 1);
+  }
+});
+
 test("search and cart overlays use the complete dynamic viewport", async ({ page }) => {
   await acceptEssentialCookies(page);
   await page.setViewportSize({ width: 768, height: 1024 });

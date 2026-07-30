@@ -10,5 +10,35 @@ const columns = [
 ] satisfies Array<{ title: string; links: Array<readonly [string, string]> }>;
 
 export function Footer() {
-  return <footer className="site-footer"><div className="shell footer-top"><div className="footer-brand"><Brand /><p>The Taste of Bangladesh, expressed through regional products, generous cooking and stories handled with care.</p></div>{columns.map((column) => <div className="footer-column" key={column.title}><p className="footer-title">{column.title}</p><ul className="footer-links">{column.links.map(([label, href]) => <li key={href}><Link href={href}>{label}</Link></li>)}</ul></div>)}</div><div className="shell footer-bottom"><span>© {new Date().getFullYear()} Bangla Blend</span><span>English storefront · Bangladesh and approved international markets</span></div></footer>;
+  return (
+    <footer className="site-footer">
+      <div className="shell footer-top">
+        <div className="footer-brand">
+          <Brand />
+          <p>
+            The Taste of Bangladesh, expressed through regional products, generous cooking and
+            stories handled with care.
+          </p>
+        </div>
+
+        {columns.map((column) => (
+          <div className="footer-column" key={column.title}>
+            <p className="footer-title">{column.title}</p>
+            <ul className="footer-links">
+              {column.links.map(([label, href]) => (
+                <li key={href}>
+                  <Link href={href}>{label}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+
+      <div className="shell footer-bottom">
+        <span>© {new Date().getFullYear()} Bangla Blend</span>
+        <span>English storefront · Bangladesh and approved international markets</span>
+      </div>
+    </footer>
+  );
 }
