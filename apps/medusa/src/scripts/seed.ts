@@ -18,6 +18,7 @@ import {
   updateProductsWorkflow
 } from "@medusajs/medusa/core-flows";
 import {
+  activeCatalogRevision,
   retiredSampleProductHandles,
   sampleCatalog,
   sampleCollections
@@ -28,8 +29,6 @@ import { defaultAdminSettings } from "../seeds/admin-settings";
 import { ADMIN_CONTROL_MODULE } from "../modules/admin-control";
 import type AdminControlModuleService from "../modules/admin-control/service";
 import { wrapSettingValue } from "../modules/admin-control/value";
-
-const CATALOG_REVISION = "bd-price-list-2026-07-29";
 
 export default async function seedBanglaBlend({ container }: ExecArgs) {
   const logger = container.resolve(ContainerRegistrationKeys.LOGGER);
@@ -92,8 +91,20 @@ export default async function seedBanglaBlend({ container }: ExecArgs) {
   const existingProductsByHandle = new Map(
     existingProducts.map((product) => [product.handle, product])
   );
+  const activeHandles = new Set(sampleCatalog.map((product) => product.handle));
   const retiredHandles = new Set<string>(retiredSampleProductHandles);
-  const retiredProducts = existingProducts.filter((product) => retiredHandles.has(product.handle));
+  const retiredProducts = existingProducts.filter((product) => {
+    if (activeHandles.has(product.handle)) return false;
+    const hasSeededSku = (product.variants ?? []).some(
+      (variant: { sku?: string | null }) =>
+        typeof variant.sku === "string" && variant.sku.startsWith("SAMPLE-")
+    );
+    return (
+      retiredHandles.has(product.handle) ||
+      hasSeededSku ||
+      typeof product.metadata?.catalog_revision === "string"
+    );
+  });
 
   if (retiredProducts.length) {
     await deleteProductsWorkflow(container).run({
@@ -118,7 +129,7 @@ export default async function seedBanglaBlend({ container }: ExecArgs) {
       existingSkus.length === desiredSkus.length &&
       existingSkus.every((sku, index) => sku === desiredSkus[index]);
     const needsVariantSync =
-      existingProduct.metadata?.catalog_revision !== CATALOG_REVISION ||
+      existingProduct.metadata?.catalog_revision !== activeCatalogRevision ||
       !variantsMatch;
 
     if (needsVariantSync) {
@@ -189,7 +200,7 @@ export default async function seedBanglaBlend({ container }: ExecArgs) {
             eligible_markets: product.markets,
             product_badges: product.badges,
             best_seller: product.bestSeller === true,
-            catalog_revision: CATALOG_REVISION,
+            catalog_revision: activeCatalogRevision,
             is_placeholder: false,
             verified: true
           }
@@ -214,7 +225,7 @@ export default async function seedBanglaBlend({ container }: ExecArgs) {
       eligible_markets: product.markets,
       product_badges: product.badges,
       best_seller: product.bestSeller === true,
-      catalog_revision: CATALOG_REVISION,
+      catalog_revision: activeCatalogRevision,
       is_placeholder: false,
       verified: true
     },
@@ -264,5 +275,5 @@ export default async function seedBanglaBlend({ container }: ExecArgs) {
   } else if (shippingOptionsToCreate.length) {
     logger.warn("Sample shipping options were not created because no service zone exists. Create an approved Bangladesh fulfillment set/service zone in Admin, then rerun the seed.");
   }
-  logger.info(`Seed complete. ${products.length} sample products and ${newLevels.length} sample inventory levels created. Configure real shipping options against approved service zones before checkout testing; international regions remain disabled operationally.`);
+  logger.info(`Seed complete. ${retiredProducts.length} retired sample products removed, ${products.length} sample products and ${newLevels.length} sample inventory levels created. Configure real shipping options against approved service zones before checkout testing; international regions remain disabled operationally.`);
 }

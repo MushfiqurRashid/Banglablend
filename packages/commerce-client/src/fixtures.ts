@@ -1,5 +1,7 @@
 import type { Market, Product } from "@bangla-blend/types";
 
+export const activeCatalogRevision = "bd-price-list-2026-07-29";
+
 export const markets: Market[] = [
   {
     code: "bd",
@@ -277,6 +279,8 @@ export const sampleProducts: Product[] = [
     verified: false,
   },
 ];
+
+export const activeProductHandles = sampleProducts.map((product) => product.handle);
 
 export function withMarketPrices(products: Product[], marketCode: string): Product[] {
   const market = markets.find((item) => item.code === marketCode) ?? markets[0]!;

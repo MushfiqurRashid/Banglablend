@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
+import {
+  activeCatalogRevision,
+  activeProductHandles,
+} from "@bangla-blend/commerce-client";
 import { searchContent } from "@bangla-blend/search-client";
 import { getActiveMarket, getStoreProducts } from "@/lib/commerce/server";
+
+const activeProductHandleSet = new Set<string>(activeProductHandles);
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -11,7 +17,13 @@ export async function GET(request: Request) {
   const apiKey = process.env.MEILISEARCH_SEARCH_KEY;
   if (host && apiKey) {
     const results = await searchContent({ host, apiKey, query, market: market.code });
-    return NextResponse.json({ hits: results.hits, estimatedTotalHits: results.estimatedTotalHits, source: "meilisearch" });
+    const hits = results.hits.filter(
+      (hit) =>
+        (hit.type !== "product" && hit.type !== "gift") ||
+        (activeProductHandleSet.has(hit.slug) &&
+          hit.catalogRevision === activeCatalogRevision),
+    );
+    return NextResponse.json({ hits, estimatedTotalHits: hits.length, source: "meilisearch" });
   }
   if (process.env.NODE_ENV === "development" && process.env.ENABLE_DEVELOPMENT_FALLBACKS === "true") {
     const products = await getStoreProducts(query, market.code);

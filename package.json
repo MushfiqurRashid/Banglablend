@@ -32,6 +32,7 @@
     "format:check": "prettier --check .",
     "check:production": "node scripts/verify-production-config.mjs",
     "seed": "corepack pnpm --filter @bangla-blend/medusa seed",
+    "catalog:sync": "corepack pnpm seed && corepack pnpm search:index",
     "seed:superadmin": "corepack pnpm --filter @bangla-blend/medusa seed:superadmin",
     "db:migrate": "corepack pnpm --filter @bangla-blend/medusa db:migrate",
     "search:index": "corepack pnpm --filter @bangla-blend/medusa search:index"

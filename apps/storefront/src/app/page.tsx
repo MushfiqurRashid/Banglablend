@@ -250,7 +250,7 @@ export default async function HomePage() {
             className="most-popular-products"
             data-count={Math.min(mostPopularProducts.length, 4)}
           >
-            <ProductGrid products={mostPopularProducts} showAddToCart />
+            <ProductGrid products={mostPopularProducts} action="order" />
           </div>
         </PageContainer>
       </Section>

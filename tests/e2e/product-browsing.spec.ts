@@ -23,7 +23,9 @@ test("shop and product routes render market-aware details", async ({ page }) => 
   await expect(page.getByRole("heading", { name: "Shop", level: 1 })).toBeVisible();
   await page.goto("/products/mezban-masala");
   await expect(page.getByRole("heading", { name: "Mezban Masala", level: 1 })).toBeVisible();
-  await expect(page.getByText(/sample|awaiting|unavailable/i).first()).toBeVisible();
+  await expect(page.locator(".pdp-subtitle")).toHaveText(
+    "Authentic Chattogram spice blend for rich traditional dishes",
+  );
 });
 
 test("shop subsections reuse the catalog UI and scope the visible products", async ({ page }) => {

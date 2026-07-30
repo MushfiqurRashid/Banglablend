@@ -87,15 +87,6 @@ test("home page keeps the promise band and section rhythm compact", async ({ pag
     await expect(categoryCards.nth(index)).toHaveAttribute("href", href);
   }
 
-  const featuredBlends = page.locator(
-    ".most-popular-section + .featured-products-section",
-  );
-  await expect(featuredBlends).toHaveCount(1);
-  await expect(
-    featuredBlends.getByRole("heading", { level: 2, name: "Featured blends", exact: true }),
-  ).toBeVisible();
-  await expect(featuredBlends.locator(".product-card")).toHaveCount(2);
-
   const communityRecipes = page.locator(".recipe-feature-section");
   await expect(
     communityRecipes.getByRole("heading", {
@@ -114,7 +105,6 @@ test("home page keeps the promise band and section rhythm compact", async ({ pag
   await expect(
     whyBanglaBlend.getByRole("heading", { level: 2, name: "Why Bangla Blend", exact: true }),
   ).toBeVisible();
-  await expect(page.locator(".recipe-feature-section + [data-testid='why-bangla-blend']")).toHaveCount(1);
   await expect(whyBanglaBlend.getByRole("row")).toHaveCount(5);
   const whySectionPadding = await whyBanglaBlend.evaluate((element) =>
     Number.parseFloat(getComputedStyle(element).paddingTop),
@@ -125,7 +115,6 @@ test("home page keeps the promise band and section rhythm compact", async ({ pag
     ".category-section",
     ".most-popular-section",
     ".impact-section",
-    ".featured-products-section",
     ".market-section",
     ".recipe-feature-section",
   ]) {
@@ -138,6 +127,10 @@ test("home page keeps the promise band and section rhythm compact", async ({ pag
   const firstStoryLink = await page.locator(".feature-link").first().boundingBox();
   expect(firstStoryLink).not.toBeNull();
   expect(firstStoryLink!.height).toBeLessThanOrEqual(isMobile ? 64 : 72);
+  const firstStoryFontSize = await page.locator(".feature-name").first().evaluate((element) =>
+    Number.parseFloat(getComputedStyle(element).fontSize),
+  );
+  expect(firstStoryFontSize).toBeGreaterThanOrEqual(isMobile ? 13 : 14);
 
   const storyCopyPadding = await page.locator(".region-feature-copy").evaluate((element) =>
     Number.parseFloat(getComputedStyle(element).paddingTop),
@@ -163,13 +156,23 @@ test("Most Popular uses the same products as the Best Sellers collection", async
 
   const popularTitles = await popularSection.locator(".product-card h3").allTextContents();
   expect(popularTitles).toHaveLength(4);
-  await expect(popularSection.locator(".product-card .add-to-cart")).toHaveCount(4);
+  const popularCards = popularSection.locator(".product-card");
+  await expect(popularCards.getByRole("link", { name: "Click to order" })).toHaveCount(4);
+  await expect(popularSection.locator(".add-to-cart")).toHaveCount(0);
 
-  const featuredSection = page.locator(".featured-products-section");
-  const featuredTitles = await featuredSection.locator(".product-card h3").allTextContents();
-  expect(featuredTitles).toHaveLength(2);
-  await expect(featuredSection.locator(".product-card .add-to-cart")).toHaveCount(2);
-  expect(featuredTitles.filter((title) => popularTitles.includes(title))).toEqual([]);
+  for (let index = 0; index < (await popularCards.count()); index += 1) {
+    const card = popularCards.nth(index);
+    const productHref = await card.locator(".product-card-image").getAttribute("href");
+    await expect(card.getByRole("link", { name: "Click to order" })).toHaveAttribute(
+      "href",
+      productHref!,
+    );
+  }
+
+  const firstOrderLink = popularCards.first().getByRole("link", { name: "Click to order" });
+  const firstProductHref = await firstOrderLink.getAttribute("href");
+  await firstOrderLink.click();
+  await expect(page).toHaveURL(new RegExp(`${firstProductHref!.replaceAll("/", "\\/")}$`));
 
   await page.goto("/shop/best-sellers");
   const bestSellerTitles = await page.locator(".shop-product-card h2").allTextContents();

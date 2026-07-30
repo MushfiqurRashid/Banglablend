@@ -89,5 +89,6 @@ export interface SearchDocument {
   slug: string;
   excerpt?: string;
   image?: string;
+  catalogRevision?: string;
   eligibleMarkets?: MarketCode[];
 }

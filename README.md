@@ -50,6 +50,10 @@ On macOS/Linux use `cp` instead of `copy`. Generate strong independent values fo
 6. Run `pnpm search:index` after the seed.
 7. Start all applications with `pnpm dev`, or use `pnpm dev:storefront`, `pnpm dev:medusa`, and `pnpm dev:studio` separately.
 
+After pulling a catalog update into an existing local environment, run `pnpm catalog:sync`. This
+removes retired sample products from the persistent Medusa database and rebuilds Meilisearch
+without stale product documents.
+
 Use the local-only credentials, bootstrap command, native RBAC checklist, and data-ownership rules in
 [Superadmin operations](docs/superadmin.md). Rotate the documented bootstrap password before the
 environment is shared or deployed.
@@ -76,6 +80,7 @@ Cash on Delivery uses Medusa's system provider. SSLCOMMERZ session creation, cre
 pnpm dev
 pnpm db:migrate
 pnpm seed
+pnpm catalog:sync
 pnpm search:index
 pnpm lint
 pnpm typecheck

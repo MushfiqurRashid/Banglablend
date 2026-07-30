@@ -12,11 +12,11 @@ import { AddToCartButton } from "./add-to-cart-button";
 export function ProductCard({
   product,
   index = 0,
-  showAddToCart = false,
+  action = "none",
 }: {
   product: Product;
   index?: number;
-  showAddToCart?: boolean;
+  action?: "none" | "add-to-cart" | "order";
 }) {
   const reducedMotion = useReducedMotion();
   const primaryVariant = product.variants[0];
@@ -32,9 +32,17 @@ export function ProductCard({
         <Link href={`/products/${product.handle}`}><h3>{product.title}</h3></Link>
         <p className="product-subtitle">{product.subtitle}</p>
         <div className="product-card-meta"><span>{product.region}</span><ProductPrice variant={product.variants[0]} /></div>
-        {showAddToCart ? (
+        {action !== "none" ? (
           <div className="product-card-actions">
-            {primaryVariant ? (
+            {action === "order" ? (
+              <Link
+                className="button button-primary product-card-order"
+                href={`/products/${product.handle}`}
+              >
+                Click to order
+                <ArrowUpRight size={15} aria-hidden="true" />
+              </Link>
+            ) : primaryVariant ? (
               <AddToCartButton
                 variantId={primaryVariant.id}
                 disabled={

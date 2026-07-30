@@ -3,10 +3,10 @@ import { ProductCard } from "./product-card";
 
 export function ProductGrid({
   products,
-  showAddToCart = false,
+  action = "none",
 }: {
   products: Product[];
-  showAddToCart?: boolean;
+  action?: "none" | "add-to-cart" | "order";
 }) {
   if (!products.length) return <div className="empty-state"><h3>No products found</h3><p>Try another collection or delivery destination.</p></div>;
   return (
@@ -16,7 +16,7 @@ export function ProductGrid({
           key={product.id}
           product={product}
           index={index}
-          showAddToCart={showAddToCart}
+          action={action}
         />
       ))}
     </div>

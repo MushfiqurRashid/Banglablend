@@ -16,6 +16,8 @@ interface SampleCatalogProduct {
   bestSeller?: boolean;
 }
 
+export const activeCatalogRevision = "bd-price-list-2026-07-29";
+
 export const sampleCollections = [
   { title: "Originals", handle: "originals" },
   { title: "Reserve", handle: "reserve" },

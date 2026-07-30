@@ -1,5 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { listProducts } from "../../packages/commerce-client/src";
+import {
+  activeCatalogRevision,
+} from "../../packages/commerce-client/src/fixtures";
 import { getProductMedia } from "../../apps/storefront/src/lib/product-presentation";
 
 const config = {
@@ -122,6 +125,52 @@ describe("product media adaptation", () => {
 });
 
 describe("product publishing visibility", () => {
+  it("uses the current fixture when an allowed backend product has a stale revision", async () => {
+    mockProducts([
+      medusaProduct({
+        id: "prod_stale_mezban",
+        handle: "mezban-masala",
+        title: "Old Mezban Masala",
+      }),
+    ]);
+
+    const products = await listProducts({
+      ...config,
+      allowDevelopmentFallback: true,
+      allowedProductHandles: ["mezban-masala"],
+      requiredCatalogRevision: activeCatalogRevision,
+    });
+
+    expect(products).toHaveLength(1);
+    expect(products[0]?.title).toBe("Mezban Masala");
+    expect(products[0]?.variants.map((variant) => variant.title)).toEqual([
+      "75 g",
+      "100 g",
+    ]);
+  });
+
+  it("hides stale backend products outside the storefront catalog allowlist", async () => {
+    mockProducts([
+      medusaProduct({
+        id: "prod_current",
+        handle: "mezban-masala",
+        title: "Mezban Masala",
+      }),
+      medusaProduct({
+        id: "prod_retired",
+        handle: "hill-tracts-turmeric",
+        title: "Hill Tracts Turmeric",
+      }),
+    ]);
+
+    const products = await listProducts({
+      ...config,
+      allowedProductHandles: ["mezban-masala"],
+    });
+
+    expect(products.map((product) => product.handle)).toEqual(["mezban-masala"]);
+  });
+
   it("shows clearly marked placeholder products only when development fallbacks are enabled", async () => {
     mockProducts([
       medusaProduct({

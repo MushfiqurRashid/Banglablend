@@ -2,6 +2,7 @@ import { createClient } from "@sanity/client";
 import type { ExecArgs } from "@medusajs/framework/types";
 import { ContainerRegistrationKeys } from "@medusajs/framework/utils";
 import { Meilisearch } from "meilisearch";
+import { activeCatalogRevision, sampleCatalog } from "../seeds/catalog";
 
 const synonyms = {
   mezban: ["mezbani", "মেজবান"],
@@ -31,7 +32,14 @@ export default async function indexSearch({ container }: ExecArgs) {
     fields: ["id", "title", "handle", "description", "thumbnail", "collection.handle", "metadata"],
     filters: { status: "published" }
   });
-  const verifiedProducts = products.filter((product) => product.metadata?.verified === true && product.metadata?.is_placeholder !== true);
+  const activeProductHandles = new Set(sampleCatalog.map((product) => product.handle));
+  const verifiedProducts = products.filter(
+    (product) =>
+      activeProductHandles.has(product.handle) &&
+      product.metadata?.catalog_revision === activeCatalogRevision &&
+      product.metadata?.verified === true &&
+      product.metadata?.is_placeholder !== true
+  );
   const productDocuments = verifiedProducts.map((product) => ({
     id: `product_${product.id}`,
     source: "medusa",
@@ -40,6 +48,7 @@ export default async function indexSearch({ container }: ExecArgs) {
     slug: product.handle,
     excerpt: product.description,
     image: product.thumbnail,
+    catalogRevision: activeCatalogRevision,
     language: "en",
     eligibleMarkets: product.metadata?.eligible_markets ?? ["bd"]
   }));
@@ -71,7 +80,11 @@ export default async function indexSearch({ container }: ExecArgs) {
     synonyms
   });
   const documents = [...productDocuments, ...editorialDocuments];
-  const task = await index.addDocuments(documents, { primaryKey: "id" });
-  await client.tasks.waitForTask(task.taskUid);
+  const clearTask = await index.deleteAllDocuments();
+  await client.tasks.waitForTask(clearTask.taskUid);
+  if (documents.length) {
+    const task = await index.addDocuments(documents, { primaryKey: "id" });
+    await client.tasks.waitForTask(task.taskUid);
+  }
   logger.info(`Indexed ${productDocuments.length} commerce records and ${editorialDocuments.length} verified editorial records.`);
 }

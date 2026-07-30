@@ -1,5 +1,8 @@
 import type { CurrencyCode, MarketCode, Product } from "@bangla-blend/types";
-import { sampleProducts, withMarketPrices } from "./fixtures";
+import {
+  sampleProducts,
+  withMarketPrices,
+} from "./fixtures";
 
 interface MedusaPrice {
   amount: number;
@@ -40,6 +43,8 @@ export interface CommerceConfig {
   regionId?: string;
   market: MarketCode;
   allowDevelopmentFallback?: boolean;
+  allowedProductHandles?: readonly string[];
+  requiredCatalogRevision?: string;
 }
 
 function isCurrency(value: string): value is CurrencyCode {
@@ -180,9 +185,14 @@ export class CommerceUnavailableError extends Error {
 }
 
 function fallbackProducts(config: CommerceConfig, query: string) {
-  return withMarketPrices(sampleProducts, config.market).filter((product) =>
-    `${product.title} ${product.description}`.toLowerCase().includes(query.toLowerCase()),
-  );
+  const allowedHandles = config.allowedProductHandles
+    ? new Set(config.allowedProductHandles)
+    : undefined;
+  return withMarketPrices(sampleProducts, config.market)
+    .filter((product) => !allowedHandles || allowedHandles.has(product.handle))
+    .filter((product) =>
+      `${product.title} ${product.description}`.toLowerCase().includes(query.toLowerCase()),
+    );
 }
 
 export async function listProducts(config: CommerceConfig, query = ""): Promise<Product[]> {
@@ -206,7 +216,35 @@ export async function listProducts(config: CommerceConfig, query = ""): Promise<
     });
     if (!response.ok) throw new CommerceUnavailableError(`Medusa returned ${response.status}.`);
     const payload = (await response.json()) as MedusaProductResponse;
-    return payload.products
+    const allowedHandles = config.allowedProductHandles
+      ? new Set(config.allowedProductHandles)
+      : undefined;
+    const allowedProducts = payload.products.filter(
+      (product) => !allowedHandles || allowedHandles.has(product.handle),
+    );
+    const hasStaleRevision =
+      Boolean(config.requiredCatalogRevision) &&
+      allowedProducts.some(
+        (product) =>
+          product.metadata?.catalog_revision !== config.requiredCatalogRevision,
+      );
+    const currentProducts = allowedProducts.filter(
+      (product) =>
+        !config.requiredCatalogRevision ||
+        product.metadata?.catalog_revision === config.requiredCatalogRevision,
+    );
+    const hasIncompleteCatalog =
+      !query &&
+      Boolean(config.allowedProductHandles?.length) &&
+      new Set(currentProducts.map((product) => product.handle)).size <
+        config.allowedProductHandles!.length;
+    if (
+      config.allowDevelopmentFallback &&
+      (hasStaleRevision || hasIncompleteCatalog)
+    ) {
+      return fallbackProducts(config, query);
+    }
+    return currentProducts
       .map(adaptProduct)
       .filter((product) => product.eligibleMarkets.includes(config.market))
       .filter(
@@ -240,3 +278,5 @@ export function formatMoney(amount: number, currencyCode: string, locale = "en-B
     maximumFractionDigits: currencyCode === "BDT" ? 0 : 2,
   }).format(amount);
 }
+
+export { activeCatalogRevision, activeProductHandles } from "./fixtures";
