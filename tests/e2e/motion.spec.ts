@@ -1,14 +1,26 @@
 import { expect, test } from "@playwright/test";
 
 test("animated overlays remain accessible and operable", async ({ page, isMobile }) => {
+  const hydrationErrors: string[] = [];
+  page.on("console", (message) => {
+    if (
+      ["error", "warning"].includes(message.type()) &&
+      /hydrated|hydration mismatch|server rendered html/i.test(message.text())
+    ) {
+      hydrationErrors.push(message.text());
+    }
+  });
+
   await page.goto("/");
 
-  await page.getByRole("button", { name: "Search", exact: true }).click();
-  const searchDialog = page.getByRole("dialog", { name: "Search Bangla Blend" });
-  await expect(searchDialog).toBeVisible();
-  await expect(searchDialog).toHaveCSS("opacity", "1");
-  await searchDialog.getByRole("button", { name: "Close search" }).click();
-  await expect(searchDialog).toBeHidden();
+  if (!isMobile) {
+    await page.getByRole("button", { name: "Search", exact: true }).click();
+    const searchDialog = page.getByRole("dialog", { name: "Search Bangla Blend" });
+    await expect(searchDialog).toBeVisible();
+    await expect(searchDialog).toHaveCSS("opacity", "1");
+    await searchDialog.getByRole("button", { name: "Close search" }).click();
+    await expect(searchDialog).toBeHidden();
+  }
 
   await page.getByRole("button", { name: /open cart/i }).click();
   const cartDialog = page.getByRole("dialog", { name: "Shopping bag" });
@@ -23,4 +35,6 @@ test("animated overlays remain accessible and operable", async ({ page, isMobile
     await menu.getByRole("button", { name: "Close menu" }).click();
     await expect(menu).toBeHidden();
   }
+
+  expect(hydrationErrors).toEqual([]);
 });

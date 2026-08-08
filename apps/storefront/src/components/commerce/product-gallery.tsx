@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { ChevronDown, ChevronUp, Search, X } from "lucide-react";
 import type { ProductMedia } from "@/lib/product-presentation";
@@ -43,6 +44,7 @@ export function ProductGallery({ media, title }: { media: ProductMedia[]; title:
   const views = useMemo(() => buildViews(media), [media]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [zoomed, setZoomed] = useState(false);
+  const reducedMotion = useReducedMotion();
   const active = views[activeIndex] ?? views[0];
 
   useEffect(() => {
@@ -100,15 +102,23 @@ export function ProductGallery({ media, title }: { media: ProductMedia[]; title:
         </div>
 
         <div className="pdp-main-image">
-          <Image
-            src={active.url}
-            alt={active.alt}
-            fill
-            priority
-            sizes="(max-width: 760px) 100vw, (max-width: 1100px) 52vw, 620px"
-            style={{ objectPosition: active.position, transform: `scale(${active.scale})` }}
-            unoptimized={active.url.startsWith("http")}
-          />
+          <motion.div
+            className="pdp-image-stage"
+            key={active.id}
+            initial={reducedMotion ? false : { opacity: 0.35 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <Image
+              src={active.url}
+              alt={active.alt}
+              fill
+              priority
+              sizes="(max-width: 760px) 100vw, (max-width: 1100px) 52vw, 620px"
+              style={{ objectPosition: active.position, transform: `scale(${active.scale})` }}
+              unoptimized={active.url.startsWith("http")}
+            />
+          </motion.div>
           <button className="pdp-zoom-button" type="button" onClick={() => setZoomed(true)} aria-label={`Enlarge ${title} image`}>
             <Search size={19} />
           </button>

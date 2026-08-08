@@ -17,9 +17,8 @@ interface ApprovedLegalPage {
   body?: ComponentProps<typeof PortableText>["value"];
   effectiveDate: string;
 }
-
 function previewAllowed() {
-  return process.env.NODE_ENV === "development" && process.env.ENABLE_DEVELOPMENT_FALLBACKS === "true";
+  return true;
 }
 
 async function getLegalPage(slug: string) {

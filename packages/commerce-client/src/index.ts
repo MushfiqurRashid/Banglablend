@@ -1,8 +1,11 @@
-import type { CurrencyCode, MarketCode, Product } from "@bangla-blend/types";
-import {
-  sampleProducts,
-  withMarketPrices,
-} from "./fixtures";
+import type {
+  CurrencyCode,
+  MarketCode,
+  Product,
+  StorefrontCatalog,
+  StorefrontSection,
+} from "@bangla-blend/types";
+import { sampleProducts, withMarketPrices } from "./fixtures";
 
 interface MedusaPrice {
   amount: number;
@@ -27,10 +30,26 @@ interface MedusaProduct {
   thumbnail?: string | null;
   images?: Array<{ url: string }>;
   collection?: { handle?: string | null } | null;
+  categories?: MedusaProductCategory[];
   tags?: Array<{ value: string }>;
   metadata?: Record<string, unknown> | null;
   variants?: MedusaVariant[];
   created_at?: string;
+}
+
+interface MedusaProductCategory {
+  id: string;
+  name: string;
+  handle: string;
+  description?: string | null;
+  is_active?: boolean;
+  is_internal?: boolean;
+  metadata?: Record<string, unknown> | null;
+  parent_category?: { id?: string; handle?: string | null } | null;
+}
+
+interface MedusaProductCategoryResponse {
+  product_categories: MedusaProductCategory[];
 }
 
 interface MedusaProductResponse {
@@ -94,6 +113,48 @@ function stringList(value: unknown) {
     : [];
 }
 
+const storefrontSections: StorefrontSection[] = [
+  "originals",
+  "reserve",
+  "pantry",
+  "tea-wellness",
+  "lifestyle-accessories",
+  "gifts",
+];
+
+function isStorefrontSection(value: unknown): value is StorefrontSection {
+  return typeof value === "string" && storefrontSections.includes(value as StorefrontSection);
+}
+
+function adaptCatalog(category: MedusaProductCategory): StorefrontCatalog | undefined {
+  const section = category.parent_category?.handle;
+  if (!isStorefrontSection(section) || category.is_internal === true) return undefined;
+  const metadata = category.metadata ?? {};
+  const experience = metadata.storefront_experience === "build_a_box" ? "build_a_box" : "listing";
+  const rawBoxSize = metadata.box_size;
+  const boxSize =
+    experience === "build_a_box" &&
+    typeof rawBoxSize === "number" &&
+    Number.isInteger(rawBoxSize) &&
+    rawBoxSize >= 2 &&
+    rawBoxSize <= 12
+      ? rawBoxSize
+      : experience === "build_a_box"
+        ? 3
+        : undefined;
+
+  return {
+    id: category.id,
+    name: category.name,
+    handle: category.handle,
+    description: category.description ?? undefined,
+    section,
+    experience,
+    boxSize,
+    active: category.is_active !== false,
+  };
+}
+
 function adaptProduct(product: MedusaProduct): Product {
   const metadata = product.metadata ?? {};
   const eligible = Array.isArray(metadata.eligible_markets)
@@ -148,6 +209,10 @@ function adaptProduct(product: MedusaProduct): Product {
     ].includes(collection)
       ? (collection as Product["collection"])
       : "originals",
+    catalogs: (product.categories ?? [])
+      .map(adaptCatalog)
+      .filter((catalog): catalog is StorefrontCatalog => Boolean(catalog))
+      .filter((catalog) => catalog.active),
     region: typeof metadata.region === "string" ? metadata.region : undefined,
     thumbnail,
     thumbnailAlt,
@@ -168,13 +233,54 @@ function adaptProduct(product: MedusaProduct): Product {
     verified: metadata.verified === true,
     bestSeller: metadata.best_seller === true,
     giftType:
-      metadata.gift_type === "regional"
-        ? "regional"
-        : metadata.gift_type === "set"
-          ? "set"
-          : undefined,
+      metadata.gift_type === "corporate"
+        ? "corporate"
+        : metadata.gift_type === "regional"
+          ? "regional"
+          : metadata.gift_type === "set"
+            ? "set"
+            : undefined,
     createdAt: product.created_at,
   };
+}
+
+export async function listStorefrontCatalogs(
+  config: CommerceConfig,
+  section?: StorefrontSection,
+): Promise<StorefrontCatalog[]> {
+  if (!config.backendUrl || !config.publishableKey) {
+    if (config.allowDevelopmentFallback) return [];
+    throw new CommerceUnavailableError();
+  }
+
+  const url = new URL("/store/product-categories", config.backendUrl);
+  url.searchParams.set("limit", "100");
+  url.searchParams.set(
+    "fields",
+    "id,name,handle,description,is_active,is_internal,metadata,parent_category.id,parent_category.handle",
+  );
+
+  try {
+    const response = await fetch(url, {
+      headers: { "x-publishable-api-key": config.publishableKey },
+      cache: "no-store",
+    });
+    if (!response.ok) throw new CommerceUnavailableError(`Medusa returned ${response.status}.`);
+    const payload = (await response.json()) as MedusaProductCategoryResponse;
+    return (payload.product_categories ?? [])
+      .map(adaptCatalog)
+      .filter((catalog): catalog is StorefrontCatalog => Boolean(catalog))
+      .filter((catalog) => catalog.active && (!section || catalog.section === section))
+      .sort((left, right) => left.name.localeCompare(right.name));
+  } catch (error) {
+    if (config.allowDevelopmentFallback) return [];
+    if (error instanceof CommerceUnavailableError) throw error;
+    throw new CommerceUnavailableError(
+      error instanceof Error
+        ? `The commerce catalog service could not be reached: ${error.message}`
+        : undefined,
+    );
+  }
 }
 
 export class CommerceUnavailableError extends Error {
@@ -190,9 +296,27 @@ function fallbackProducts(config: CommerceConfig, query: string) {
     : undefined;
   return withMarketPrices(sampleProducts, config.market)
     .filter((product) => !allowedHandles || allowedHandles.has(product.handle))
-    .filter((product) =>
-      `${product.title} ${product.description}`.toLowerCase().includes(query.toLowerCase()),
-    );
+    .filter((product) => matchesProductQuery(product, query));
+}
+
+function matchesProductQuery(product: Product, query: string) {
+  const normalizedQuery = query.trim().toLowerCase();
+  if (!normalizedQuery) return true;
+  const catalogTerms = (product.catalogs ?? [])
+    .flatMap((catalog) => [catalog.name, catalog.handle, catalog.section])
+    .join(" ");
+  return [
+    product.title,
+    product.subtitle,
+    product.description,
+    product.region,
+    product.badges.join(" "),
+    catalogTerms,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase()
+    .includes(normalizedQuery);
 }
 
 export async function listProducts(config: CommerceConfig, query = ""): Promise<Product[]> {
@@ -205,9 +329,11 @@ export async function listProducts(config: CommerceConfig, query = ""): Promise<
 
   const url = new URL("/store/products", config.backendUrl);
   url.searchParams.set("limit", "100");
-  url.searchParams.set("fields", "+variants.calculated_price,+metadata,+tags");
+  url.searchParams.set(
+    "fields",
+    "+variants.calculated_price,+metadata,+tags,+categories.id,+categories.name,+categories.handle,+categories.description,+categories.is_active,+categories.is_internal,+categories.metadata,+categories.parent_category.id,+categories.parent_category.handle",
+  );
   if (config.regionId) url.searchParams.set("region_id", config.regionId);
-  if (query) url.searchParams.set("q", query);
 
   try {
     const response = await fetch(url, {
@@ -225,8 +351,7 @@ export async function listProducts(config: CommerceConfig, query = ""): Promise<
     const hasStaleRevision =
       Boolean(config.requiredCatalogRevision) &&
       allowedProducts.some(
-        (product) =>
-          product.metadata?.catalog_revision !== config.requiredCatalogRevision,
+        (product) => product.metadata?.catalog_revision !== config.requiredCatalogRevision,
       );
     const currentProducts = allowedProducts.filter(
       (product) =>
@@ -238,10 +363,7 @@ export async function listProducts(config: CommerceConfig, query = ""): Promise<
       Boolean(config.allowedProductHandles?.length) &&
       new Set(currentProducts.map((product) => product.handle)).size <
         config.allowedProductHandles!.length;
-    if (
-      config.allowDevelopmentFallback &&
-      (hasStaleRevision || hasIncompleteCatalog)
-    ) {
+    if (config.allowDevelopmentFallback && (hasStaleRevision || hasIncompleteCatalog)) {
       return fallbackProducts(config, query);
     }
     return currentProducts
@@ -251,7 +373,8 @@ export async function listProducts(config: CommerceConfig, query = ""): Promise<
         (product) =>
           (product.verified === true && product.isPlaceholder !== true) ||
           (config.allowDevelopmentFallback === true && product.isPlaceholder === true),
-      );
+      )
+      .filter((product) => matchesProductQuery(product, query));
   } catch (error) {
     if (config.allowDevelopmentFallback) return fallbackProducts(config, query);
     if (error instanceof CommerceUnavailableError) throw error;

@@ -39,7 +39,7 @@ const topics: Topic[] = [
     title: "Food Heritage",
     description: "Discover the history, influences and evolution of Bengali food through time.",
     href: "/discover-bangladesh/food-heritage",
-    image: "/images/our-story-craft.png",
+    image: "/images/our-story-craft.webp",
     imageAlt: "Spices being ground by hand in a traditional stone mortar",
     action: "Explore stories",
     icon: Landmark,
@@ -50,7 +50,7 @@ const topics: Topic[] = [
     description:
       "Iconic dishes and food traditions that define the unique character of our regions.",
     href: "/discover-bangladesh/regional-flavours",
-    image: "/images/bangladesh-river-landscape.png",
+    image: "/images/bangladesh-river-landscape.webp",
     imageAlt: "A river winding through the green landscape of Bangladesh",
     action: "Explore stories",
     icon: MapPin,
@@ -61,7 +61,7 @@ const topics: Topic[] = [
     description:
       "The origins, characteristics and cultural significance of the ingredients we love.",
     href: "/discover-bangladesh/ingredient-stories",
-    image: "/images/our-story-standards.png",
+    image: "/images/our-story-standards.webp",
     imageAlt: "Bangladeshi spices arranged in brass and earthen bowls",
     action: "Explore stories",
     icon: Leaf,
@@ -81,7 +81,7 @@ const topics: Topic[] = [
     description:
       "Practical guides, techniques and tips to help you cook with confidence and bring out the best flavours.",
     href: "/discover-bangladesh/cooking-guides",
-    image: "/images/shorisha-ilish-recipe.png",
+    image: "/images/shorisha-ilish-recipe.webp",
     imageAlt: "Shorisha ilish served in a traditional dark earthen bowl",
     action: "Explore guides",
     icon: CookingPot,
@@ -92,7 +92,7 @@ const topics: Topic[] = [
     description:
       "Celebrate the seasons and special occasions with traditional foods and timeless recipes.",
     href: "/discover-bangladesh/festivals-seasons",
-    image: "/images/recipe-masala-chai.png",
+    image: "/images/recipe-masala-chai.webp",
     imageAlt: "Two warm cups of spiced tea with ginger and whole spices",
     action: "Explore stories",
     icon: CalendarDays,
@@ -128,7 +128,7 @@ export default function DiscoverBangladeshPage() {
           </div>
           <div className="discover-hero-media">
             <Image
-              src="/images/our-story-hero.png"
+              src="/images/our-story-hero.webp"
               alt="Dried chillies, turmeric, mustard seed and aromatic spices from a Bangladeshi kitchen"
               fill
               priority

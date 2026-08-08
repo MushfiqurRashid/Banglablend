@@ -1,8 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { listProducts } from "../../packages/commerce-client/src";
-import {
-  activeCatalogRevision,
-} from "../../packages/commerce-client/src/fixtures";
+import { listProducts, listStorefrontCatalogs } from "../../packages/commerce-client/src";
+import { activeCatalogRevision } from "../../packages/commerce-client/src/fixtures";
 import { getProductMedia } from "../../apps/storefront/src/lib/product-presentation";
 
 const config = {
@@ -122,6 +120,113 @@ describe("product media adaptation", () => {
       alt: "Front of the Media Product jar",
     });
   });
+
+  it("adapts active nested product categories into reusable storefront catalog assignments", async () => {
+    mockProducts([
+      medusaProduct({
+        categories: [
+          {
+            id: "pcat_build_box",
+            name: "Build a Box",
+            handle: "build-a-box",
+            is_active: true,
+            parent_category: { id: "pcat_gifts", handle: "gifts" },
+            metadata: { storefront_experience: "build_a_box", box_size: 4 },
+          },
+          {
+            id: "pcat_inactive",
+            name: "Seasonal",
+            handle: "seasonal",
+            is_active: false,
+            parent_category: { id: "pcat_gifts", handle: "gifts" },
+          },
+        ],
+      }),
+    ]);
+
+    const [product] = await listProducts(config);
+
+    expect(product?.catalogs).toEqual([
+      {
+        id: "pcat_build_box",
+        name: "Build a Box",
+        handle: "build-a-box",
+        description: undefined,
+        section: "gifts",
+        experience: "build_a_box",
+        boxSize: 4,
+        active: true,
+      },
+    ]);
+  });
+
+  it("finds products by an assigned catalog name in the storefront search fallback", async () => {
+    mockProducts([
+      medusaProduct({
+        categories: [
+          {
+            id: "pcat_build_box",
+            name: "Build a Box",
+            handle: "build-a-box",
+            is_active: true,
+            parent_category: { id: "pcat_gifts", handle: "gifts" },
+            metadata: { storefront_experience: "build_a_box", box_size: 3 },
+          },
+        ],
+      }),
+    ]);
+
+    await expect(listProducts(config, "Build a Box")).resolves.toHaveLength(1);
+    await expect(listProducts(config, "Not this catalog")).resolves.toEqual([]);
+  });
+});
+
+describe("storefront catalog discovery", () => {
+  it("lists active managed catalogs and filters by their parent storefront section", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(
+        async () =>
+          new Response(
+            JSON.stringify({
+              product_categories: [
+                {
+                  id: "pcat_build_box",
+                  name: "Build a Box",
+                  handle: "build-a-box",
+                  description: "Choose four products.",
+                  is_active: true,
+                  parent_category: { id: "pcat_gifts", handle: "gifts" },
+                  metadata: { storefront_experience: "build_a_box", box_size: 4 },
+                },
+                {
+                  id: "pcat_pantry",
+                  name: "Everyday pantry",
+                  handle: "everyday-pantry",
+                  is_active: true,
+                  parent_category: { id: "pcat_pantry_root", handle: "pantry" },
+                  metadata: {},
+                },
+              ],
+            }),
+            { status: 200, headers: { "content-type": "application/json" } },
+          ),
+      ),
+    );
+
+    await expect(listStorefrontCatalogs(config, "gifts")).resolves.toEqual([
+      {
+        id: "pcat_build_box",
+        name: "Build a Box",
+        handle: "build-a-box",
+        description: "Choose four products.",
+        section: "gifts",
+        experience: "build_a_box",
+        boxSize: 4,
+        active: true,
+      },
+    ]);
+  });
 });
 
 describe("product publishing visibility", () => {
@@ -143,10 +248,7 @@ describe("product publishing visibility", () => {
 
     expect(products).toHaveLength(1);
     expect(products[0]?.title).toBe("Mezban Masala");
-    expect(products[0]?.variants.map((variant) => variant.title)).toEqual([
-      "75 g",
-      "100 g",
-    ]);
+    expect(products[0]?.variants.map((variant) => variant.title)).toEqual(["75 g", "100 g"]);
   });
 
   it("hides stale backend products outside the storefront catalog allowlist", async () => {

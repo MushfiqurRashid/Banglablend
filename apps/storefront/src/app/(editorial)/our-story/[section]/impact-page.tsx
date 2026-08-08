@@ -46,7 +46,7 @@ const workStories = [
     title: "Ingredients in context",
     kicker: "Field notes",
     copy: "Regional ingredients deserve accurate records and stories grounded in the food they help create.",
-    image: "/images/our-story-impact.png",
+    image: "/images/our-story-impact.webp",
     alt: "A Bangladeshi farmer harvesting leafy crops in a sunlit field",
   },
   {
@@ -60,7 +60,7 @@ const workStories = [
     title: "Craft made visible",
     kicker: "From the kitchen",
     copy: "Clear process and practical cooking guidance connect careful craft with confident everyday use.",
-    image: "/images/our-story-craft.png",
+    image: "/images/our-story-craft.webp",
     alt: "Hands grinding whole spices with a traditional stone mortar",
   },
 ] as const;
@@ -94,7 +94,7 @@ const processSteps = [
 
 const glimpses = [
   {
-    image: "/images/bangladesh-river-landscape.png",
+    image: "/images/bangladesh-river-landscape.webp",
     alt: "River, farmland and palms in rural Bangladesh at sunrise",
   },
   {
@@ -102,11 +102,11 @@ const glimpses = [
     alt: "Red chillies being gathered after drying",
   },
   {
-    image: "/images/our-story-impact.png",
+    image: "/images/our-story-impact.webp",
     alt: "Leafy crops being harvested in a Bangladeshi field",
   },
   {
-    image: "/images/our-story-craft.png",
+    image: "/images/our-story-craft.webp",
     alt: "Whole spices being ground in a stone mortar",
   },
   {
@@ -166,7 +166,7 @@ export function ImpactPage() {
           </div>
           <div className="impact-page-hero-media">
             <Image
-              src="/images/our-story-impact.png"
+              src="/images/our-story-impact.webp"
               alt="A Bangladeshi farmer harvesting leafy crops in a sunlit field"
               fill
               priority

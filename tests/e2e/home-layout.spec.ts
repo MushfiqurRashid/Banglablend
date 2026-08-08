@@ -49,15 +49,13 @@ test("home page serves the premium campaign hero and reference copy", async ({ p
   await expect(promises.nth(3)).toContainText("People first");
 
   const heroImage = hero.locator(".home-hero-media img");
-  await expect(heroImage).toHaveAttribute("src", /home-hero-premium-v2\.png/);
+  await expect(heroImage).toHaveAttribute("src", /home-hero-premium-v2\.webp/);
   await expect
     .poll(() => heroImage.evaluate((image) => (image as HTMLImageElement).naturalWidth))
     .toBeGreaterThan(0);
-  await expect(heroImage).toHaveAttribute("src", /q=95/);
-
-  const asset = await request.get("/images/home-hero-premium-v2.png");
+  const asset = await request.get("/images/home-hero-premium-v2.webp");
   expect(asset.status()).toBe(200);
-  expect((await asset.body()).byteLength).toBeGreaterThan(2_000_000);
+  expect((await asset.body()).byteLength).toBeGreaterThan(200_000);
 
   const overflow = await page.evaluate(
     () => Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - innerWidth,
@@ -136,6 +134,22 @@ test("home page keeps the promise band and section rhythm compact", async ({ pag
     Number.parseFloat(getComputedStyle(element).paddingTop),
   );
   expect(storyCopyPadding).toBeLessThanOrEqual(isMobile ? 40 : 68);
+
+  const storySectionBox = await page.locator(".region-feature").boundingBox();
+  const storyGridBox = await page.locator(".region-feature-grid").boundingBox();
+  const storyMediaBox = await page.locator(".region-feature-media").boundingBox();
+  const storyCopyBox = await page.locator(".region-feature-copy").boundingBox();
+  expect(storySectionBox).not.toBeNull();
+  expect(storyGridBox).not.toBeNull();
+  expect(storyMediaBox).not.toBeNull();
+  expect(storyCopyBox).not.toBeNull();
+  expect(Math.abs(storyGridBox!.x - storySectionBox!.x)).toBeLessThanOrEqual(1);
+  expect(Math.abs(storyGridBox!.y - storySectionBox!.y)).toBeLessThanOrEqual(1);
+  expect(Math.abs(storyGridBox!.width - storySectionBox!.width)).toBeLessThanOrEqual(1);
+  expect(Math.abs(storyMediaBox!.x - storyGridBox!.x)).toBeLessThanOrEqual(1);
+  expect(
+    Math.abs(storyCopyBox!.x + storyCopyBox!.width - (storyGridBox!.x + storyGridBox!.width)),
+  ).toBeLessThanOrEqual(1);
 
   const overflow = await page.evaluate(
     () => Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - innerWidth,

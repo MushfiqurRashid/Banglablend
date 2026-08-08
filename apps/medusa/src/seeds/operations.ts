@@ -1,5 +1,19 @@
 export const sampleCategories = [
   {
+    name: "Originals",
+    handle: "originals",
+    is_active: true,
+    is_internal: false,
+    metadata: { storefront_section: true, verified: true },
+  },
+  {
+    name: "Reserve",
+    handle: "reserve",
+    is_active: true,
+    is_internal: false,
+    metadata: { storefront_section: true, verified: true },
+  },
+  {
     name: "Spice blends",
     handle: "spice-blends",
     is_active: true,
@@ -18,16 +32,47 @@ export const sampleCategories = [
     handle: "pantry",
     is_active: true,
     is_internal: false,
-    metadata: { isPlaceholder: true, verified: false },
+    metadata: { storefront_section: true, verified: true },
+  },
+  {
+    name: "Tea & Wellness",
+    handle: "tea-wellness",
+    is_active: true,
+    is_internal: false,
+    metadata: { storefront_section: true, verified: true },
+  },
+  {
+    name: "Lifestyle Accessories",
+    handle: "lifestyle-accessories",
+    is_active: true,
+    is_internal: false,
+    metadata: { storefront_section: true, verified: true },
   },
   {
     name: "Gifts",
     handle: "gifts",
     is_active: true,
     is_internal: false,
-    metadata: { isPlaceholder: true, verified: false },
+    metadata: { storefront_section: true, verified: true },
   },
 ];
+
+export const sampleStorefrontCatalogs = [
+  {
+    name: "Build a Box",
+    handle: "build-a-box",
+    description: "Choose three eligible Bangla Blend products to create your own gift box.",
+    parentHandle: "gifts",
+    is_active: true,
+    is_internal: false,
+    metadata: {
+      storefront_catalog: true,
+      storefront_experience: "build_a_box",
+      box_size: 3,
+      verified: true,
+    },
+  },
+] as const;
 
 export const samplePromotions = [
   {

@@ -22,6 +22,10 @@ export default defineMiddlewares({
       middlewares: [adminAuthentication],
     },
     {
+      matcher: "/admin/content*",
+      middlewares: [adminAuthentication],
+    },
+    {
       method: ["GET"],
       matcher: "/admin/superadmin*",
       policies: [{ resource: "superadmin", operation: PolicyOperation.read }],
@@ -32,7 +36,32 @@ export default defineMiddlewares({
       policies: [{ resource: "superadmin", operation: PolicyOperation.create }],
     },
     {
-      method: ["POST", "PUT", "PATCH"],
+      method: ["POST"],
+      matcher: "/admin/superadmin/catalog",
+      policies: [{ resource: "superadmin", operation: PolicyOperation.create }],
+    },
+    {
+      method: ["POST"],
+      matcher: "/admin/superadmin/catalog/*",
+      policies: [{ resource: "superadmin", operation: PolicyOperation.update }],
+    },
+    {
+      method: ["POST"],
+      matcher: "/admin/superadmin/catalogs",
+      policies: [{ resource: "superadmin", operation: PolicyOperation.create }],
+    },
+    {
+      method: ["POST"],
+      matcher: "/admin/superadmin/catalogs/*",
+      policies: [{ resource: "superadmin", operation: PolicyOperation.update }],
+    },
+    {
+      method: ["POST"],
+      matcher: "/admin/superadmin/settings*",
+      policies: [{ resource: "superadmin", operation: PolicyOperation.update }],
+    },
+    {
+      method: ["PUT", "PATCH"],
       matcher: "/admin/superadmin/*",
       policies: [{ resource: "superadmin", operation: PolicyOperation.update }],
     },

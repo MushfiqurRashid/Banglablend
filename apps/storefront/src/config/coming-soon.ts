@@ -25,7 +25,7 @@ export const discoverComingSoonPages = {
     eyebrow: "Discover Bangladesh",
     description:
       "A journey through Bangladesh’s distinct regional kitchens is in preparation, shaped by place, season and the people who keep these flavours alive.",
-    image: "/images/bangladesh-river-landscape.png",
+    image: "/images/bangladesh-river-landscape.webp",
     imageAlt: "A calm river landscape in Bangladesh",
     parent: { label: "Discover Bangladesh", href: "/discover-bangladesh" },
   },
@@ -34,7 +34,7 @@ export const discoverComingSoonPages = {
     eyebrow: "Discover Bangladesh",
     description:
       "We are tracing the origins, character and kitchen life of remarkable ingredients, one carefully reviewed story at a time.",
-    image: "/images/hero-spice-still-life.png",
+    image: "/images/hero-spice-still-life.webp",
     imageAlt: "Bangla Blend jars beside bowls of whole and ground spices",
     parent: { label: "Discover Bangladesh", href: "/discover-bangladesh" },
   },
@@ -52,7 +52,7 @@ export const discoverComingSoonPages = {
     eyebrow: "Discover Bangladesh",
     description:
       "Practical, generous guidance from the Bangla Blend kitchen is on the way, developed to make every technique feel clear and rewarding.",
-    image: "/images/recipe-grilled-hilsa.png",
+    image: "/images/recipe-grilled-hilsa.webp",
     imageAlt: "Grilled hilsa with green chillies and lime",
     parent: { label: "Discover Bangladesh", href: "/discover-bangladesh" },
   },
@@ -61,7 +61,7 @@ export const discoverComingSoonPages = {
     eyebrow: "Discover Bangladesh",
     description:
       "A seasonal collection of celebrations, table traditions and special-occasion flavours is being thoughtfully assembled.",
-    image: "/images/recipe-masala-chai.png",
+    image: "/images/recipe-masala-chai.webp",
     imageAlt: "Masala chai served in handmade clay cups",
     parent: { label: "Discover Bangladesh", href: "/discover-bangladesh" },
   },
@@ -70,7 +70,7 @@ export const discoverComingSoonPages = {
     eyebrow: "Discover Bangladesh",
     description:
       "Notes from our kitchen, studio and growing community are coming together for a closer look at how Bangla Blend is made.",
-    image: "/images/our-story-craft.png",
+    image: "/images/our-story-craft.webp",
     imageAlt: "Hands preparing spices with a traditional stone mortar",
     parent: { label: "Discover Bangladesh", href: "/discover-bangladesh" },
   },
@@ -82,7 +82,7 @@ export const giftComingSoonPages = {
     eyebrow: "The art of giving",
     description:
       "A refined collection of Bangla Blend favourites is being composed for generous tables, meaningful moments and beautifully considered gifting.",
-    image: "/images/gifts-hero.png",
+    image: "/images/gifts-hero.webp",
     imageAlt: "A premium Bangla Blend gift presentation",
     parent: { label: "Gifts", href: "/gifts" },
   },
@@ -91,7 +91,7 @@ export const giftComingSoonPages = {
     eyebrow: "The art of giving",
     description:
       "We are curating gift stories inspired by the regions of Bangladesh, bringing together distinctive flavours, craft and a true sense of place.",
-    image: "/images/bangladesh-river-landscape.png",
+    image: "/images/bangladesh-river-landscape.webp",
     imageAlt: "A river landscape evoking the regions of Bangladesh",
     parent: { label: "Gifts", href: "/gifts" },
   },
@@ -111,18 +111,17 @@ export const giftsComingSoonPage = {
   eyebrow: "The art of giving",
   description:
     "A refined gift shop of Bangla Blend favourites is being composed for generous tables, meaningful celebrations and beautifully considered giving.",
-  image: "/images/gifts-hero.png",
+  image: "/images/gifts-hero.webp",
   imageAlt: "A premium Bangla Blend gift presentation",
   parent: { label: "Home", href: "/" },
 } satisfies ComingSoonPageConfig;
-
 export const recipeComingSoonPages = {
   recipes: {
     title: "Recipe Library",
     eyebrow: "The Bangla Blend kitchen",
     description:
       "A generous library of tested recipes, regional favourites and everyday inspiration is simmering. We look forward to sharing it with you.",
-    image: "/images/shorisha-ilish-recipe.png",
+    image: "/images/shorisha-ilish-recipe.webp",
     imageAlt: "Mustard fish curry served with green chillies and rice",
     parent: { label: "Home", href: "/" },
   },
@@ -131,7 +130,7 @@ export const recipeComingSoonPages = {
     eyebrow: "The Bangla Blend kitchen",
     description:
       "We are mapping recipes through the places and food traditions that shape them, with each regional connection carefully reviewed.",
-    image: "/images/bangladesh-river-landscape.png",
+    image: "/images/bangladesh-river-landscape.webp",
     imageAlt: "A river landscape in Bangladesh at dawn",
     parent: { label: "Recipe Library", href: "/recipes" },
   },
@@ -140,7 +139,7 @@ export const recipeComingSoonPages = {
     eyebrow: "The Bangla Blend kitchen",
     description:
       "New ways to cook with Bangla Blend originals, pantry staples and signature blends are being tested in our kitchen.",
-    image: "/images/hero-spice-still-life.png",
+    image: "/images/hero-spice-still-life.webp",
     imageAlt: "Bangla Blend products with bowls of spices",
     parent: { label: "Recipe Library", href: "/recipes" },
   },
@@ -149,7 +148,7 @@ export const recipeComingSoonPages = {
     eyebrow: "The Bangla Blend kitchen",
     description:
       "Beloved dishes and established Bengali food traditions are being documented with respect, context and careful kitchen testing.",
-    image: "/images/recipe-mezban-gosh.png",
+    image: "/images/recipe-mezban-gosh.webp",
     imageAlt: "Mezban beef curry in a hammered brass bowl",
     parent: { label: "Recipe Library", href: "/recipes" },
   },
@@ -158,7 +157,7 @@ export const recipeComingSoonPages = {
     eyebrow: "The Bangla Blend kitchen",
     description:
       "Approachable recipes for the rhythm of everyday meals are on the way—practical, flavourful and made to be returned to often.",
-    image: "/images/recipe-chana-dal-bhuna.png",
+    image: "/images/recipe-chana-dal-bhuna.webp",
     imageAlt: "Golden chana dal with fried onion and green chilli",
     parent: { label: "Recipe Library", href: "/recipes" },
   },
@@ -169,7 +168,7 @@ export const meetAnnapurnaComingSoonPage = {
   eyebrow: "Our Story",
   description:
     "Annapurna’s story will be shared in her own voice. Her personal note and portrait are being prepared with the same warmth and care behind Bangla Blend.",
-  image: "/images/our-story-annapurna.png",
+  image: "/images/our-story-annapurna.webp",
   imageAlt: "An illustrated woman holding a bowl in a warm kitchen",
   parent: { label: "Our Story", href: "/our-story" },
 } satisfies ComingSoonPageConfig;

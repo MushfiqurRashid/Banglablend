@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import Link from "@/components/navigation/smart-link";
 
 export function CookieBanner() {
   const [visible, setVisible] = useState(false);

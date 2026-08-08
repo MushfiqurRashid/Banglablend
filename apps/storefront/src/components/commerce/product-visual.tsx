@@ -22,7 +22,9 @@ export function ProductVisual({ product, className }: { product: Product; classN
           src={media.url}
           alt={media.alt}
           fill
+          quality={70}
           sizes="(max-width: 700px) 50vw, 25vw"
+          fetchPriority="low"
           unoptimized={media.url.startsWith("http")}
         />
       </div>

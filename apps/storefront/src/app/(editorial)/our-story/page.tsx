@@ -59,7 +59,7 @@ const storyCards = [
   {
     id: "meet-annapurna",
     title: "Meet Annapurna",
-    image: "/images/our-story-annapurna.png",
+    image: "/images/our-story-annapurna.webp",
     imageAlt: "An illustrated woman holding a bowl in a warm kitchen scene",
     copy: "Annapurna represents abundance, nourishment and the spirit of sharing food with love. That spirit is at the heart of Bangla Blend.",
     cta: "Meet Annapurna",
@@ -69,7 +69,7 @@ const storyCards = [
   {
     id: "from-our-notes",
     title: "From Our Notes",
-    image: "/images/our-story-notes.png",
+    image: "/images/our-story-notes.webp",
     imageAlt: "An open recipe notebook beside a cup of tea and whole spices",
     copy: "Thoughts from our kitchen table, including food stories, seasonal inspiration, new launches and everything we are discovering along the way.",
     cta: "Read our notes",
@@ -96,7 +96,7 @@ export default function OurStoryPage() {
           </div>
           <div className="story-hero-media">
             <Image
-              src="/images/our-story-hero.png"
+              src="/images/our-story-hero.webp"
               alt="Bangladeshi spices, chillies and leaves arranged in handcrafted bowls"
               fill
               priority
@@ -149,7 +149,7 @@ export default function OurStoryPage() {
 
           <div className="story-about-media">
             <Image
-              src="/images/our-story-craft.png"
+              src="/images/our-story-craft.webp"
               alt="Illustrative editorial scene of hands preparing spices with a stone mortar"
               fill
               sizes="(max-width: 700px) 100vw, (max-width: 900px) 50vw, 31vw"
@@ -180,7 +180,7 @@ export default function OurStoryPage() {
         <PageContainer className="story-philosophy-layout">
           <div className="story-philosophy-media">
             <Image
-              src="/images/bangladesh-river-landscape.png"
+              src="/images/bangladesh-river-landscape.webp"
               alt="Fields and palms beside a river at sunrise in Bangladesh"
               fill
               sizes="(max-width: 700px) 100vw, 51vw"

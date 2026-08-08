@@ -22,7 +22,7 @@ export function NewsletterSection() {
         <div className="newsletter-card">
           <div className="newsletter-card-media">
             <Image
-              src="/images/our-story-notes.png"
+              src="/images/our-story-notes.webp"
               alt="A handwritten recipe notebook beside tea and whole spices"
               fill
               sizes="(max-width: 900px) 100vw, 45vw"

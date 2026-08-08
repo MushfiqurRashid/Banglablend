@@ -15,16 +15,22 @@ import {
   createStockLocationsWorkflow,
   linkSalesChannelsToStockLocationWorkflow,
   setProductProductOptionsWorkflow,
-  updateProductsWorkflow
+  updateProductsWorkflow,
 } from "@medusajs/medusa/core-flows";
 import {
   activeCatalogRevision,
   retiredSampleProductHandles,
   sampleCatalog,
-  sampleCollections
+  sampleCollections,
 } from "../seeds/catalog";
 import { sampleRegions, sampleShippingOptions } from "../seeds/markets";
-import { sampleCategories, sampleCustomers, sampleInventoryBySku, samplePromotions } from "../seeds/operations";
+import {
+  sampleCategories,
+  sampleCustomers,
+  sampleInventoryBySku,
+  samplePromotions,
+  sampleStorefrontCatalogs,
+} from "../seeds/operations";
 import { defaultAdminSettings } from "../seeds/admin-settings";
 import { ADMIN_CONTROL_MODULE } from "../modules/admin-control";
 import type AdminControlModuleService from "../modules/admin-control/service";
@@ -37,44 +43,115 @@ export default async function seedBanglaBlend({ container }: ExecArgs) {
   logger.info("Seeding clearly marked Bangla Blend sample commerce data.");
   const existingSettings = await adminControlService.listAppSettings({}, { take: 500 });
   const existingSettingKeys = new Set(existingSettings.map((setting) => setting.key));
-  const settingsToCreate = defaultAdminSettings.filter((setting) => !existingSettingKeys.has(setting.key));
+  const settingsToCreate = defaultAdminSettings.filter(
+    (setting) => !existingSettingKeys.has(setting.key),
+  );
   if (settingsToCreate.length) {
     await adminControlService.createAppSettings(
       settingsToCreate.map((setting) => ({
         ...setting,
         value: wrapSettingValue(setting.value),
         updated_by: "system:seed",
-        metadata: { seeded: true }
-      }))
+        metadata: { seeded: true },
+      })),
     );
   }
-  const { data: existingRegions } = await query.graph({ entity: "region", fields: ["id", "name", "metadata"] });
+  const { data: existingRegions } = await query.graph({
+    entity: "region",
+    fields: ["id", "name", "metadata"],
+  });
   const existingRegionCodes = new Set(
     existingRegions.flatMap((region) => {
       const marketCode = region.metadata?.market_code;
       return typeof marketCode === "string" ? [marketCode] : [];
-    })
+    }),
   );
   const regionsToCreate = sampleRegions
     .filter((region) => !existingRegionCodes.has(region.metadata.market_code))
     .map((region) =>
       region.metadata.market_code === "bd" && process.env.SSLCOMMERZ_ENABLED === "true"
-        ? { ...region, payment_providers: [...region.payment_providers, "pp_sslcommerz_sslcommerz"] }
-        : region
+        ? {
+            ...region,
+            payment_providers: [...region.payment_providers, "pp_sslcommerz_sslcommerz"],
+          }
+        : region,
     );
-  if (regionsToCreate.length) await createRegionsWorkflow(container).run({ input: { regions: regionsToCreate } });
-  const { data: collections } = await query.graph({ entity: "product_collection", fields: ["id", "handle"] });
+  if (regionsToCreate.length)
+    await createRegionsWorkflow(container).run({ input: { regions: regionsToCreate } });
+  const { data: collections } = await query.graph({
+    entity: "product_collection",
+    fields: ["id", "handle"],
+  });
   const existingCollectionHandles = new Set(collections.map((collection) => collection.handle));
-  const collectionsToCreate = sampleCollections.filter((collection) => !existingCollectionHandles.has(collection.handle));
-  if (collectionsToCreate.length) await createCollectionsWorkflow(container).run({ input: { collections: collectionsToCreate } });
-  const { data: categories } = await query.graph({ entity: "product_category", fields: ["id", "handle"] });
+  const collectionsToCreate = sampleCollections.filter(
+    (collection) => !existingCollectionHandles.has(collection.handle),
+  );
+  if (collectionsToCreate.length)
+    await createCollectionsWorkflow(container).run({ input: { collections: collectionsToCreate } });
+  const { data: categories } = await query.graph({
+    entity: "product_category",
+    fields: ["id", "handle"],
+  });
   const existingCategoryHandles = new Set(categories.map((category) => category.handle));
-  const categoriesToCreate = sampleCategories.filter((category) => !existingCategoryHandles.has(category.handle));
-  if (categoriesToCreate.length) await createProductCategoriesWorkflow(container).run({ input: { product_categories: categoriesToCreate } });
-  const { data: currentCollections } = await query.graph({ entity: "product_collection", fields: ["id", "handle"] });
-  const { data: stores } = await query.graph({ entity: "store", fields: ["default_sales_channel_id"] });
-  const { data: profiles } = await query.graph({ entity: "shipping_profile", fields: ["id", "type"] });
-  if (!stores[0]?.default_sales_channel_id || !profiles[0]?.id) throw new Error("Run the Medusa initial store setup so a sales channel and shipping profile exist before seeding products.");
+  const categoriesToCreate = sampleCategories.filter(
+    (category) => !existingCategoryHandles.has(category.handle),
+  );
+  if (categoriesToCreate.length)
+    await createProductCategoriesWorkflow(container).run({
+      input: { product_categories: categoriesToCreate },
+    });
+  const { data: currentCategories } = await query.graph({
+    entity: "product_category",
+    fields: ["id", "handle", "parent_category_id"],
+  });
+  const currentCategoriesByHandle = new Map(
+    currentCategories.map((category) => [category.handle, category]),
+  );
+  const storefrontCatalogsToCreate = sampleStorefrontCatalogs.flatMap((catalog) => {
+    if (currentCategoriesByHandle.has(catalog.handle)) return [];
+    const parent = currentCategoriesByHandle.get(catalog.parentHandle);
+    if (!parent) throw new Error(`Missing storefront catalog section ${catalog.parentHandle}.`);
+    return [
+      {
+        name: catalog.name,
+        handle: catalog.handle,
+        description: catalog.description,
+        parent_category_id: parent.id,
+        is_active: catalog.is_active,
+        is_internal: catalog.is_internal,
+        metadata: catalog.metadata,
+      },
+    ];
+  });
+  if (storefrontCatalogsToCreate.length) {
+    await createProductCategoriesWorkflow(container).run({
+      input: { product_categories: storefrontCatalogsToCreate },
+    });
+  }
+  const { data: availableStorefrontCatalogs } = await query.graph({
+    entity: "product_category",
+    fields: ["id", "handle"],
+    filters: { handle: sampleStorefrontCatalogs.map((catalog) => catalog.handle) },
+  });
+  const buildABoxCategory = availableStorefrontCatalogs.find(
+    (category) => category.handle === "build-a-box",
+  );
+  const { data: currentCollections } = await query.graph({
+    entity: "product_collection",
+    fields: ["id", "handle"],
+  });
+  const { data: stores } = await query.graph({
+    entity: "store",
+    fields: ["default_sales_channel_id"],
+  });
+  const { data: profiles } = await query.graph({
+    entity: "shipping_profile",
+    fields: ["id", "type"],
+  });
+  if (!stores[0]?.default_sales_channel_id || !profiles[0]?.id)
+    throw new Error(
+      "Run the Medusa initial store setup so a sales channel and shipping profile exist before seeding products.",
+    );
   const { data: existingProducts } = await query.graph({
     entity: "product",
     fields: [
@@ -84,12 +161,13 @@ export default async function seedBanglaBlend({ container }: ExecArgs) {
       "options.id",
       "options.title",
       "options.values.value",
+      "categories.id",
       "variants.id",
-      "variants.sku"
-    ]
+      "variants.sku",
+    ],
   });
   const existingProductsByHandle = new Map(
-    existingProducts.map((product) => [product.handle, product])
+    existingProducts.map((product) => [product.handle, product]),
   );
   const activeHandles = new Set(sampleCatalog.map((product) => product.handle));
   const retiredHandles = new Set<string>(retiredSampleProductHandles);
@@ -97,7 +175,7 @@ export default async function seedBanglaBlend({ container }: ExecArgs) {
     if (activeHandles.has(product.handle)) return false;
     const hasSeededSku = (product.variants ?? []).some(
       (variant: { sku?: string | null }) =>
-        typeof variant.sku === "string" && variant.sku.startsWith("SAMPLE-")
+        typeof variant.sku === "string" && variant.sku.startsWith("SAMPLE-"),
     );
     return (
       retiredHandles.has(product.handle) ||
@@ -108,7 +186,7 @@ export default async function seedBanglaBlend({ container }: ExecArgs) {
 
   if (retiredProducts.length) {
     await deleteProductsWorkflow(container).run({
-      input: { ids: retiredProducts.map((product) => product.id) }
+      input: { ids: retiredProducts.map((product) => product.id) },
     });
   }
 
@@ -129,14 +207,13 @@ export default async function seedBanglaBlend({ container }: ExecArgs) {
       existingSkus.length === desiredSkus.length &&
       existingSkus.every((sku, index) => sku === desiredSkus[index]);
     const needsVariantSync =
-      existingProduct.metadata?.catalog_revision !== activeCatalogRevision ||
-      !variantsMatch;
+      existingProduct.metadata?.catalog_revision !== activeCatalogRevision || !variantsMatch;
 
     if (needsVariantSync) {
       const variantIds = existingVariants.map((variant) => variant.id);
       if (variantIds.length) {
         await deleteProductVariantsWorkflow(container).run({
-          input: { ids: variantIds }
+          input: { ids: variantIds },
         });
       }
       const sizeOption = (
@@ -150,7 +227,7 @@ export default async function seedBanglaBlend({ container }: ExecArgs) {
         throw new Error(`Product ${product.handle} is missing its Size option.`);
       }
       const existingOptionValues = new Set(
-        (sizeOption.values ?? []).map((optionValue) => optionValue.value)
+        (sizeOption.values ?? []).map((optionValue) => optionValue.value),
       );
       const optionValuesToAdd = product.variants
         .map((variant) => variant.title)
@@ -159,11 +236,13 @@ export default async function seedBanglaBlend({ container }: ExecArgs) {
         await setProductProductOptionsWorkflow(container).run({
           input: {
             product_id: existingProduct.id,
-            update: [{
-              product_option_id: sizeOption.id,
-              add: optionValuesToAdd.map((value) => ({ value }))
-            }]
-          }
+            update: [
+              {
+                product_option_id: sizeOption.id,
+                add: optionValuesToAdd.map((value) => ({ value })),
+              },
+            ],
+          },
         });
       }
       await createProductVariantsWorkflow(container).run({
@@ -176,10 +255,10 @@ export default async function seedBanglaBlend({ container }: ExecArgs) {
             options: { Size: variant.title },
             prices: Object.entries(variant.prices).map(([currency_code, amount]) => ({
               currency_code,
-              amount
-            }))
-          }))
-        }
+              amount,
+            })),
+          })),
+        },
       });
     }
 
@@ -193,8 +272,20 @@ export default async function seedBanglaBlend({ container }: ExecArgs) {
           thumbnail: product.thumbnail,
           status: ProductStatus.PUBLISHED,
           collection_id: currentCollections.find(
-            (collection) => collection.handle === product.collection
+            (collection) => collection.handle === product.collection,
           )?.id,
+          ...(buildABoxCategory
+            ? {
+                categories: Array.from(
+                  new Set([
+                    ...(existingProduct.categories ?? []).map(
+                      (category: { id: string }) => category.id,
+                    ),
+                    buildABoxCategory.id,
+                  ]),
+                ).map((id) => ({ id })),
+              }
+            : {}),
           metadata: {
             region: product.region,
             eligible_markets: product.markets,
@@ -202,78 +293,157 @@ export default async function seedBanglaBlend({ container }: ExecArgs) {
             best_seller: product.bestSeller === true,
             catalog_revision: activeCatalogRevision,
             is_placeholder: false,
-            verified: true
-          }
-        }
-      }
+            verified: true,
+          },
+        },
+      },
     });
   }
 
   const existingHandles = new Set(existingProducts.map((product) => product.handle));
-  const products = sampleCatalog.filter((product) => !existingHandles.has(product.handle)).map((product) => ({
-    title: product.title,
-    handle: product.handle,
-    subtitle: product.subtitle,
-    description: product.description,
-    thumbnail: product.thumbnail,
-    status: ProductStatus.PUBLISHED,
-    collection_id: currentCollections.find((collection) => collection.handle === product.collection)?.id,
-    shipping_profile_id: profiles[0]!.id,
-    sales_channels: [{ id: stores[0]!.default_sales_channel_id }],
-    metadata: {
-      region: product.region,
-      eligible_markets: product.markets,
-      product_badges: product.badges,
-      best_seller: product.bestSeller === true,
-      catalog_revision: activeCatalogRevision,
-      is_placeholder: false,
-      verified: true
-    },
-    options: [{
-      title: "Size",
-      values: product.variants.map((variant) => variant.title)
-    }],
-    variants: product.variants.map((variant) => ({
-      title: variant.title,
-      sku: variant.sku,
-      manage_inventory: true,
-      options: { Size: variant.title },
-      prices: Object.entries(variant.prices).map(([currency_code, amount]) => ({
-        currency_code,
-        amount
-      }))
-    }))
-  }));
+  const products = sampleCatalog
+    .filter((product) => !existingHandles.has(product.handle))
+    .map((product) => ({
+      title: product.title,
+      handle: product.handle,
+      subtitle: product.subtitle,
+      description: product.description,
+      thumbnail: product.thumbnail,
+      status: ProductStatus.PUBLISHED,
+      collection_id: currentCollections.find(
+        (collection) => collection.handle === product.collection,
+      )?.id,
+      ...(buildABoxCategory ? { categories: [{ id: buildABoxCategory.id }] } : {}),
+      shipping_profile_id: profiles[0]!.id,
+      sales_channels: [{ id: stores[0]!.default_sales_channel_id }],
+      metadata: {
+        region: product.region,
+        eligible_markets: product.markets,
+        product_badges: product.badges,
+        best_seller: product.bestSeller === true,
+        catalog_revision: activeCatalogRevision,
+        is_placeholder: false,
+        verified: true,
+      },
+      options: [
+        {
+          title: "Size",
+          values: product.variants.map((variant) => variant.title),
+        },
+      ],
+      variants: product.variants.map((variant) => ({
+        title: variant.title,
+        sku: variant.sku,
+        manage_inventory: true,
+        options: { Size: variant.title },
+        prices: Object.entries(variant.prices).map(([currency_code, amount]) => ({
+          currency_code,
+          amount,
+        })),
+      })),
+    }));
   if (products.length) await createProductsWorkflow(container).run({ input: { products } });
 
-  const { data: locations } = await query.graph({ entity: "stock_location", fields: ["id", "name"] });
+  const { data: locations } = await query.graph({
+    entity: "stock_location",
+    fields: ["id", "name"],
+  });
   let location = locations.find((entry) => entry.name === "Sample Bangladesh warehouse");
   if (!location) {
-    const created = await createStockLocationsWorkflow(container).run({ input: { locations: [{ name: "Sample Bangladesh warehouse", metadata: { isPlaceholder: true, verified: false } }] } });
+    const created = await createStockLocationsWorkflow(container).run({
+      input: {
+        locations: [
+          {
+            name: "Sample Bangladesh warehouse",
+            metadata: { isPlaceholder: true, verified: false },
+          },
+        ],
+      },
+    });
     location = created.result[0];
-    if (location && stores[0]?.default_sales_channel_id) await linkSalesChannelsToStockLocationWorkflow(container).run({ input: { id: location.id, add: [stores[0].default_sales_channel_id] } });
+    if (location && stores[0]?.default_sales_channel_id)
+      await linkSalesChannelsToStockLocationWorkflow(container).run({
+        input: { id: location.id, add: [stores[0].default_sales_channel_id] },
+      });
   }
-  const { data: seededProducts } = await query.graph({ entity: "product", fields: ["handle", "variants.sku", "variants.inventory_items.inventory_item_id"], filters: { handle: sampleCatalog.map((product) => product.handle) } });
-  const { data: inventoryLevels } = await query.graph({ entity: "inventory_level", fields: ["inventory_item_id", "location_id"], filters: { location_id: location?.id } });
+  const { data: seededProducts } = await query.graph({
+    entity: "product",
+    fields: ["handle", "variants.sku", "variants.inventory_items.inventory_item_id"],
+    filters: { handle: sampleCatalog.map((product) => product.handle) },
+  });
+  const { data: inventoryLevels } = await query.graph({
+    entity: "inventory_level",
+    fields: ["inventory_item_id", "location_id"],
+    filters: { location_id: location?.id },
+  });
   const existingInventoryIds = new Set(inventoryLevels.map((level) => level.inventory_item_id));
-  const newLevels = seededProducts.flatMap((product) => product.variants ?? []).flatMap((variant) => (variant.inventory_items ?? []).map((link: { inventory_item_id: string }) => ({ inventory_item_id: link.inventory_item_id, location_id: location!.id, stocked_quantity: sampleInventoryBySku[variant.sku ?? ""] ?? 0 }))).filter((level) => !existingInventoryIds.has(level.inventory_item_id));
-  if (newLevels.length) await createInventoryLevelsWorkflow(container).run({ input: { inventory_levels: newLevels } });
+  const newLevels = seededProducts
+    .flatMap((product) => product.variants ?? [])
+    .flatMap((variant) =>
+      (variant.inventory_items ?? []).map((link: { inventory_item_id: string }) => ({
+        inventory_item_id: link.inventory_item_id,
+        location_id: location!.id,
+        stocked_quantity: sampleInventoryBySku[variant.sku ?? ""] ?? 0,
+      })),
+    )
+    .filter((level) => !existingInventoryIds.has(level.inventory_item_id));
+  if (newLevels.length)
+    await createInventoryLevelsWorkflow(container).run({ input: { inventory_levels: newLevels } });
 
-  const { data: customers } = await query.graph({ entity: "customer", fields: ["id", "email"], filters: { email: sampleCustomers[0]!.email } });
-  if (!customers.length) await createCustomersWorkflow(container).run({ input: { customersData: sampleCustomers } });
-  const { data: promotions } = await query.graph({ entity: "promotion", fields: ["id", "code"], filters: { code: samplePromotions[0]!.code } });
-  if (!promotions.length) await createPromotionsWorkflow(container).run({ input: { promotionsData: [...samplePromotions] } });
-  const { data: shippingOptions } = await query.graph({ entity: "shipping_option", fields: ["id", "name"] });
-  const { data: serviceZones } = await query.graph({ entity: "service_zone", fields: ["id", "name"] });
-  const domesticZone = serviceZones.find((zone) => /bangladesh/i.test(zone.name ?? "")) ?? serviceZones[0];
+  const { data: customers } = await query.graph({
+    entity: "customer",
+    fields: ["id", "email"],
+    filters: { email: sampleCustomers[0]!.email },
+  });
+  if (!customers.length)
+    await createCustomersWorkflow(container).run({ input: { customersData: sampleCustomers } });
+  const { data: promotions } = await query.graph({
+    entity: "promotion",
+    fields: ["id", "code"],
+    filters: { code: samplePromotions[0]!.code },
+  });
+  if (!promotions.length)
+    await createPromotionsWorkflow(container).run({
+      input: { promotionsData: [...samplePromotions] },
+    });
+  const { data: shippingOptions } = await query.graph({
+    entity: "shipping_option",
+    fields: ["id", "name"],
+  });
+  const { data: serviceZones } = await query.graph({
+    entity: "service_zone",
+    fields: ["id", "name"],
+  });
+  const domesticZone =
+    serviceZones.find((zone) => /bangladesh/i.test(zone.name ?? "")) ?? serviceZones[0];
   const existingShippingOptionNames = new Set(shippingOptions.map((option) => option.name));
   const shippingOptionsToCreate = sampleShippingOptions
     .filter((option) => option.market === "bd")
     .filter((option) => !existingShippingOptionNames.has(option.name));
   if (shippingOptionsToCreate.length && domesticZone) {
-    await createShippingOptionsWorkflow(container).run({ input: shippingOptionsToCreate.map((option) => ({ name: option.name, service_zone_id: domesticZone.id, shipping_profile_id: profiles[0]!.id, provider_id: "manual_manual", price_type: "flat" as const, type: { label: option.name, description: "Clearly marked sample delivery option; replace with approved carrier terms.", code: option.name.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-") }, prices: [{ amount: option.price, currency_code: option.currency_code }], data: { isPlaceholder: true, verified: false } })) });
+    await createShippingOptionsWorkflow(container).run({
+      input: shippingOptionsToCreate.map((option) => ({
+        name: option.name,
+        service_zone_id: domesticZone.id,
+        shipping_profile_id: profiles[0]!.id,
+        provider_id: "manual_manual",
+        price_type: "flat" as const,
+        type: {
+          label: option.name,
+          description:
+            "Clearly marked sample delivery option; replace with approved carrier terms.",
+          code: option.name.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-"),
+        },
+        prices: [{ amount: option.price, currency_code: option.currency_code }],
+        data: { isPlaceholder: true, verified: false },
+      })),
+    });
   } else if (shippingOptionsToCreate.length) {
-    logger.warn("Sample shipping options were not created because no service zone exists. Create an approved Bangladesh fulfillment set/service zone in Admin, then rerun the seed.");
+    logger.warn(
+      "Sample shipping options were not created because no service zone exists. Create an approved Bangladesh fulfillment set/service zone in Admin, then rerun the seed.",
+    );
   }
-  logger.info(`Seed complete. ${retiredProducts.length} retired sample products removed, ${products.length} sample products and ${newLevels.length} sample inventory levels created. Configure real shipping options against approved service zones before checkout testing; international regions remain disabled operationally.`);
+  logger.info(
+    `Seed complete. ${retiredProducts.length} retired sample products removed, ${products.length} sample products and ${newLevels.length} sample inventory levels created. Configure real shipping options against approved service zones before checkout testing; international regions remain disabled operationally.`,
+  );
 }

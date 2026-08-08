@@ -20,6 +20,10 @@ Never correct price, inventory, order, or payment state in Sanity. Never add a p
 
 Check payment status before fulfillment. A gateway redirect is not proof of payment. For COD, follow the approved carrier/collection process. For gifts, review recipient address, message, price-hiding preference, packaging, requested date, and instructions; do not expose buyer billing details to the recipient. Use role-based access and leave audit context for manual changes.
 
+The order detail page includes an operational roadmap: **Order placed -> COD approved/payment verified -> Packed/fulfilled -> Shipped -> Delivered**. The next button runs Medusa's native domain workflow and cannot skip a stage. Creating fulfillment allocates the order items from the primary stock location, shipment records carrier handoff, and delivery requires an existing shipment. Customer notifications can be disabled when no configured channel should send them. Cancellations, returns, partial returns, refunds, and payment exceptions remain visible as exception paths and must use their supported Medusa actions.
+
+Operators and customers see the stable business reference `order_01`, `order_02`, and so on, derived from Medusa's database sequence. The opaque ID such as `order_01K...` remains the immutable identifier used by URLs, API calls, relations, and audit records. Never rewrite internal IDs to make them shorter, and never reuse a business reference after cancellation or deletion.
+
 ## Content operations
 
 Use Sanity Studio for narrative content, navigation, campaigns, recipes, places, sourcing profiles, policies, and product/gift storytelling. Draft → in review → verified is mandatory for factual material. Record citations/consent internally, require alt text, and check both language variants. Legal pages require their approval flag and effective date.

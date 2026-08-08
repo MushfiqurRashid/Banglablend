@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { defineRouteConfig } from "@medusajs/admin-sdk";
-import { Buildings } from "@medusajs/icons";
+import { ChartActivity } from "@medusajs/icons";
 import { Badge, Button, Container, Heading, Table, Text } from "@medusajs/ui";
 import {
   ErrorState,
@@ -168,8 +168,8 @@ const SuperadminDashboard = () => {
   return (
     <div className="flex flex-col gap-y-4 pb-8">
       <PageHeader
-        title="Superadmin control center"
-        subtitle="Manage catalog, sales, customers, operations, staff access, content handoffs, settings, and audit evidence from one organized workspace."
+        title="Bangla Blend Dashboard"
+        subtitle="Monitor catalog, sales, customers, inventory, content, staff access, settings, and audit evidence from one operating dashboard."
         badge="Full application access"
         actions={
           <>
@@ -334,6 +334,12 @@ const SuperadminDashboard = () => {
               badge="Full CRUD"
             />
             <ResourceCard
+              title="Storefront catalogs"
+              description="Create nested merchandising catalogs, choose their customer experience, and assign products without changing their primary collection."
+              href={adminPath("/superadmin/catalogs")}
+              badge="Nested catalogs"
+            />
+            <ResourceCard
               title="Sales & customers"
               description="Review orders, payments, fulfillment, returns, customer profiles, addresses, and service history."
               href={adminPath("/orders")}
@@ -441,8 +447,9 @@ const SuperadminDashboard = () => {
 };
 
 export const config = defineRouteConfig({
-  label: "Superadmin",
-  icon: Buildings,
+  label: "Dashboard",
+  icon: ChartActivity,
+  rank: 1,
 });
 
 export default SuperadminDashboard;

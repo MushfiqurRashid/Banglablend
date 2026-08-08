@@ -1,14 +1,21 @@
 "use client";
 
 import { useRef, useState } from "react";
-import Link from "next/link";
+import Link from "@/components/navigation/smart-link";
 import { ArrowUpRight, ChevronDown, Menu, X } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useModalDialog } from "@/components/accessibility/use-modal-dialog";
 import { Brand } from "./brand";
 import { DestinationSelector } from "./destination-selector";
+import type { StorefrontCatalog } from "@bangla-blend/types";
 
-const groups = [
+type NavigationGroup = {
+  label: string;
+  href: string;
+  children: Array<readonly [string, string]>;
+};
+
+const groups: NavigationGroup[] = [
   {
     label: "Shop",
     href: "/shop",
@@ -55,7 +62,7 @@ const groups = [
       ["Meet Annapurna", "/our-story/meet-annapurna"],
     ],
   },
-] as const;
+];
 
 const secondaryLinks = [
   ["Search", "/search"],
@@ -65,12 +72,32 @@ const secondaryLinks = [
   ["Account", "/account"],
 ] as const;
 
-export function MobileMenu() {
+export function MobileMenu({ catalogs = [] }: { catalogs?: StorefrontCatalog[] }) {
   const [open, setOpen] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const reducedMotion = useReducedMotion();
   const close = () => setOpen(false);
+  const navigationGroups = groups.map((group) => {
+    const dynamicChildren =
+      group.label === "Gifts"
+        ? catalogs
+            .filter((catalog) => catalog.section === "gifts")
+            .map((catalog) => [catalog.name, `/gifts/${catalog.handle}`] as const)
+        : group.label === "Shop"
+          ? catalogs
+              .filter((catalog) => catalog.section !== "gifts")
+              .map(
+                (catalog) => [catalog.name, `/shop/${catalog.section}/${catalog.handle}`] as const,
+              )
+          : [];
+    return {
+      ...group,
+      children: [...group.children, ...dynamicChildren].filter(
+        (child, index, children) => children.findIndex((item) => item[1] === child[1]) === index,
+      ),
+    };
+  });
 
   useModalDialog(open, close, dialogRef, closeRef);
 
@@ -119,7 +146,7 @@ export function MobileMenu() {
                 <ArrowUpRight size={19} />
               </Link>
 
-              {groups.map((group) => (
+              {navigationGroups.map((group) => (
                 <details className="mobile-menu-group" key={group.href}>
                   <summary>
                     {group.label}

@@ -1,6 +1,8 @@
 # Commerce model
 
-Medusa owns transactional state. A product groups one or more purchasable variants; variants own SKUs, option values, prices, and inventory relationships. Collections provide the storefront taxonomy: Originals, Reserve, Pantry, Tea & Wellness, Lifestyle Accessories, and Gifts. Categories may be added for merchandising without changing editorial schemas.
+Medusa owns transactional state. A product groups one or more purchasable variants; variants own SKUs, option values, prices, and inventory relationships. Collections provide each product's single primary storefront and reporting section: Originals, Reserve, Pantry, Tea & Wellness, Lifestyle Accessories, or Gifts.
+
+Nested Medusa product categories provide reusable storefront catalogs. A product can belong to many of these catalogs without changing its primary collection. For example, an Originals product can also be assigned to `Gifts → Build a Box`. Active managed catalogs are projected into storefront routes, navigation, product filtering, and search. A listing catalog renders a normal product grid; a Build a Box catalog also stores the required box size and renders the box builder. Catalog assignment never overrides price, inventory, market eligibility, or product publishing rules.
 
 ## Markets, prices, and eligibility
 
@@ -11,6 +13,8 @@ Do not convert a BDT display price in the browser. Each enabled region needs an 
 ## Inventory and fulfillment
 
 Production variants should use inventory items and stock locations. Domestic chilled/fresh products must only attach to supported Bangladesh shipping/service zones. Exportable ambient products must be explicitly approved per destination. Overselling, backorders, preorder rules, and safety-stock thresholds are operational decisions configured in Medusa, not UI assumptions.
+
+The guided product creator requires an initial stock quantity for every variant and creates its inventory level at the store's primary stock location. A product cannot be published from that workflow with zero initial stock. Draft products may start at zero and must remain unavailable until an operator records real stock in Medusa.
 
 The included catalog seed disables inventory management only for visibly marked sample variants so a fresh development install can render. Replace these fixtures with verified products, locations, inventory levels, and shipping options before acceptance testing.
 
@@ -23,3 +27,5 @@ Order state is authoritative in Medusa. Email and fulfillment integrations subsc
 ## Gifts
 
 Gift fields—recipient, message, hidden prices, packaging preference, delivery date, and instructions—are captured by validated checkout input and stored in order metadata. The gift workflow projects them into a dedicated `gift-order` module record for operations. Billing and delivery countries may differ; the selected delivery market controls product and shipping eligibility.
+
+Gift catalogs are managed in Medusa Admin under **Superadmin → Storefront catalogs**. `Gifts → Build a Box` is seeded for local development, and the sample products are assigned to it so the earlier build-a-box selection remains available. Operators can add or remove assignments from both the guided product creator and the Superadmin catalog editor.

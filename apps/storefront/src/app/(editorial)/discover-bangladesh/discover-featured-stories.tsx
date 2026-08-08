@@ -12,7 +12,7 @@ const featuredStories = [
     description:
       "Discover the heritage of Chattogram’s communal feast and the flavours that bring people together.",
     href: "/discover-bangladesh/regional-flavours",
-    image: "/images/recipe-mezban-gosh.png",
+    image: "/images/recipe-mezban-gosh.webp",
     imageAlt: "A brass bowl filled with rich Chattogram mezban beef",
   },
   {
@@ -21,7 +21,7 @@ const featuredStories = [
     description:
       "Why this chilli is famous for its vivid colour, gentle heat and distinctive aroma.",
     href: "/discover-bangladesh/ingredient-stories",
-    image: "/images/our-story-standards.png",
+    image: "/images/our-story-standards.webp",
     imageAlt: "Red chilli and other spices in bowls on a dark wooden table",
   },
   {
@@ -29,7 +29,7 @@ const featuredStories = [
     title: "How Geography Shaped Bengali Cuisine",
     description: "Rivers, deltas, land and monsoon are the natural forces that shape what we eat.",
     href: "/discover-bangladesh/food-heritage",
-    image: "/images/bangladesh-river-landscape.png",
+    image: "/images/bangladesh-river-landscape.webp",
     imageAlt: "A boat on a river flowing through rural Bangladesh",
   },
   {
@@ -37,7 +37,7 @@ const featuredStories = [
     title: "Winter Pitha Traditions",
     description: "Traditional pithas, ingredients and stories that warm every Bengali winter.",
     href: "/discover-bangladesh/festivals-seasons",
-    image: "/images/recipe-masala-chai.png",
+    image: "/images/recipe-masala-chai.webp",
     imageAlt: "Warm spiced tea served in earthen cups",
   },
   {
@@ -45,7 +45,7 @@ const featuredStories = [
     title: "From Farm to Jar",
     description: "Follow the journey of our spices from local farms to your kitchen.",
     href: "/discover-bangladesh/farmer-sourcing-stories",
-    image: "/images/our-story-impact.png",
+    image: "/images/our-story-impact.webp",
     imageAlt: "A Bangladeshi farmer harvesting leafy greens",
   },
 ] as const;

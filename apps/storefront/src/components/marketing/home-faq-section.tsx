@@ -1,8 +1,5 @@
-"use client";
-
-import Link from "next/link";
+import Link from "@/components/navigation/smart-link";
 import { ArrowUpRight, Sprout } from "lucide-react";
-import { usePathname } from "next/navigation";
 import { faqs } from "@/data/faqs";
 import { PageContainer } from "@/components/layout/page-container";
 import styles from "./home-faq-section.module.css";
@@ -10,12 +7,6 @@ import styles from "./home-faq-section.module.css";
 const homepageFaqs = faqs.slice(0, 7);
 
 export function HomeFaqSection() {
-  const pathname = usePathname();
-
-  if (pathname !== "/") {
-    return null;
-  }
-
   return (
     <section className={styles.section} aria-labelledby="home-faq-title">
       <PageContainer className={styles.inner}>

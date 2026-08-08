@@ -10,7 +10,7 @@ import {
   List,
   SlidersHorizontal,
   Sparkles,
-  X
+  X,
 } from "lucide-react";
 import type { Product } from "@bangla-blend/types";
 import { formatMoney } from "@bangla-blend/commerce-client";
@@ -25,7 +25,7 @@ const collectionLabels: Record<Product["collection"], string> = {
   pantry: "Pantry",
   "tea-wellness": "Tea & Wellness",
   "lifestyle-accessories": "Lifestyle Accessories",
-  gifts: "Gifts"
+  gifts: "Gifts",
 };
 
 type HeatFilter = "all" | "mild" | "medium" | "hot";
@@ -55,19 +55,28 @@ function isSpiceType(product: Product, filter: SpiceTypeFilter) {
 }
 
 export function ShopCatalog({ products }: { products: Product[] }) {
-  const prices = products.flatMap((product) => product.variants.map((variant) => variant.price.amount));
+  const prices = products.flatMap((product) =>
+    product.variants.map((variant) => variant.price.amount),
+  );
   const fullPriceRange = Math.max(...prices, 0);
   const currency = products[0]?.variants[0]?.price.currencyCode ?? "BDT";
   const regions = useMemo(
-    () => Array.from(new Set(products.map((product) => product.region).filter((region): region is string => Boolean(region)))).sort(),
-    [products]
+    () =>
+      Array.from(
+        new Set(
+          products
+            .map((product) => product.region)
+            .filter((region): region is string => Boolean(region)),
+        ),
+      ).sort(),
+    [products],
   );
   const availableCollections = useMemo(
     () =>
       (Object.keys(collectionLabels) as Product["collection"][]).filter((collection) =>
-        products.some((product) => product.collection === collection)
+        products.some((product) => product.collection === collection),
       ),
-    [products]
+    [products],
   );
 
   const [selectedCollections, setSelectedCollections] = useState<Product["collection"][]>([]);
@@ -96,14 +105,16 @@ export function ShopCatalog({ products }: { products: Product[] }) {
 
   const toggleCollection = (collection: Product["collection"]) => {
     setSelectedCollections((current) =>
-      current.includes(collection) ? current.filter((item) => item !== collection) : [...current, collection]
+      current.includes(collection)
+        ? current.filter((item) => item !== collection)
+        : [...current, collection],
     );
     setPage(1);
   };
 
   const toggleRegion = (region: string) => {
     setSelectedRegions((current) =>
-      current.includes(region) ? current.filter((item) => item !== region) : [...current, region]
+      current.includes(region) ? current.filter((item) => item !== region) : [...current, region],
     );
     setPage(1);
   };
@@ -112,8 +123,10 @@ export function ShopCatalog({ products }: { products: Product[] }) {
     const filtered = products.filter((product) => {
       const productPrice = product.variants[0]?.price.amount ?? 0;
       const hasInventory = product.variants.some((variant) => (variant.inventoryQuantity ?? 0) > 0);
-      if (selectedCollections.length && !selectedCollections.includes(product.collection)) return false;
-      if (selectedRegions.length && (!product.region || !selectedRegions.includes(product.region))) return false;
+      if (selectedCollections.length && !selectedCollections.includes(product.collection))
+        return false;
+      if (selectedRegions.length && (!product.region || !selectedRegions.includes(product.region)))
+        return false;
       if (productPrice > maxPrice) return false;
       if (heat !== "all" && heatBand(product) !== heat) return false;
       if (!isBestFor(product, bestFor)) return false;
@@ -123,8 +136,10 @@ export function ShopCatalog({ products }: { products: Product[] }) {
     });
 
     return [...filtered].sort((a, b) => {
-      if (sort === "price-asc") return (a.variants[0]?.price.amount ?? 0) - (b.variants[0]?.price.amount ?? 0);
-      if (sort === "price-desc") return (b.variants[0]?.price.amount ?? 0) - (a.variants[0]?.price.amount ?? 0);
+      if (sort === "price-asc")
+        return (a.variants[0]?.price.amount ?? 0) - (b.variants[0]?.price.amount ?? 0);
+      if (sort === "price-desc")
+        return (b.variants[0]?.price.amount ?? 0) - (a.variants[0]?.price.amount ?? 0);
       if (sort === "name") return a.title.localeCompare(b.title);
       if (sort === "newest") {
         return new Date(b.createdAt ?? 0).valueOf() - new Date(a.createdAt ?? 0).valueOf();
@@ -140,7 +155,7 @@ export function ShopCatalog({ products }: { products: Product[] }) {
     bestFor,
     spiceType,
     inStockOnly,
-    sort
+    sort,
   ]);
 
   const totalPages = Math.max(1, Math.ceil(visibleProducts.length / PAGE_SIZE));
@@ -167,13 +182,21 @@ export function ShopCatalog({ products }: { products: Product[] }) {
             aria-label="Close filters"
             onClick={() => setFiltersOpen(false)}
           />
-          <aside className={`shop-filter-panel ${filtersOpen ? "is-open" : ""}`} aria-label="Product filters">
+          <aside
+            className={`shop-filter-panel ${filtersOpen ? "is-open" : ""}`}
+            aria-label="Product filters"
+          >
             <div className="shop-filter-heading">
               <div>
                 <span>Filters</span>
                 {filterCount ? <small>{filterCount} active</small> : null}
               </div>
-              <button type="button" className="shop-clear-link" onClick={clearFilters} disabled={!filterCount}>
+              <button
+                type="button"
+                className="shop-clear-link"
+                onClick={clearFilters}
+                disabled={!filterCount}
+              >
                 Clear all
               </button>
               <button
@@ -190,7 +213,9 @@ export function ShopCatalog({ products }: { products: Product[] }) {
               <summary>Category</summary>
               <div className="shop-filter-options">
                 {availableCollections.map((collection) => {
-                  const count = products.filter((product) => product.collection === collection).length;
+                  const count = products.filter(
+                    (product) => product.collection === collection,
+                  ).length;
                   return (
                     <label key={collection}>
                       <input
@@ -245,7 +270,9 @@ export function ShopCatalog({ products }: { products: Product[] }) {
 
             <details className="shop-filter-group">
               <summary>Dietary</summary>
-              <p className="shop-filter-note">Dietary options will appear with verified product information.</p>
+              <p className="shop-filter-note">
+                Dietary options will appear with verified product information.
+              </p>
             </details>
 
             <details className="shop-filter-group">
@@ -255,7 +282,7 @@ export function ShopCatalog({ products }: { products: Product[] }) {
                   ["all", "All types"],
                   ["blends", "Signature blends"],
                   ["ingredients", "Single ingredients"],
-                  ["pantry-tea", "Pantry & tea"]
+                  ["pantry-tea", "Pantry & tea"],
                 ].map(([value, label]) => (
                   <label key={value}>
                     <input
@@ -280,7 +307,7 @@ export function ShopCatalog({ products }: { products: Product[] }) {
                   ["all", "All heat levels"],
                   ["mild", "Mild"],
                   ["medium", "Medium"],
-                  ["hot", "Hot"]
+                  ["hot", "Hot"],
                 ].map(([value, label]) => (
                   <label key={value}>
                     <input
@@ -305,7 +332,7 @@ export function ShopCatalog({ products }: { products: Product[] }) {
                   ["all", "All occasions"],
                   ["everyday", "Everyday cooking"],
                   ["tea", "Tea rituals"],
-                  ["gifting", "Gifting"]
+                  ["gifting", "Gifting"],
                 ].map(([value, label]) => (
                   <label key={value}>
                     <input
@@ -340,7 +367,11 @@ export function ShopCatalog({ products }: { products: Product[] }) {
               </div>
             </details>
 
-            <button type="button" className="button button-secondary shop-clear-button" onClick={clearFilters}>
+            <button
+              type="button"
+              className="button button-secondary shop-clear-button"
+              onClick={clearFilters}
+            >
               Clear all filters
             </button>
           </aside>
@@ -348,7 +379,11 @@ export function ShopCatalog({ products }: { products: Product[] }) {
           <div className="shop-results">
             <div className="shop-results-toolbar">
               <div className="shop-results-summary">
-                <button type="button" className="shop-mobile-filter" onClick={() => setFiltersOpen(true)}>
+                <button
+                  type="button"
+                  className="shop-mobile-filter"
+                  onClick={() => setFiltersOpen(true)}
+                >
                   <SlidersHorizontal size={17} />
                   Filters
                   {filterCount ? <span>{filterCount}</span> : null}
@@ -415,13 +450,17 @@ export function ShopCatalog({ products }: { products: Product[] }) {
                         <button
                           type="button"
                           className={isFavourite ? "is-active" : ""}
-                          aria-label={isFavourite ? `Remove ${product.title} from favourites` : `Add ${product.title} to favourites`}
+                          aria-label={
+                            isFavourite
+                              ? `Remove ${product.title} from favourites`
+                              : `Add ${product.title} to favourites`
+                          }
                           aria-pressed={isFavourite}
                           onClick={() =>
                             setFavourites((current) =>
                               current.includes(product.id)
                                 ? current.filter((item) => item !== product.id)
-                                : [...current, product.id]
+                                : [...current, product.id],
                             )
                           }
                         >
@@ -430,22 +469,35 @@ export function ShopCatalog({ products }: { products: Product[] }) {
                       </div>
                       <div className="shop-product-copy">
                         <div className="shop-product-badges">
-                          {product.badges.slice(0, 2).map((badge) => <span key={badge}>{badge}</span>)}
+                          {product.badges.slice(0, 2).map((badge) => (
+                            <span key={badge}>{badge}</span>
+                          ))}
                         </div>
-                        <Link href={`/products/${product.handle}`}><h2>{product.title}</h2></Link>
+                        <Link href={`/products/${product.handle}`}>
+                          <h2>{product.title}</h2>
+                        </Link>
                         <p>{product.subtitle ?? product.region ?? "Bangladesh"}</p>
                         <div className="shop-product-meta">
                           <span>{product.region ?? "Bangladesh"}</span>
-                          <strong>{variant ? formatMoney(variant.price.amount, variant.price.currencyCode) : "Price unavailable"}</strong>
+                          <strong>
+                            {variant
+                              ? formatMoney(variant.price.amount, variant.price.currencyCode)
+                              : "Price unavailable"}
+                          </strong>
                         </div>
                         <div className="shop-product-actions">
                           {variant ? (
                             <AddToCartButton
                               variantId={variant.id}
-                              disabled={Boolean(product.isPlaceholder) || (variant.inventoryQuantity ?? 0) <= 0}
+                              disabled={
+                                Boolean(product.isPlaceholder) ||
+                                (variant.inventoryQuantity ?? 0) <= 0
+                              }
                             />
                           ) : (
-                            <button className="button button-primary" type="button" disabled>Add to cart</button>
+                            <button className="button button-primary" type="button" disabled>
+                              Add to cart
+                            </button>
                           )}
                           <Link href={`/products/${product.handle}`}>View details</Link>
                         </div>
@@ -459,7 +511,9 @@ export function ShopCatalog({ products }: { products: Product[] }) {
                 <Sparkles size={28} />
                 <h2>No products match those filters</h2>
                 <p>Clear one or more filters to return to the full collection.</p>
-                <button type="button" className="button button-secondary" onClick={clearFilters}>Clear filters</button>
+                <button type="button" className="button button-secondary" onClick={clearFilters}>
+                  Clear filters
+                </button>
               </div>
             )}
 

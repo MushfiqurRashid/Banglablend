@@ -7,7 +7,6 @@
   color: #272019;
   background: var(--about-cream);
 }
-
 .about-brand-breadcrumb {
   padding-block: 1rem 0;
 }
@@ -411,7 +410,7 @@
   padding-block: clamp(3rem, 6vw, 6rem);
   background:
     linear-gradient(rgb(25 36 12 / 0.36), rgb(25 36 12 / 0.5)),
-    url("/images/bangladesh-river-landscape.png") center 54% / cover;
+    url("/images/bangladesh-river-landscape.webp") center 54% / cover;
 }
 
 .about-brand-closing-card {

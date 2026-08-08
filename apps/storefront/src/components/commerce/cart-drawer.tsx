@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import Link from "next/link";
+import Link from "@/components/navigation/smart-link";
 import { X, Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { formatMoney } from "@bangla-blend/commerce-client";

@@ -24,7 +24,7 @@ export function ProductPurchase({
   );
 
   if (!variant) return <p className="form-error">This product has no purchasable variant.</p>;
-  const isOutOfStock = variant.inventoryQuantity !== undefined && variant.inventoryQuantity <= 0;
+  const isOutOfStock = (variant.inventoryQuantity ?? 0) <= 0;
 
   return (
     <div className="purchase-panel">

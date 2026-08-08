@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/components/navigation/smart-link";
 import { ChevronDown, ArrowUpRight } from "lucide-react";
 
 interface MegaMenuProps {
@@ -7,7 +7,6 @@ interface MegaMenuProps {
   href: string;
   links: Array<{ label: string; href: string; image: string }>;
 }
-
 export function MegaMenu({ label, href, links }: MegaMenuProps) {
   return (
     <div className="nav-item">
@@ -22,7 +21,13 @@ export function MegaMenu({ label, href, links }: MegaMenuProps) {
               <li key={item.href}>
                 <Link href={item.href}>
                   <span className="mega-link-media" aria-hidden="true">
-                    <Image src={item.image} alt="" fill sizes="52px" />
+                    <Image
+                      src={item.image}
+                      alt=""
+                      width={52}
+                      height={52}
+                      fetchPriority="low"
+                    />
                   </span>
                   <span className="mega-link-label">{item.label}</span>
                   <ArrowUpRight size={15} aria-hidden="true" />

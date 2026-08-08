@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { Badge, Button, Container, Heading, Text } from "@medusajs/ui";
 
 export const adminPath = (path: string) => `/app${path.startsWith("/") ? path : `/${path}`}`;
@@ -181,4 +181,12 @@ export function EmptyState({ title, description }: { title: string; description:
       </Text>
     </div>
   );
+}
+
+export function AdminRouteRedirect({ destination, label }: { destination: string; label: string }) {
+  useEffect(() => {
+    window.location.replace(adminPath(destination));
+  }, [destination]);
+
+  return <LoadingState label={`Opening ${label}...`} />;
 }

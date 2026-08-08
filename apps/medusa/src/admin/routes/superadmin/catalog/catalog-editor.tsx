@@ -13,6 +13,27 @@ const marketOptions = [
   { code: "me", label: "Middle East" },
 ] as const;
 
+const storefrontSectionHandles = new Set([
+  "originals",
+  "reserve",
+  "pantry",
+  "tea-wellness",
+  "lifestyle-accessories",
+  "gifts",
+]);
+
+type ManagedCatalog = {
+  id: string;
+  name: string;
+  handle: string;
+  section: string;
+  experience: "listing" | "build_a_box";
+  box_size: number | null;
+  is_active: boolean;
+};
+
+type CatalogListResponse = { catalogs: ManagedCatalog[] };
+
 interface FormState {
   title: string;
   handle: string;
@@ -52,6 +73,7 @@ interface FormState {
   harvestDate: string;
   evidenceReference: string;
   originVerification: "draft" | "in_review" | "verified" | "rejected";
+  categoryIds: string[];
 }
 
 function metadataString(metadata: Record<string, unknown>, key: string) {
@@ -123,6 +145,9 @@ function initialState(product: CatalogProduct): FormState {
     harvestDate: origin?.harvest_date?.slice(0, 10) ?? "",
     evidenceReference: origin?.evidence_reference ?? "",
     originVerification: origin?.verification_status ?? "draft",
+    categoryIds: product.categories
+      .filter((category) => storefrontSectionHandles.has(category.parent_category?.handle ?? ""))
+      .map((category) => category.id),
   };
 }
 
@@ -212,7 +237,22 @@ export function CatalogEditor({
   const [error, setError] = useState<string>();
   const [saved, setSaved] = useState(false);
   const [dirty, setDirty] = useState(false);
+  const [catalogs, setCatalogs] = useState<ManagedCatalog[]>();
+  const [catalogError, setCatalogError] = useState<string>();
   const allowNavigation = useRef(false);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    adminRequest<CatalogListResponse>("/admin/superadmin/catalogs", {
+      signal: controller.signal,
+    })
+      .then((response) => setCatalogs(response.catalogs))
+      .catch((caught) => {
+        if (caught instanceof DOMException && caught.name === "AbortError") return;
+        setCatalogError(caught instanceof Error ? caught.message : "Catalogs could not be loaded.");
+      });
+    return () => controller.abort();
+  }, []);
 
   useEffect(() => {
     if (!dirty) return;
@@ -331,6 +371,7 @@ export function CatalogEditor({
             usage: nullable(form.usage),
             eligible_markets: markets,
             badges,
+            category_ids: form.categoryIds,
             best_seller: form.bestSeller,
             storefront_visible: form.storefrontVisible,
             thumbnail_alt: nullable(form.thumbnailAlt),
@@ -513,7 +554,10 @@ export function CatalogEditor({
                 onChange={(event) => set("region", event.target.value)}
               />
             </Field>
-            <Field label="Badges" help="Separate each badge with a comma. For example: Bestseller, Ready to gift">
+            <Field
+              label="Badges"
+              help="Separate each badge with a comma. For example: Bestseller, Ready to gift"
+            >
               <Input
                 maxLength={1000}
                 value={form.badges}
@@ -615,6 +659,79 @@ export function CatalogEditor({
           </div>
         </Container>
       </div>
+
+      <Container>
+        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+          <div>
+            <Heading level="h2">Additional storefront catalogs</Heading>
+            <Text className="text-ui-fg-subtle mt-1">
+              Keep the product in its primary collection while also placing it in reusable catalogs
+              such as Gifts · Build a Box.
+            </Text>
+          </div>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => window.location.assign(adminPath("/superadmin/catalogs"))}
+          >
+            Manage catalogs
+          </Button>
+        </div>
+        {catalogError ? (
+          <Text role="alert" className="text-ui-fg-error mt-4">
+            {catalogError}
+          </Text>
+        ) : catalogs === undefined ? (
+          <Text className="text-ui-fg-subtle mt-4">Loading catalogs…</Text>
+        ) : catalogs.length ? (
+          <div className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {catalogs.map((catalog) => {
+              const checked = form.categoryIds.includes(catalog.id);
+              const disabled = !catalog.is_active && !checked;
+              return (
+                <label
+                  key={catalog.id}
+                  className={`border-ui-border-base flex items-start gap-3 rounded-lg border p-4 ${
+                    disabled ? "opacity-60" : "cursor-pointer"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    className="mt-1 size-4"
+                    checked={checked}
+                    disabled={disabled}
+                    onChange={(event) =>
+                      set(
+                        "categoryIds",
+                        event.target.checked
+                          ? [...form.categoryIds, catalog.id]
+                          : form.categoryIds.filter((id) => id !== catalog.id),
+                      )
+                    }
+                  />
+                  <span>
+                    <Text weight="plus">{catalog.name}</Text>
+                    <Text size="xsmall" className="text-ui-fg-subtle mt-1">
+                      {catalog.section.replaceAll("-", " ")}
+                      {catalog.experience === "build_a_box"
+                        ? ` · Build a box (${catalog.box_size ?? 3} products)`
+                        : " · Product listing"}
+                      {!catalog.is_active ? " · Inactive" : ""}
+                    </Text>
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="border-ui-border-base mt-5 rounded-lg border border-dashed p-6 text-center">
+            <Heading level="h3">No reusable catalogs yet</Heading>
+            <Text className="text-ui-fg-subtle mt-1">
+              Create one to group products across their primary sections.
+            </Text>
+          </div>
+        )}
+      </Container>
 
       <Container>
         <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
@@ -759,7 +876,10 @@ export function CatalogEditor({
             />
           </div>
           <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Field label="Supported country codes" help="Separate ISO two letter codes with commas.">
+            <Field
+              label="Supported country codes"
+              help="Separate ISO two letter codes with commas."
+            >
               <Input
                 maxLength={320}
                 value={form.supportedCountries}
@@ -839,8 +959,8 @@ export function CatalogEditor({
         <Container>
           <Heading level="h2">Origin and verification</Heading>
           <Text className="text-ui-fg-subtle mt-1">
-            Internal provenance details support review; only approved claims for customers should
-            be published.
+            Internal provenance details support review; only approved claims for customers should be
+            published.
           </Text>
           <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="Division">

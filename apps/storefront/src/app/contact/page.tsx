@@ -63,7 +63,6 @@ function ContactOrnament() {
     </span>
   );
 }
-
 export default function ContactPage() {
   const contactDetails = [
     {
@@ -125,7 +124,7 @@ export default function ContactPage() {
           </div>
           <div className="contact-hero-media">
             <Image
-              src="/images/our-story-hero.png"
+              src="/images/our-story-hero.webp"
               alt="Turmeric, dried chilli, mustard seeds and fresh curry leaves arranged on a warm stone surface"
               fill
               priority

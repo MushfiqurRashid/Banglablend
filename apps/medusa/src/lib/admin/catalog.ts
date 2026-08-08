@@ -11,6 +11,16 @@ export const catalogProductFields = [
   "collection.id",
   "collection.title",
   "collection.handle",
+  "categories.id",
+  "categories.name",
+  "categories.handle",
+  "categories.is_active",
+  "categories.is_internal",
+  "categories.parent_category_id",
+  "categories.parent_category.id",
+  "categories.parent_category.name",
+  "categories.parent_category.handle",
+  "categories.metadata",
   "tags.id",
   "tags.value",
   "metadata",
@@ -23,7 +33,7 @@ export const catalogProductFields = [
   "variants.prices.amount",
   "variants.prices.currency_code",
   "created_at",
-  "updated_at"
+  "updated_at",
 ];
 
 export interface CatalogImage {
@@ -56,6 +66,16 @@ export interface CatalogProductRecord {
   thumbnail?: string | null;
   images?: CatalogImage[];
   collection?: { id?: string; title?: string; handle?: string } | null;
+  categories?: Array<{
+    id: string;
+    name: string;
+    handle: string;
+    is_active?: boolean;
+    is_internal?: boolean;
+    parent_category_id?: string | null;
+    parent_category?: { id?: string; name?: string; handle?: string } | null;
+    metadata?: Record<string, unknown> | null;
+  }>;
   tags?: Array<{ id?: string; value?: string }>;
   metadata?: Record<string, unknown> | null;
   variants?: CatalogVariant[];
@@ -86,21 +106,23 @@ export function getCatalogReadiness(product: CatalogProductRecord): CatalogReadi
   const checks = {
     description: Boolean(product.description?.trim()),
     media: Boolean(
-      product.thumbnail?.trim()
-      || product.images?.some((image) => Boolean(image.url?.trim()))
+      product.thumbnail?.trim() || product.images?.some((image) => Boolean(image.url?.trim())),
     ),
     variant: variants.length > 0 && variants.every((variant) => Boolean(variant.sku?.trim())),
-    price: variants.length > 0 && variants.every((variant) =>
-      variant.prices?.some((price) =>
-        typeof price.amount === "number"
-        && Number.isFinite(price.amount)
-        && price.amount > 0
-        && Boolean(price.currency_code?.trim())
-      )
-    ),
+    price:
+      variants.length > 0 &&
+      variants.every((variant) =>
+        variant.prices?.some(
+          (price) =>
+            typeof price.amount === "number" &&
+            Number.isFinite(price.amount) &&
+            price.amount > 0 &&
+            Boolean(price.currency_code?.trim()),
+        ),
+      ),
     market: markets.length > 0,
     verified: metadata.verified === true && metadata.is_placeholder !== true,
-    published: product.status === "published"
+    published: product.status === "published",
   };
 
   const labels: Record<keyof typeof checks, string> = {
@@ -110,7 +132,7 @@ export function getCatalogReadiness(product: CatalogProductRecord): CatalogReadi
     price: "positive price",
     market: "eligible market",
     verified: "catalog verification",
-    published: "published status"
+    published: "published status",
   };
   const missing = (Object.keys(checks) as Array<keyof typeof checks>)
     .filter((key) => !checks[key])
@@ -119,7 +141,7 @@ export function getCatalogReadiness(product: CatalogProductRecord): CatalogReadi
   return {
     ready: missing.length === 0,
     checks,
-    missing
+    missing,
   };
 }
 
@@ -128,8 +150,9 @@ export function sanitizeCatalogProduct(product: CatalogProductRecord) {
     ...product,
     metadata: product.metadata ?? {},
     images: product.images ?? [],
+    categories: product.categories ?? [],
     tags: product.tags ?? [],
     variants: product.variants ?? [],
-    readiness: getCatalogReadiness(product)
+    readiness: getCatalogReadiness(product),
   };
 }

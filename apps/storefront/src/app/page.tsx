@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/components/navigation/smart-link";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -19,6 +19,7 @@ import { ProductGrid } from "@/components/commerce/product-grid";
 import { PageContainer } from "@/components/layout/page-container";
 import { Section } from "@/components/layout/section";
 import { WhyBanglaBlend } from "@/components/marketing/why-bangla-blend";
+import { HomeFaqSection } from "@/components/marketing/home-faq-section";
 import "./home.css";
 
 export const dynamic = "force-dynamic";
@@ -68,7 +69,7 @@ const communityRecipeSuggestions = [
     time: "60 min",
     difficulty: "Intermediate",
     href: "/recipes/traditional",
-    image: "/images/recipe-mezban-gosh.png",
+    image: "/images/recipe-mezban-gosh.webp",
     imageAlt: "Mezban beef curry in a hammered brass bowl",
   },
   {
@@ -77,7 +78,7 @@ const communityRecipeSuggestions = [
     time: "45 min",
     difficulty: "Beginner",
     href: "/recipes/everyday-cooking",
-    image: "/images/recipe-chana-dal-bhuna.png",
+    image: "/images/recipe-chana-dal-bhuna.webp",
     imageAlt: "Golden chana dal bhuna with fried onion and green chilli",
   },
   {
@@ -86,7 +87,7 @@ const communityRecipeSuggestions = [
     time: "30 min",
     difficulty: "Intermediate",
     href: "/recipes/by-product",
-    image: "/images/recipe-grilled-hilsa.png",
+    image: "/images/recipe-grilled-hilsa.webp",
     imageAlt: "Grilled hilsa steaks with green chillies and lime",
   },
   {
@@ -95,7 +96,7 @@ const communityRecipeSuggestions = [
     time: "15 min",
     difficulty: "Beginner",
     href: "/recipes/everyday-cooking",
-    image: "/images/recipe-masala-chai.png",
+    image: "/images/recipe-masala-chai.webp",
     imageAlt: "Steaming masala chai in handmade clay cups",
   },
 ] as const;
@@ -135,7 +136,7 @@ export default async function HomePage() {
     excerpt: "A fish preparation rich with mustard, green chilli and warm spice, served with steamed rice.",
     prepTime: 20,
     cookTime: 25,
-    image: "/images/shorisha-ilish-recipe.png",
+    image: "/images/shorisha-ilish-recipe.webp",
     imageAlt: "Shorisha ilish served with mustard, green chilli and rice",
   };
   const primaryAction = {
@@ -151,14 +152,15 @@ export default async function HomePage() {
       <section className="home-hero">
         <div className="home-hero-media">
           <Image
-            src={homepage?.heroImage ?? "/images/home-hero-premium-v2.png"}
+            src={homepage?.heroImage ?? "/images/home-hero-premium-v2.webp"}
             alt={
               homepage?.heroImageAlt ??
               "Bangla Blend Hathajari red chilli powder with a brass spice box and a regional rice dish"
             }
             fill
             priority
-            quality={95}
+            fetchPriority="high"
+            quality={75}
             sizes="100vw"
           />
         </div>
@@ -220,7 +222,9 @@ export default async function HomePage() {
                     src={category.image}
                     alt=""
                     fill
-                    sizes="(max-width: 700px) 82vw, 25vw"
+                    quality={70}
+                    sizes="(max-width: 700px) 64vw, 25vw"
+                    fetchPriority="low"
                     style={{ objectPosition: category.position }}
                   />
                 </div>
@@ -256,10 +260,10 @@ export default async function HomePage() {
       </Section>
 
       <section className="region-feature">
-        <PageContainer className="region-feature-grid">
+        <div className="region-feature-grid">
           <div className="region-feature-media">
             <Image
-              src="/images/bangladesh-blended-map.png"
+              src="/images/bangladesh-blended-map.webp"
               alt="Bangladesh Blended spice map highlighting the regional flavours of Rangpur, Mymensingh, Sylhet, Rajshahi, Dhaka, Chattogram, Khulna and Barishal"
               fill
               sizes="(max-width: 800px) 100vw, 55vw"
@@ -297,7 +301,7 @@ export default async function HomePage() {
               </span>
             </div>
           </div>
-        </PageContainer>
+        </div>
         <div className="feature-strip">
           {discoverFeatures.map((feature) => (
             <Link className="feature-link" key={feature.href} href={feature.href}>
@@ -314,7 +318,7 @@ export default async function HomePage() {
         <PageContainer className="impact-editorial">
           <div className="impact-visual">
             <Image
-              src="/images/our-story-craft.png"
+              src="/images/our-story-craft.webp"
               alt="Spices being ground by hand in a traditional stone mortar"
               fill
               sizes="(max-width: 800px) 100vw, 52vw"
@@ -458,7 +462,7 @@ export default async function HomePage() {
           <div className="market-story">
             <Image
               className="market-story-backdrop"
-              src="/images/bangladesh-river-landscape.png"
+              src="/images/bangladesh-river-landscape.webp"
               alt=""
               fill
               sizes="(max-width: 800px) 100vw, 36vw"
@@ -500,7 +504,7 @@ export default async function HomePage() {
               <Link className="market-journey-card" href="/shop">
                 <span className="market-journey-media">
                   <Image
-                    src="/images/our-story-impact.png"
+                    src="/images/our-story-impact.webp"
                     alt="A Bangladeshi grower harvesting leafy crops in a sunlit field"
                     fill
                     sizes="(max-width: 760px) 86vw, 34vw"
@@ -558,6 +562,7 @@ export default async function HomePage() {
       </Section>
 
       <WhyBanglaBlend />
+      <HomeFaqSection />
     </>
   );
 }

@@ -1,101 +1,137 @@
 import type { AuthenticatedMedusaRequest, MedusaResponse } from "@medusajs/framework/http";
 import { ContainerRegistrationKeys, MedusaError, ProductStatus } from "@medusajs/framework/utils";
 import { z } from "@medusajs/framework/zod";
-import {
-  deleteProductsWorkflow,
-  updateProductsWorkflow
-} from "@medusajs/medusa/core-flows";
+import { deleteProductsWorkflow, updateProductsWorkflow } from "@medusajs/medusa/core-flows";
 import { recordAdminAudit } from "../../../../../lib/admin/audit";
 import {
   catalogProductFields,
   getCatalogReadiness,
   sanitizeCatalogProduct,
-  type CatalogProductRecord
+  type CatalogProductRecord,
 } from "../../../../../lib/admin/catalog";
 import { PRODUCT_MARKET_MODULE } from "../../../../../modules/product-market";
 import type ProductMarketModuleService from "../../../../../modules/product-market/service";
 import { PRODUCT_ORIGIN_MODULE } from "../../../../../modules/product-origin";
 import type ProductOriginModuleService from "../../../../../modules/product-origin/service";
+import {
+  isManagedStorefrontCatalog,
+  type StorefrontCatalogCategory,
+} from "../../../../../lib/admin/storefront-catalog";
 
 const nullableText = (maximum: number) => z.string().trim().max(maximum).nullable().optional();
-const productIdSchema = z.string().trim().min(1).max(160).regex(/^[A-Za-z0-9_-]+$/);
+const productIdSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .max(160)
+  .regex(/^[A-Za-z0-9_-]+$/);
 
-const marketSchema = z.object({
-  bangladesh_available: z.boolean().optional(),
-  international_available: z.boolean().optional(),
-  supported_countries: z.array(z.string().trim().toLowerCase().length(2)).max(80).optional(),
-  restricted_countries: z.array(z.string().trim().toLowerCase().length(2)).max(80).optional(),
-  export_ready: z.boolean().optional(),
-  domestic_only: z.boolean().optional(),
-  shipping_classification: nullableText(160),
-  customs_description: nullableText(500),
-  country_of_origin: nullableText(120),
-  package_dimensions: z.record(z.string(), z.union([z.string(), z.number()])).nullable().optional(),
-  storage_requirements: nullableText(1000),
-  temperature_requirements: nullableText(500),
-  shelf_life_days: z.number().int().min(0).max(3650).nullable().optional(),
-  minimum_shelf_life_at_dispatch_days: z.number().int().min(0).max(3650).nullable().optional(),
-  verified: z.boolean().optional()
-}).strict().superRefine((profile, context) => {
-  if (profile.domestic_only === true && profile.international_available === true) {
-    context.addIssue({
-      code: "custom",
-      path: ["international_available"],
-      message: "A product limited to domestic sales cannot be internationally available."
-    });
-  }
-  if (profile.domestic_only === true && profile.export_ready === true) {
-    context.addIssue({
-      code: "custom",
-      path: ["export_ready"],
-      message: "A product limited to domestic sales cannot be marked ready for export."
-    });
-  }
-});
+const marketSchema = z
+  .object({
+    bangladesh_available: z.boolean().optional(),
+    international_available: z.boolean().optional(),
+    supported_countries: z.array(z.string().trim().toLowerCase().length(2)).max(80).optional(),
+    restricted_countries: z.array(z.string().trim().toLowerCase().length(2)).max(80).optional(),
+    export_ready: z.boolean().optional(),
+    domestic_only: z.boolean().optional(),
+    shipping_classification: nullableText(160),
+    customs_description: nullableText(500),
+    country_of_origin: nullableText(120),
+    package_dimensions: z
+      .record(z.string(), z.union([z.string(), z.number()]))
+      .nullable()
+      .optional(),
+    storage_requirements: nullableText(1000),
+    temperature_requirements: nullableText(500),
+    shelf_life_days: z.number().int().min(0).max(3650).nullable().optional(),
+    minimum_shelf_life_at_dispatch_days: z.number().int().min(0).max(3650).nullable().optional(),
+    verified: z.boolean().optional(),
+  })
+  .strict()
+  .superRefine((profile, context) => {
+    if (profile.domestic_only === true && profile.international_available === true) {
+      context.addIssue({
+        code: "custom",
+        path: ["international_available"],
+        message: "A product limited to domestic sales cannot be internationally available.",
+      });
+    }
+    if (profile.domestic_only === true && profile.export_ready === true) {
+      context.addIssue({
+        code: "custom",
+        path: ["export_ready"],
+        message: "A product limited to domestic sales cannot be marked ready for export.",
+      });
+    }
+  });
 
-const originSchema = z.object({
-  division: nullableText(120),
-  district: nullableText(120),
-  locality: nullableText(160),
-  producer_reference: nullableText(200),
-  harvest_date: z.string().datetime().nullable().optional(),
-  batch_number: nullableText(120),
-  latitude: z.number().min(-90).max(90).nullable().optional(),
-  longitude: z.number().min(-180).max(180).nullable().optional(),
-  verification_status: z.enum(["draft", "in_review", "verified", "rejected"]).optional(),
-  evidence_reference: nullableText(500)
-}).strict();
+const originSchema = z
+  .object({
+    division: nullableText(120),
+    district: nullableText(120),
+    locality: nullableText(160),
+    producer_reference: nullableText(200),
+    harvest_date: z.string().datetime().nullable().optional(),
+    batch_number: nullableText(120),
+    latitude: z.number().min(-90).max(90).nullable().optional(),
+    longitude: z.number().min(-180).max(180).nullable().optional(),
+    verification_status: z.enum(["draft", "in_review", "verified", "rejected"]).optional(),
+    evidence_reference: nullableText(500),
+  })
+  .strict();
 
-const updateSchema = z.object({
-  title: z.string().trim().min(1).max(160).optional(),
-  handle: z.string().trim().min(1).max(160).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).optional(),
-  subtitle: nullableText(255),
-  description: nullableText(10000),
-  status: z.enum(["draft", "proposed", "published", "rejected"]).optional(),
-  region: nullableText(160),
-  ingredients: nullableText(5000),
-  storage: nullableText(2000),
-  shelf_life: nullableText(1000),
-  usage: nullableText(3000),
-  eligible_markets: z.array(z.enum(["bd", "gb", "us", "ca", "eu", "au", "me"])).min(1).optional(),
-  badges: z.array(z.string().trim().min(1).max(80)).max(12).optional(),
-  best_seller: z.boolean().optional(),
-  gift_type: z.enum(["set", "regional"]).nullable().optional(),
-  verified: z.boolean().optional(),
-  is_placeholder: z.boolean().optional(),
-  storefront_visible: z.boolean().optional(),
-  thumbnail_alt: nullableText(300),
-  image_alt_texts: z.record(z.string().url(), z.string().trim().min(1).max(300)).optional(),
-  market_profile: marketSchema.optional(),
-  origin_profile: originSchema.optional()
-}).strict();
+const updateSchema = z
+  .object({
+    title: z.string().trim().min(1).max(160).optional(),
+    handle: z
+      .string()
+      .trim()
+      .min(1)
+      .max(160)
+      .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+      .optional(),
+    subtitle: nullableText(255),
+    description: nullableText(10000),
+    status: z.enum(["draft", "proposed", "published", "rejected"]).optional(),
+    region: nullableText(160),
+    ingredients: nullableText(5000),
+    storage: nullableText(2000),
+    shelf_life: nullableText(1000),
+    usage: nullableText(3000),
+    eligible_markets: z
+      .array(z.enum(["bd", "gb", "us", "ca", "eu", "au", "me"]))
+      .min(1)
+      .optional(),
+    badges: z.array(z.string().trim().min(1).max(80)).max(12).optional(),
+    best_seller: z.boolean().optional(),
+    gift_type: z.enum(["corporate", "set", "regional"]).nullable().optional(),
+    category_ids: z
+      .array(
+        z
+          .string()
+          .trim()
+          .min(1)
+          .max(160)
+          .regex(/^[A-Za-z0-9_-]+$/),
+      )
+      .max(50)
+      .optional(),
+    verified: z.boolean().optional(),
+    is_placeholder: z.boolean().optional(),
+    storefront_visible: z.boolean().optional(),
+    thumbnail_alt: nullableText(300),
+    image_alt_texts: z.record(z.string().url(), z.string().trim().min(1).max(300)).optional(),
+    market_profile: marketSchema.optional(),
+    origin_profile: originSchema.optional(),
+  })
+  .strict();
 
 async function retrieveProduct(req: AuthenticatedMedusaRequest, id: string) {
   const query = req.scope.resolve(ContainerRegistrationKeys.QUERY);
   const { data } = await query.graph({
     entity: "product",
     fields: catalogProductFields,
-    filters: { id }
+    filters: { id },
   });
   return data[0] as CatalogProductRecord | undefined;
 }
@@ -105,7 +141,7 @@ async function retrieveProfiles(req: AuthenticatedMedusaRequest, productId: stri
   const originService = req.scope.resolve<ProductOriginModuleService>(PRODUCT_ORIGIN_MODULE);
   const [[market], [origin]] = await Promise.all([
     marketService.listProductMarkets({ product_id: productId }),
-    originService.listProductOrigins({ product_id: productId })
+    originService.listProductOrigins({ product_id: productId }),
   ]);
   return { market: market ?? null, origin: origin ?? null };
 }
@@ -125,15 +161,17 @@ export async function GET(req: AuthenticatedMedusaRequest, res: MedusaResponse) 
     product: {
       ...sanitizeCatalogProduct(product),
       market_profile: profiles.market,
-      origin_profile: profiles.origin
-    }
+      origin_profile: profiles.origin,
+    },
   });
 }
 
 export async function POST(req: AuthenticatedMedusaRequest, res: MedusaResponse) {
   const parsed = updateSchema.safeParse(req.body);
   if (!parsed.success) {
-    return res.status(400).json({ message: "Invalid catalog update.", errors: parsed.error.flatten() });
+    return res
+      .status(400)
+      .json({ message: "Invalid catalog update.", errors: parsed.error.flatten() });
   }
 
   const parsedId = productIdSchema.safeParse(req.params.id);
@@ -155,6 +193,7 @@ export async function POST(req: AuthenticatedMedusaRequest, res: MedusaResponse)
     badges,
     best_seller: bestSeller,
     gift_type: giftType,
+    category_ids: categoryIds,
     verified,
     is_placeholder: isPlaceholder,
     thumbnail_alt: thumbnailAlt,
@@ -177,27 +216,66 @@ export async function POST(req: AuthenticatedMedusaRequest, res: MedusaResponse)
     ...(verified !== undefined ? { verified } : {}),
     ...(isPlaceholder !== undefined ? { is_placeholder: isPlaceholder } : {}),
     ...(thumbnailAlt !== undefined ? { thumbnail_alt: thumbnailAlt } : {}),
-    ...(imageAltTexts !== undefined ? { image_alt_texts: imageAltTexts } : {})
+    ...(imageAltTexts !== undefined ? { image_alt_texts: imageAltTexts } : {}),
   };
+
+  let categories: Array<{ id: string }> | undefined;
+  if (categoryIds !== undefined) {
+    const query = req.scope.resolve(ContainerRegistrationKeys.QUERY);
+    const { data } = categoryIds.length
+      ? await query.graph({
+          entity: "product_category",
+          fields: [
+            "id",
+            "name",
+            "handle",
+            "is_active",
+            "is_internal",
+            "parent_category_id",
+            "parent_category.handle",
+            "metadata",
+          ],
+          filters: { id: categoryIds },
+        })
+      : { data: [] };
+    const selectedCategories = data as StorefrontCatalogCategory[];
+    if (
+      selectedCategories.length !== categoryIds.length ||
+      selectedCategories.some((category) => !isManagedStorefrontCatalog(category))
+    ) {
+      return res.status(400).json({ message: "Choose only managed storefront catalogs." });
+    }
+
+    const unmanagedCategoryIds = (before.categories ?? [])
+      .filter((category) => !isManagedStorefrontCatalog(category))
+      .map((category) => category.id);
+    categories = Array.from(new Set([...unmanagedCategoryIds, ...categoryIds])).map(
+      (categoryId) => ({
+        id: categoryId,
+      }),
+    );
+  }
 
   if (storefrontVisible !== undefined) {
     metadata.verified = storefrontVisible;
     metadata.is_placeholder = !storefrontVisible;
   }
 
-  const nextStatus = storefrontVisible === true
-    ? ProductStatus.PUBLISHED
-    : storefrontVisible === false && (status === undefined || status === "published")
-      ? ProductStatus.DRAFT
-      : status !== undefined
-        ? mapStatus(status)
-        : before.status
-          ? mapStatus(before.status)
-          : ProductStatus.DRAFT;
+  const nextStatus =
+    storefrontVisible === true
+      ? ProductStatus.PUBLISHED
+      : storefrontVisible === false && (status === undefined || status === "published")
+        ? ProductStatus.DRAFT
+        : status !== undefined
+          ? mapStatus(status)
+          : before.status
+            ? mapStatus(before.status)
+            : ProductStatus.DRAFT;
   const update = {
     ...coreFields,
+    ...(categories !== undefined ? { categories } : {}),
     ...(status !== undefined || storefrontVisible !== undefined ? { status: nextStatus } : {}),
-    metadata
+    metadata,
   };
 
   if (nextStatus === ProductStatus.PUBLISHED) {
@@ -205,13 +283,13 @@ export async function POST(req: AuthenticatedMedusaRequest, res: MedusaResponse)
       ...before,
       ...coreFields,
       status: "published",
-      metadata
+      metadata,
     } as CatalogProductRecord;
     const readiness = getCatalogReadiness(candidate);
     if (!readiness.ready) {
       return res.status(409).json({
         message: `Product cannot be shown in the storefront until these items are complete: ${readiness.missing.join(", ")}.`,
-        readiness
+        readiness,
       });
     }
   }
@@ -219,8 +297,8 @@ export async function POST(req: AuthenticatedMedusaRequest, res: MedusaResponse)
   await updateProductsWorkflow(req.scope).run({
     input: {
       selector: { id: before.id },
-      update
-    }
+      update,
+    },
   });
 
   const marketService = req.scope.resolve<ProductMarketModuleService>(PRODUCT_MARKET_MODULE);
@@ -238,9 +316,10 @@ export async function POST(req: AuthenticatedMedusaRequest, res: MedusaResponse)
       ...originFields,
       ...(harvestDate !== undefined
         ? { harvest_date: harvestDate === null ? null : new Date(harvestDate) }
-        : {})
+        : {}),
     };
-    if (existing) await originService.updateProductOrigins({ id: existing.id, ...normalizedOrigin });
+    if (existing)
+      await originService.updateProductOrigins({ id: existing.id, ...normalizedOrigin });
     else await originService.createProductOrigins({ product_id: before.id, ...normalizedOrigin });
   }
 
@@ -255,16 +334,16 @@ export async function POST(req: AuthenticatedMedusaRequest, res: MedusaResponse)
       title: before.title,
       handle: before.handle,
       status: before.status,
-      metadata: before.metadata
+      metadata: before.metadata,
     },
     after: after
       ? {
           title: after.title,
           handle: after.handle,
           status: after.status,
-          metadata: after.metadata
+          metadata: after.metadata,
         }
-      : null
+      : null,
   });
 
   const profiles = await retrieveProfiles(req, before.id);
@@ -273,9 +352,9 @@ export async function POST(req: AuthenticatedMedusaRequest, res: MedusaResponse)
       ? {
           ...sanitizeCatalogProduct(after),
           market_profile: profiles.market,
-          origin_profile: profiles.origin
+          origin_profile: profiles.origin,
         }
-      : null
+      : null,
   });
 }
 
@@ -286,7 +365,14 @@ export async function DELETE(req: AuthenticatedMedusaRequest, res: MedusaRespons
   const before = await retrieveProduct(req, id);
   if (!before) throw new MedusaError(MedusaError.Types.NOT_FOUND, "Product not found.");
 
+  const profiles = await retrieveProfiles(req, before.id);
   await deleteProductsWorkflow(req.scope).run({ input: { ids: [before.id] } });
+  const marketService = req.scope.resolve<ProductMarketModuleService>(PRODUCT_MARKET_MODULE);
+  const originService = req.scope.resolve<ProductOriginModuleService>(PRODUCT_ORIGIN_MODULE);
+  await Promise.all([
+    profiles.market ? marketService.deleteProductMarkets(profiles.market.id) : Promise.resolve(),
+    profiles.origin ? originService.deleteProductOrigins(profiles.origin.id) : Promise.resolve(),
+  ]);
   await recordAdminAudit(req, {
     action: "catalog.product.deleted",
     resourceType: "product",
@@ -297,8 +383,8 @@ export async function DELETE(req: AuthenticatedMedusaRequest, res: MedusaRespons
       title: before.title,
       handle: before.handle,
       status: before.status,
-      metadata: before.metadata
-    }
+      metadata: before.metadata,
+    },
   });
 
   return res.json({ id: before.id, object: "product", deleted: true });

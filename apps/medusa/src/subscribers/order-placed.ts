@@ -1,5 +1,6 @@
 import type { SubscriberArgs, SubscriberConfig } from "@medusajs/framework";
 import { createEmailAdapter } from "../lib/email/adapter";
+import { formatBusinessOrderReference } from "../lib/admin/order-workflow";
 
 interface OrderRecord {
   id: string;
@@ -16,7 +17,7 @@ export default async function orderPlacedHandler({ event, container }: Subscribe
   const order = data[0];
   if (!order?.email) { logger.warn(`Order ${event.data.id} has no customer email for confirmation.`); return; }
   if (!process.env.EMAIL_PROVIDER) { logger.warn(`Order ${event.data.id} was placed, but transactional email is not configured.`); return; }
-  const reference = order.display_id ? `#${order.display_id}` : order.id;
+  const reference = formatBusinessOrderReference(order.display_id, order.id);
   const total = typeof order.total === "number" && order.currency_code ? new Intl.NumberFormat("en-BD", { style: "currency", currency: order.currency_code.toUpperCase() }).format(order.total) : "shown in your order account";
   await createEmailAdapter().send({
     to: order.email,

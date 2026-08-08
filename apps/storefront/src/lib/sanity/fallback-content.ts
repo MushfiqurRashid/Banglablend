@@ -8,7 +8,6 @@ export const divisions = [
   { title: "Rangpur", slug: "rangpur", note: "Editorial profile in preparation" },
   { title: "Mymensingh", slug: "mymensingh", note: "Editorial profile in preparation" }
 ];
-
 export const chattogramRegions = [
   { title: "Chattogram", slug: "chattogram" },
   { title: "Hathazari", slug: "hathazari" },
@@ -26,7 +25,7 @@ export const recipes = [
     cookTime: 25,
     servings: 4,
     difficulty: "Intermediate",
-    image: "/images/shorisha-ilish-recipe.png",
+    image: "/images/shorisha-ilish-recipe.webp",
     verified: false,
     ingredients: [
       { metric: "800 g", imperial: "1¾ lb", bangla: "ইলিশ", english: "hilsa steaks" },
@@ -48,7 +47,7 @@ export const recipes = [
     cookTime: 35,
     servings: 4,
     difficulty: "Beginner",
-    image: "/images/shorisha-ilish-recipe.png",
+    image: "/images/shorisha-ilish-recipe.webp",
     verified: false,
     ingredients: [],
     steps: []
@@ -62,7 +61,7 @@ export const recipes = [
     cookTime: 10,
     servings: 2,
     difficulty: "Beginner",
-    image: "/images/hero-spice-still-life.png",
+    image: "/images/hero-spice-still-life.webp",
     verified: false,
     ingredients: [],
     steps: []
@@ -116,7 +115,7 @@ export const articles = [
     excerpt: "Why food heritage lives not only in celebration dishes, but also in repeated everyday gestures.",
     date: "2026-07-20",
     readingTime: 5,
-    image: "/images/shorisha-ilish-recipe.png",
+    image: "/images/shorisha-ilish-recipe.webp",
     body: [
       "Food heritage is often presented through grand dishes and festival tables. It also lives in quieter knowledge: how rice is washed, when a spice is added, which texture signals that a dish is ready, and how a meal changes with the season.",
       "Bangla Blend documents these practices carefully. Family memory can begin an editorial inquiry, but published cultural and historical claims need review, context and an identifiable source.",
@@ -131,7 +130,7 @@ export const articles = [
     excerpt: "A framework for exploring place through ingredients, techniques and local food memories.",
     date: "2026-07-20",
     readingTime: 6,
-    image: "/images/bangladesh-river-landscape.png",
+    image: "/images/bangladesh-river-landscape.webp",
     body: [
       "Rivers, coasts, hills, cities and agricultural landscapes all influence what is available to cook and how food traditions develop. Regional flavour is a relationship between place, people and practice. It is not simply a decorative label.",
       "Our regional stories connect dishes with reviewed sources, contributor knowledge and clearly identified locations. When the evidence is incomplete, the detail stays in editorial review.",
@@ -146,7 +145,7 @@ export const articles = [
     excerpt: "An introduction to mustard's pungency, aroma and many roles in Bengali cooking.",
     date: "2026-07-20",
     readingTime: 4,
-    image: "/images/shorisha-ilish-recipe.png",
+    image: "/images/shorisha-ilish-recipe.webp",
     body: [
       "Mustard can enter a kitchen as seed, oil or paste, with each form bringing a different kind of heat and aroma. The result depends on variety, freshness, preparation and the other ingredients around it.",
       "A useful ingredient story separates broadly applicable cooking guidance from claims about a specific harvest or source. Origin and processing details for individual products are published only when their records have been verified.",
@@ -161,7 +160,7 @@ export const articles = [
     excerpt: "The records, consent and review behind a sourcing story that is ready to publish.",
     date: "2026-07-20",
     readingTime: 5,
-    image: "/images/bangladesh-river-landscape.png",
+    image: "/images/bangladesh-river-landscape.webp",
     body: [
       "A producer's name or a place of origin should never be used as atmosphere. A responsible sourcing story begins with consent and a record that connects the person, ingredient, location and product accurately.",
       "Claims about livelihoods, environmental practices, certifications and impact need evidence appropriate to the claim. Where that evidence does not yet exist, Bangla Blend does not fill the gap with implication.",
@@ -176,7 +175,7 @@ export const articles = [
     excerpt: "How the editorial workflow separates an interesting lead from a publishable claim.",
     date: "2026-07-20",
     readingTime: 5,
-    image: "/images/bangladesh-river-landscape.png",
+    image: "/images/bangladesh-river-landscape.webp",
     body: [
       "Bangla Blend treats regional storytelling as a publishing responsibility. A compelling anecdote, familiar phrase or supplier note is a useful lead, but it is not automatically a fact ready for customers.",
       "Each claim tied to a place should carry a source, a verification state and an editor. Personal stories require consent, while product provenance must agree with the commerce record.",
@@ -191,7 +190,7 @@ export const articles = [
     excerpt: "A practical framework for choosing, storing and using everyday spices.",
     date: "2026-07-20",
     readingTime: 4,
-    image: "/images/hero-spice-still-life.png",
+    image: "/images/hero-spice-still-life.webp",
     body: [
       "A useful spice pantry reflects the food you actually cook. Begin with a small group of versatile ingredients, learn how they smell and taste when fresh, and add more only when a recipe or technique calls for them.",
       "Keep spices sealed away from heat, light and moisture. Whole spices generally hold their character longer, while ground spices reward smaller quantities and regular refreshment.",
@@ -206,7 +205,7 @@ export const articles = [
     excerpt: "Thinking about celebration food through season, hospitality and the many ways families gather.",
     date: "2026-07-20",
     readingTime: 5,
-    image: "/images/shorisha-ilish-recipe.png",
+    image: "/images/shorisha-ilish-recipe.webp",
     body: [
       "Pohela Boishakh tables are shaped by family practice, region, setting and the season's ingredients. No single menu can represent every way Bengalis welcome the new year.",
       "A thoughtful celebration guide offers context without turning a living tradition into a checklist. It can suggest ways to plan a generous meal while recognising household and regional variation.",
@@ -221,7 +220,7 @@ export const articles = [
     excerpt: "A look at how each product connects to useful cooking guidance.",
     date: "2026-07-20",
     readingTime: 3,
-    image: "/images/shorisha-ilish-recipe.png",
+    image: "/images/shorisha-ilish-recipe.webp",
     body: [
       "A Bangla Blend product page should not be the end of the journey. It should help a cook understand the flavour, find an appropriate recipe and see the place or practice that informed it.",
       "Those connections are maintained as structured references. Product facts remain in commerce data, while recipes and stories can be reviewed and updated independently in the editorial system.",

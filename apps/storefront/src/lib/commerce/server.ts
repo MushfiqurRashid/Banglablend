@@ -1,7 +1,7 @@
 import "server-only";
 import { cookies } from "next/headers";
-import { getProduct, listProducts } from "@bangla-blend/commerce-client";
-import type { MarketCode } from "@bangla-blend/types";
+import { getProduct, listProducts, listStorefrontCatalogs } from "@bangla-blend/commerce-client";
+import type { MarketCode, StorefrontSection } from "@bangla-blend/types";
 import { MARKET_COOKIE, getMarket, isMarketCode } from "@/config/site";
 import { getCommerceConfig } from "./config";
 
@@ -19,4 +19,9 @@ export async function getStoreProducts(query = "", marketCode?: MarketCode) {
 export async function getStoreProduct(handle: string) {
   const market = await getActiveMarket();
   return getProduct(getCommerceConfig(market.code), handle);
+}
+
+export async function getStorefrontCatalogs(section?: StorefrontSection) {
+  const market = await getActiveMarket();
+  return listStorefrontCatalogs(getCommerceConfig(market.code), section);
 }

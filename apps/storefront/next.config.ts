@@ -34,16 +34,31 @@ const contentSecurityPolicy = [
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   images: {
-    formats: ["image/avif", "image/webp"],
-    qualities: [75, 95],
+    unoptimized: process.env.NODE_ENV === "development",
+    formats: ["image/webp"],
+    deviceSizes: [480, 640, 768, 1080, 1440, 1920],
+    imageSizes: [32, 48, 64, 96, 128, 256, 384],
+    qualities: [70, 75, 85],
     remotePatterns: [
       { protocol: "https", hostname: "cdn.sanity.io" },
       { protocol: "https", hostname: "**.amazonaws.com" },
       { protocol: "https", hostname: "**.r2.dev" },
     ],
   },
+  experimental: {
+    optimizePackageImports: ["framer-motion", "lucide-react"],
+  },
   async headers() {
     return [
+      {
+        source: "/images/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=86400, stale-while-revalidate=604800",
+          },
+        ],
+      },
       {
         source: "/(.*)",
         headers: [

@@ -31,14 +31,30 @@ export interface ProductImage {
   alt: string;
 }
 
+export type StorefrontSection =
+  "originals" | "reserve" | "pantry" | "tea-wellness" | "lifestyle-accessories" | "gifts";
+
+export type StorefrontCatalogExperience = "listing" | "build_a_box";
+
+export interface StorefrontCatalog {
+  id: string;
+  name: string;
+  handle: string;
+  description?: string;
+  section: StorefrontSection;
+  experience: StorefrontCatalogExperience;
+  boxSize?: number;
+  active: boolean;
+}
+
 export interface Product {
   id: string;
   handle: string;
   title: string;
   subtitle?: string;
   description: string;
-  collection:
-    "originals" | "reserve" | "pantry" | "tea-wellness" | "lifestyle-accessories" | "gifts";
+  collection: StorefrontSection;
+  catalogs?: StorefrontCatalog[];
   region?: string;
   thumbnail?: string;
   thumbnailAlt?: string;
@@ -57,7 +73,7 @@ export interface Product {
   isPlaceholder?: boolean;
   verified?: boolean;
   bestSeller?: boolean;
-  giftType?: "set" | "regional";
+  giftType?: "corporate" | "set" | "regional";
   createdAt?: string;
 }
 
@@ -90,5 +106,6 @@ export interface SearchDocument {
   excerpt?: string;
   image?: string;
   catalogRevision?: string;
+  catalogHandles?: string[];
   eligibleMarkets?: MarketCode[];
 }

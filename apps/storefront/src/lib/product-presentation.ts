@@ -4,41 +4,40 @@ export interface ProductMedia {
   url: string;
   alt: string;
 }
-
 const localProductImages: Partial<Record<string, string[]>> = {
   "mezban-masala": [
-    "/images/products/mezban-masala-product.png",
+    "/images/products/mezban-masala-product.webp",
     "/images/products/mezban-masala-lifestyle.jpg",
   ],
-  "black-pepper": ["/images/products/black-pepper-product.png"],
+  "black-pepper": ["/images/products/black-pepper-product.webp"],
   "coxs-bazar-fish-masala": [
-    "/images/products/coxs-bazar-fish-masala-product.png",
+    "/images/products/coxs-bazar-fish-masala-product.webp",
     "/images/products/coxs-bazar-fish-masala-lifestyle.jpg",
     "/images/products/coxs-bazar-fish-masala-coastal.jpg",
   ],
   "shahi-garam-masala": [
-    "/images/products/shahi-garam-masala-product.png",
+    "/images/products/shahi-garam-masala-product.webp",
     "/images/products/shahi-garam-masala-lifestyle.jpg",
     "/images/products/shahi-garam-masala-detail.jpg",
   ],
   "white-pepper-powder": [
-    "/images/products/white-pepper-powder-product.png",
+    "/images/products/white-pepper-powder-product.webp",
     "/images/products/white-pepper-powder.jpg",
     "/images/products/pepper-pair.jpg",
   ],
   "hathazari-red-chili": [
-    "/images/products/hathazari-red-chilli-product.png",
+    "/images/products/hathazari-red-chilli-product.webp",
     "/images/products/hathazari-red-chilli-lifestyle.jpg",
   ],
 };
 
 const collectionFallbacks: Record<Product["collection"], string> = {
-  originals: "/images/hero-spice-still-life.png",
+  originals: "/images/hero-spice-still-life.webp",
   reserve: "/images/home-hero-hathajari.jpg",
-  pantry: "/images/our-story-craft.png",
-  "tea-wellness": "/images/recipe-masala-chai.png",
-  "lifestyle-accessories": "/images/our-story-standards.png",
-  gifts: "/images/hero-spice-still-life.png",
+  pantry: "/images/our-story-craft.webp",
+  "tea-wellness": "/images/recipe-masala-chai.webp",
+  "lifestyle-accessories": "/images/our-story-standards.webp",
+  gifts: "/images/hero-spice-still-life.webp",
 };
 
 export function getProductMedia(product: Product): ProductMedia[] {

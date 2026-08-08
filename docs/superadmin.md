@@ -63,6 +63,27 @@ Product titles, descriptions, image alt text, ingredients, storage, shelf life, 
 badges, market eligibility, and origin data are maintained in the Superadmin catalog workspace and
 flow through the commerce adapter to the storefront.
 
+## Collections and storefront catalogs
+
+Use a collection for the product's one primary business destination. Use a storefront catalog when
+the same product should appear in an additional curated or customer-facing grouping.
+
+1. Open **Superadmin → Storefront catalogs** (`/app/superadmin/catalogs`).
+2. Enter the catalog name and URL handle, select its parent section, and choose either **Product
+   listing** or **Build a Box**. A Build a Box catalog also requires the number of products in a
+   completed box.
+3. Create the catalog. An active Gifts catalog is available at `/gifts/{handle}`; catalogs under
+   shop sections are available at `/shop/{section}/{handle}`.
+4. Open **Products → Add product** or edit a product in the Superadmin catalog workspace. Select the
+   catalog under **Additional storefront catalogs** and save.
+
+Catalogs are backed by nested Medusa product categories and can contain products from several
+primary collections. Deactivating a catalog removes it from storefront discovery while retaining
+its assignments so it can be restored. Deleting a catalog permanently removes the category and its
+product assignments, but never deletes the assigned products, collections, variants, prices,
+inventory, orders, or audit evidence. The server validates every assignment and rejects internal,
+inactive-on-create, or unmanaged categories.
+
 ## Native Medusa RBAC
 
 The application enables Medusa's native RBAC with `MEDUSA_FF_RBAC=true` and explicitly registers
@@ -121,6 +142,25 @@ A non-technical operator should see task-oriented sections rather than raw datab
 List views should provide search, filters, sorting, pagination, clear status badges, validation
 messages, confirmation for destructive actions, and plain-language empty states. Detail pages
 should show related records and the impact of a change before saving it.
+
+## Order operations roadmap
+
+Open **Orders**, select an order, and use the roadmap above the native order detail. The numbered
+business reference starts at `order_01`; the longer Medusa ID remains in the URL and is shown for
+support diagnostics. The roadmap permits only the next supported action:
+
+1. Confirm the customer, delivery address, item quantities, payment authorization, and gift notes.
+2. For Cash on Delivery, treat the payment step as approval to proceed, not proof that cash was
+   collected. Reconcile cash against carrier or recipient evidence after delivery.
+3. Create fulfillment only when the primary location has the order inventory and packing is ready.
+4. Mark shipped only after handing the packed fulfillment to the approved carrier.
+5. Mark delivered only after carrier or recipient evidence exists.
+
+Every action runs Medusa's native fulfillment workflow and records an administrator audit entry.
+The optional notification switch controls the configured customer notification. Do not use the
+roadmap to conceal cancellation, return, exchange, refund, partial fulfillment, payment dispute, or
+inventory exceptions; use the matching native workflow so quantities and financial history remain
+reconciled.
 
 ## Product publishing checklist
 

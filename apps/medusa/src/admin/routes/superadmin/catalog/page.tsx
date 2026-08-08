@@ -250,7 +250,13 @@ const CatalogWorkspace = () => {
             >
               Control center
             </Button>
-            <Button onClick={() => window.location.assign(adminPath("/products/create"))}>
+            <Button
+              variant="secondary"
+              onClick={() => window.location.assign(adminPath("/superadmin/catalogs"))}
+            >
+              Manage catalogs
+            </Button>
+            <Button onClick={() => window.location.assign(adminPath("/superadmin/catalog/create"))}>
               Add product
             </Button>
           </>

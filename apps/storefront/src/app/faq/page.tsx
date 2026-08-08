@@ -45,7 +45,6 @@ function FaqOrnament() {
     </span>
   );
 }
-
 export default function FaqPage() {
   return (
     <div className="faq-page">
@@ -59,7 +58,7 @@ export default function FaqPage() {
           </div>
           <div className="faq-hero-media">
             <Image
-              src="/images/our-story-hero.png"
+              src="/images/our-story-hero.webp"
               alt="Turmeric, dried chillies, mustard seed and aromatic spices from a Bangladeshi kitchen"
               fill
               priority
@@ -125,7 +124,7 @@ export default function FaqPage() {
 
           <section className="faq-story-card" aria-labelledby="faq-story-title">
             <Image
-              src="/images/our-story-craft.png"
+              src="/images/our-story-craft.webp"
               alt="Whole spices being ground by hand in a traditional stone mortar"
               fill
               sizes="(max-width: 780px) 100vw, 30vw"

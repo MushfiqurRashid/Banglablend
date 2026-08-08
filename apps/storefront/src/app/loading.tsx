@@ -1,3 +1,12 @@
 export default function Loading() {
-  return <div className="shell section" aria-live="polite"><span className="eyebrow">Bangla Blend</span><h1>Gathering flavor…</h1></div>;
+  return (
+    <div className="route-loading" role="status" aria-label="Loading page">
+      <div className="route-loading-media" />
+      <div className="shell route-loading-copy">
+        <span />
+        <span />
+        <span />
+      </div>
+    </div>
+  );
 }

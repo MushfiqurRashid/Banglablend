@@ -17,6 +17,7 @@ interface CartContextValue {
   addItem: (input: AddInput) => Promise<void>;
   updateItem: (lineId: string, quantity: number) => Promise<void>;
   removeItem: (lineId: string) => Promise<void>;
+  resetCart: () => void;
 }
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -34,20 +35,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const cartQuery = useQuery({
     queryKey: ["cart"],
     queryFn: () => fetch("/api/cart", { cache: "no-store" }).then(parseCart),
-    retry: false
+    retry: false,
   });
   const mutation = useMutation({
     mutationFn: async (request: { method: "POST" | "PATCH" | "DELETE"; body: object }) =>
       fetch("/api/cart", {
         method: request.method,
         headers: { "content-type": "application/json" },
-        body: JSON.stringify(request.body)
+        body: JSON.stringify(request.body),
       }).then(parseCart),
     onSuccess: (cart) => {
       queryClient.setQueryData(["cart"], cart);
       setError(undefined);
     },
-    onError: (reason) => setError(reason instanceof Error ? reason.message : "Cart request failed.")
+    onError: (reason) =>
+      setError(reason instanceof Error ? reason.message : "Cart request failed."),
   });
 
   const value = useMemo<CartContextValue>(
@@ -60,17 +62,25 @@ export function CartProvider({ children }: { children: ReactNode }) {
       open: () => setOpen(true),
       close: () => setOpen(false),
       addItem: async (input) => {
-        await mutation.mutateAsync({ method: "POST", body: input });
-        setOpen(true);
+        try {
+          await mutation.mutateAsync({ method: "POST", body: input });
+        } finally {
+          setOpen(true);
+        }
       },
       updateItem: async (lineId, quantity) => {
         await mutation.mutateAsync({ method: "PATCH", body: { lineId, quantity } });
       },
       removeItem: async (lineId) => {
         await mutation.mutateAsync({ method: "DELETE", body: { lineId } });
-      }
+      },
+      resetCart: () => {
+        queryClient.setQueryData(["cart"], null);
+        setError(undefined);
+        setOpen(false);
+      },
     }),
-    [cartQuery.data, cartQuery.isLoading, error, isOpen, mutation]
+    [cartQuery.data, cartQuery.isLoading, error, isOpen, mutation],
   );
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

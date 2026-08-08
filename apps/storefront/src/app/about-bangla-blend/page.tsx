@@ -172,7 +172,7 @@ export default function AboutBanglaBlendPage() {
         <PageContainer className="about-brand-founder-grid">
           <div className="about-brand-founder-media">
             <Image
-              src="/images/our-story-craft.png"
+              src="/images/our-story-craft.webp"
               alt="Spices being ground by hand in a traditional stone mortar"
               fill
               sizes="(max-width: 860px) 100vw, 48vw"

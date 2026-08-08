@@ -14,6 +14,14 @@ export interface CatalogProduct {
   thumbnail?: string | null;
   images: Array<{ id?: string; url: string }>;
   collection?: { id?: string; title?: string; handle?: string } | null;
+  categories: Array<{
+    id: string;
+    name: string;
+    handle: string;
+    is_active?: boolean;
+    parent_category?: { id?: string; name?: string; handle?: string } | null;
+    metadata?: Record<string, unknown> | null;
+  }>;
   tags: Array<{ id?: string; value?: string }>;
   metadata: Record<string, unknown>;
   variants: Array<{

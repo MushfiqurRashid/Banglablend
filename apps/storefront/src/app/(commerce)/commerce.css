@@ -2100,6 +2100,11 @@
   border-radius: 0.25rem;
 }
 
+.pdp-image-stage {
+  position: absolute;
+  inset: 0;
+}
+
 .pdp-zoom-button,
 .pdp-lightbox-inner > button {
   position: absolute;

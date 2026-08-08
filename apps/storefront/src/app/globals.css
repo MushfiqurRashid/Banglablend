@@ -16,8 +16,9 @@
   --color-border: #ded1c2;
   --color-error: #a62424;
   --color-success: #376644;
-  --font-heading: var(--font-dm-sans), var(--font-noto-sans-bengali), system-ui, sans-serif;
-  --font-body: var(--font-dm-sans), var(--font-noto-sans-bengali), system-ui, sans-serif;
+  --font-noto-sans-bengali: "Nirmala UI", "Vrinda", sans-serif;
+  --font-heading: "Segoe UI Variable Display", "Segoe UI", "Nirmala UI", Arial, sans-serif;
+  --font-body: "Segoe UI Variable Text", "Segoe UI", "Nirmala UI", Arial, sans-serif;
   --page-gutter: clamp(1.25rem, 4vw, 4.5rem);
   --max-width: 90rem;
   --shadow-soft: 0 18px 50px rgb(42 33 29 / 0.1);
@@ -135,6 +136,8 @@ main > div {
 
 .section {
   padding-block: clamp(4.5rem, 8vw, 8rem);
+  content-visibility: auto;
+  contain-intrinsic-size: auto 48rem;
 }
 
 .section-compact {
@@ -1604,5 +1607,74 @@ p {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+  }
+}
+
+img[data-nimg].image-loading {
+  opacity: 0;
+}
+
+.route-progress {
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  pointer-events: none;
+  background: var(--color-deep-chilli);
+  box-shadow: 0 0 12px rgb(123 30 35 / 0.35);
+  transform-origin: left center;
+}
+
+.route-loading {
+  min-height: min(72vh, 46rem);
+  background: var(--color-parchment);
+}
+
+.route-loading-media,
+.route-loading-copy span {
+  background:
+    linear-gradient(100deg, transparent 35%, rgb(255 255 255 / 0.46) 50%, transparent 65%),
+    rgb(222 209 194 / 0.52);
+  background-size: 220% 100%, 100% 100%;
+  animation: loading-sheen 1.1s ease-in-out infinite;
+}
+
+.route-loading-media {
+  height: clamp(18rem, 48vw, 34rem);
+}
+
+.route-loading-copy {
+  display: grid;
+  gap: 0.8rem;
+  padding-block: 2rem 4rem;
+}
+
+.route-loading-copy span {
+  display: block;
+  width: min(38rem, 88%);
+  height: 0.8rem;
+  border-radius: 999px;
+}
+
+.route-loading-copy span:first-child {
+  width: min(12rem, 34%);
+  height: 0.55rem;
+}
+
+.route-loading-copy span:nth-child(2) {
+  width: min(48rem, 96%);
+  height: 2.7rem;
+}
+
+@keyframes loading-sheen {
+  to { background-position: -220% 0, 0 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-loading-media,
+  .route-loading-copy span {
+    animation: none;
   }
 }

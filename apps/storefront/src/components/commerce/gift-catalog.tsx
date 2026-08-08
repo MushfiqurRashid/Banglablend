@@ -378,7 +378,11 @@ export function GiftCatalog({ products }: { products: Product[] }) {
                         </div>
                         {variant ? (
                           <div className="shop-product-actions">
-                            <AddToCartButton variantId={variant.id} label="Add gift to bag" />
+                            <AddToCartButton
+                              variantId={variant.id}
+                              label="Add gift to bag"
+                              disabled={(variant.inventoryQuantity ?? 0) <= 0}
+                            />
                             <Link href={`/products/${product.handle}`}>
                               View what&apos;s inside
                             </Link>

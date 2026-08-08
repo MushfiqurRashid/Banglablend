@@ -36,7 +36,7 @@ function adaptCart(cart: MedusaCart): Cart {
   return { id: cart.id, currencyCode: cart.currency_code, items: (cart.items ?? []).map(adaptLine), subtotal: cart.subtotal ?? 0, discountTotal: cart.discount_total ?? 0, shippingTotal: cart.shipping_total ?? 0, total: cart.total ?? 0 };
 }
 
-async function storeRequest(path: string, init: RequestInit = {}) {
+async function storeRequest<T = { cart: MedusaCart }>(path: string, init: RequestInit = {}) {
   const market = await getActiveMarket();
   const config = getCommerceConfig(market.code);
   if (!config.backendUrl || !config.publishableKey) throw new Error("Commerce is not configured. Start Medusa and add a publishable key.");
@@ -51,7 +51,7 @@ async function storeRequest(path: string, init: RequestInit = {}) {
     const payload = (await response.json().catch(() => null)) as { message?: string } | null;
     throw new Error(payload?.message ?? `Commerce request failed (${response.status}).`);
   }
-  return response.json() as Promise<{ cart: MedusaCart }>;
+  return response.json() as Promise<T>;
 }
 
 function cartResponse(cart: MedusaCart, setCookie = false) {
@@ -61,6 +61,13 @@ function cartResponse(cart: MedusaCart, setCookie = false) {
 }
 
 function errorResponse(error: unknown) {
+  const message = error instanceof Error ? error.message : "";
+  if (message.includes("is not associated with any stock location for variant")) {
+    return NextResponse.json(
+      { error: "This item is not stocked for online orders yet. Please choose another item or try again later." },
+      { status: 409 },
+    );
+  }
   const detail = process.env.NODE_ENV === "development" && error instanceof Error ? ` ${error.message}` : "";
   return NextResponse.json({ error: `Cart request failed.${detail}` }, { status: 503 });
 }
@@ -124,7 +131,7 @@ export async function DELETE(request: Request) {
     const body = (await request.json()) as { lineId?: string };
     const cartId = (await cookies()).get(CART_COOKIE)?.value;
     if (!cartId || !body.lineId || !/^[A-Za-z0-9_-]+$/.test(cartId) || !/^[A-Za-z0-9_-]+$/.test(body.lineId)) return NextResponse.json({ error: "Invalid cart removal." }, { status: 400 });
-    const { cart } = await storeRequest(`/store/carts/${encodeURIComponent(cartId)}/line-items/${encodeURIComponent(body.lineId)}`, { method: "DELETE" });
-    return cartResponse(cart);
+    const { parent } = await storeRequest<{ parent: MedusaCart }>(`/store/carts/${encodeURIComponent(cartId)}/line-items/${encodeURIComponent(body.lineId)}`, { method: "DELETE" });
+    return cartResponse(parent);
   } catch (error) { return errorResponse(error); }
 }
