@@ -1,12 +1,10 @@
-import type { ComponentProps } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PortableText } from "@portabletext/react";
 import { ComingSoonPage } from "@/components/editorial/coming-soon-page";
 import { StandardPage } from "@/components/editorial/standard-page";
 import { meetAnnapurnaComingSoonPage } from "@/config/coming-soon";
-import { sanityFetch } from "@/lib/sanity/client";
-import { STANDARD_PAGE_QUERY } from "@/lib/sanity/queries";
+import { getStandardPage as getStoryPage } from "@/lib/content/queries";
 import { ImpactPage } from "./impact-page";
 import "../../editorial.css";
 import "./impact-page.css";
@@ -62,21 +60,11 @@ export function generateStaticParams() {
   return [...Object.keys(storyPages), "meet-annapurna"].map((section) => ({ section }));
 }
 
-interface ApprovedStoryPage {
-  title: string;
-  introduction?: string;
-  body?: ComponentProps<typeof PortableText>["value"];
-}
-
 function previewAllowed() {
   return (
     process.env.NODE_ENV === "development" &&
     process.env.ENABLE_DEVELOPMENT_FALLBACKS === "true"
   );
-}
-
-async function getStoryPage(slug: string) {
-  return sanityFetch<ApprovedStoryPage>(STANDARD_PAGE_QUERY, { slug });
 }
 
 export async function generateMetadata({

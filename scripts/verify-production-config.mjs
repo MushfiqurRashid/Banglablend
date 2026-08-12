@@ -2,10 +2,10 @@ const errors = [];
 const warnings = [];
 
 const required = [
-  "NEXT_PUBLIC_SITE_URL", "NEXT_PUBLIC_CONTACT_EMAIL", "MEDUSA_BACKEND_URL", "MEDUSA_PUBLISHABLE_API_KEY",
-  "NEXT_PUBLIC_SANITY_PROJECT_ID", "NEXT_PUBLIC_SANITY_DATASET", "SANITY_WEBHOOK_SECRET",
+  "NEXT_PUBLIC_SITE_URL", "NEXT_PUBLIC_ADMIN_URL", "NEXT_PUBLIC_STOREFRONT_URL", "NEXT_PUBLIC_CONTACT_EMAIL",
+  "NEXT_PUBLIC_SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_ANON_KEY", "SUPABASE_SERVICE_ROLE_KEY",
   "MEILISEARCH_HOST", "MEILISEARCH_SEARCH_KEY", "MEILISEARCH_ADMIN_KEY",
-  "DATABASE_URL", "REDIS_URL", "JWT_SECRET", "COOKIE_SECRET", "MEDUSA_COD_ENABLED", "SSLCOMMERZ_ENABLED",
+  "REVALIDATE_SECRET", "COD_ENABLED", "SSLCOMMERZ_ENABLED",
   "EMAIL_PROVIDER", "EMAIL_PROVIDER_API_KEY", "EMAIL_FROM_ADDRESS"
 ];
 
@@ -13,7 +13,7 @@ for (const name of required) if (!process.env[name]?.trim()) errors.push(`${name
 
 if (process.env.NEXT_PUBLIC_CONTACT_EMAIL && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(process.env.NEXT_PUBLIC_CONTACT_EMAIL)) errors.push("NEXT_PUBLIC_CONTACT_EMAIL must be a valid monitored address.");
 
-for (const name of ["NEXT_PUBLIC_SITE_URL", "MEDUSA_BACKEND_URL", "MEILISEARCH_HOST"]) {
+for (const name of ["NEXT_PUBLIC_SITE_URL", "NEXT_PUBLIC_ADMIN_URL", "NEXT_PUBLIC_STOREFRONT_URL", "NEXT_PUBLIC_SUPABASE_URL", "MEILISEARCH_HOST"]) {
   const value = process.env[name];
   if (!value) continue;
   try {
@@ -23,7 +23,12 @@ for (const name of ["NEXT_PUBLIC_SITE_URL", "MEDUSA_BACKEND_URL", "MEILISEARCH_H
   }
 }
 
-for (const name of ["JWT_SECRET", "COOKIE_SECRET", "SANITY_WEBHOOK_SECRET"]) {
+if (process.env.NODE_ENV !== "production") errors.push("NODE_ENV must be production.");
+if (process.env.NEXT_PUBLIC_ADMIN_URL && process.env.NEXT_PUBLIC_ADMIN_URL === process.env.NEXT_PUBLIC_SITE_URL) {
+  errors.push("NEXT_PUBLIC_ADMIN_URL must use a separate origin from the public storefront.");
+}
+
+for (const name of ["SUPABASE_SERVICE_ROLE_KEY", "REVALIDATE_SECRET"]) {
   const value = process.env[name] ?? "";
   if (value.length < 32 || /replace|example|development|build-only/i.test(value)) errors.push(`${name} must be an independent production secret of at least 32 characters.`);
 }
@@ -33,17 +38,20 @@ for (const name of ["PRODUCT_CATALOG_APPROVED", "EDITORIAL_CONTENT_APPROVED", "L
 }
 
 if (process.env.ENABLE_DEVELOPMENT_FALLBACKS === "true") errors.push("ENABLE_DEVELOPMENT_FALLBACKS must never be true in production.");
-if (process.env.MEDUSA_COD_ENABLED !== "true" && process.env.SSLCOMMERZ_ENABLED !== "true") errors.push("At least one Bangladesh payment method must be explicitly enabled.");
+if (process.env.COD_ENABLED !== "true" && process.env.SSLCOMMERZ_ENABLED !== "true") errors.push("At least one Bangladesh payment method must be explicitly enabled.");
 if (/localhost|127\.0\.0\.1|example\.com/i.test(Object.values(process.env).filter((value) => typeof value === "string").join("\n"))) warnings.push("One or more environment values still contain localhost, 127.0.0.1, or example.com; review all deployment variables.");
 
 if (process.env.SSLCOMMERZ_ENABLED === "true") {
-  for (const name of ["SSLCOMMERZ_STORE_ID", "SSLCOMMERZ_STORE_PASSWORD", "SSLCOMMERZ_SUCCESS_URL", "SSLCOMMERZ_FAIL_URL", "SSLCOMMERZ_CANCEL_URL", "SSLCOMMERZ_IPN_URL"]) {
+  for (const name of ["SSLCOMMERZ_STORE_ID", "SSLCOMMERZ_STORE_PASSWORD"]) {
     if (!process.env[name]?.trim()) errors.push(`${name} is required when SSLCOMMERZ is enabled.`);
   }
   if (process.env.SSLCOMMERZ_SANDBOX !== "false") errors.push("SSLCOMMERZ_SANDBOX must be false for a production payment release.");
 }
 
-if (process.env.ENABLE_INTERNATIONAL_CHECKOUT === "true" && !process.env.MEDUSA_INTERNATIONAL_PROVIDER_ID) errors.push("MEDUSA_INTERNATIONAL_PROVIDER_ID is required when international checkout is enabled.");
+// There is currently no implemented international payment provider (see
+// apps/storefront/src/app/api/checkout/route.ts) -- enabling this flag would accept
+// international orders with no way to actually collect payment for them.
+if (process.env.ENABLE_INTERNATIONAL_CHECKOUT === "true") errors.push("ENABLE_INTERNATIONAL_CHECKOUT has no supported payment provider yet; keep it false until one ships.");
 
 for (const warning of warnings) process.stderr.write(`WARNING: ${warning}\n`);
 if (errors.length) {

@@ -1,7 +1,15 @@
 import "server-only";
+import { cache } from "react";
 import { cookies } from "next/headers";
+import { createSupabaseServerClient } from "@bangla-blend/supabase-client";
 
-export const CUSTOMER_TOKEN_COOKIE = "bb_customer_token";
+// Memoized per request. Every call to createSupabaseServerClient builds a fresh GoTrueClient, and
+// auth-js only serializes token refreshes *within* one instance -- so a layout and its pages each
+// constructing their own raced to refresh the same rotated token and the server rejected them with
+// "Too many concurrent token refresh requests on the same session or refresh token".
+export const getSupabaseForRequest = cache(async () => {
+  return createSupabaseServerClient(await cookies(), { cookieName: "banglablend-storefront-auth" });
+});
 
 export interface CustomerAddress {
   id: string;
@@ -28,30 +36,66 @@ export interface CustomerSession {
   addresses?: CustomerAddress[];
 }
 
-export async function customerStoreRequest<T>(path: string, init: RequestInit = {}): Promise<{ ok: boolean; status: number; data: T | null } | null> {
-  if (!path.startsWith("/store/")) throw new Error("Customer Store API paths must remain inside /store/.");
-  const token = (await cookies()).get(CUSTOMER_TOKEN_COOKIE)?.value;
-  const backend = process.env.MEDUSA_BACKEND_URL ?? process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL;
-  const publishableKey = process.env.MEDUSA_PUBLISHABLE_API_KEY;
-  if (!token || !backend || !publishableKey) return null;
-  const target = new URL(path, backend);
-  const backendOrigin = new URL(backend).origin;
-  if (target.origin !== backendOrigin || !target.pathname.startsWith("/store/")) throw new Error("Customer Store API target was rejected.");
-  const headers = new Headers(init.headers);
-  headers.set("authorization", `Bearer ${token}`);
-  headers.set("x-publishable-api-key", publishableKey);
-  if (init.body) headers.set("content-type", "application/json");
-  const response = await fetch(target, { ...init, headers, cache: "no-store" });
-  const data = await response.json().catch(() => null) as T | null;
-  return { ok: response.ok, status: response.status, data };
+interface CustomerRow {
+  id: string;
+  email: string;
+  first_name: string | null;
+  last_name: string | null;
+  phone: string | null;
+  metadata: Record<string, unknown> | null;
+  customer_addresses: Array<{
+    id: string;
+    first_name: string;
+    last_name: string;
+    address_1: string;
+    address_2: string | null;
+    city: string;
+    province: string | null;
+    postal_code: string | null;
+    country_code: string;
+    phone: string;
+    is_default_shipping: boolean;
+    is_default_billing: boolean;
+  }> | null;
 }
 
-export async function customerStoreFetch<T>(path: string): Promise<T | null> {
-  const response = await customerStoreRequest<T>(path);
-  return response?.ok ? response.data : null;
-}
+// Memoized for the same reason as getSupabaseForRequest: the header, the page, and any server
+// action on the same request all resolve the customer.
+export const getCustomerSession = cache(async (): Promise<CustomerSession | null> => {
+  const supabase = await getSupabaseForRequest();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
 
-export async function getCustomerSession() {
-  const payload = await customerStoreFetch<{ customer: CustomerSession }>("/store/customers/me?fields=*addresses");
-  return payload?.customer ?? null;
-}
+  const { data: customer } = await supabase
+    .from("customers")
+    .select("id, email, first_name, last_name, phone, metadata, customer_addresses ( id, first_name, last_name, address_1, address_2, city, province, postal_code, country_code, phone, is_default_shipping, is_default_billing )")
+    .eq("auth_user_id", user.id)
+    .returns<CustomerRow[]>()
+    .maybeSingle();
+  if (!customer) return null;
+
+  return {
+    id: customer.id,
+    email: customer.email,
+    first_name: customer.first_name ?? undefined,
+    last_name: customer.last_name ?? undefined,
+    phone: customer.phone ?? undefined,
+    metadata: (customer.metadata as Record<string, unknown>) ?? undefined,
+    addresses: (customer.customer_addresses ?? []).map((address) => ({
+      id: address.id,
+      first_name: address.first_name,
+      last_name: address.last_name,
+      address_1: address.address_1,
+      address_2: address.address_2 ?? undefined,
+      city: address.city,
+      province: address.province ?? undefined,
+      postal_code: address.postal_code ?? undefined,
+      country_code: address.country_code,
+      phone: address.phone,
+      is_default_shipping: address.is_default_shipping,
+      is_default_billing: address.is_default_billing,
+    })),
+  };
+});

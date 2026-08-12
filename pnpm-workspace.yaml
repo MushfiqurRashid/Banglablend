@@ -3,7 +3,6 @@ packages:
   - packages/*
 
 onlyBuiltDependencies:
-  - '@medusajs/telemetry'
   - '@swc/core'
   - esbuild
   - sharp

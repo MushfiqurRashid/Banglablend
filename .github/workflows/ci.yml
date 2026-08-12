@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Lint, typecheck, test, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test:unit
+
+      # Build needs the NEXT_PUBLIC_* values because next.config.ts reads NEXT_PUBLIC_SUPABASE_URL
+      # to assemble the CSP. These are CI placeholders that only prove the build compiles -- the
+      # real values are baked in when the deployment image is built.
+      - run: pnpm build
+        env:
+          NEXT_PUBLIC_SITE_URL: https://ci.invalid
+          NEXT_PUBLIC_STOREFRONT_URL: https://ci.invalid
+          NEXT_PUBLIC_ADMIN_URL: https://admin.ci.invalid
+          NEXT_PUBLIC_CONTACT_EMAIL: ci@ci.invalid
+          NEXT_PUBLIC_SUPABASE_URL: https://ci.supabase.invalid
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder-anon-key
+
+  docker:
+    name: Container images build
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      # Build only -- proves the Dockerfiles stay valid. Publishing to a registry is a deploy
+      # concern and needs credentials, so it is deliberately not wired up here.
+      - name: Build storefront image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/storefront/Dockerfile
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            NEXT_PUBLIC_SITE_URL=https://ci.invalid
+            NEXT_PUBLIC_SUPABASE_URL=https://ci.supabase.invalid
+            NEXT_PUBLIC_SUPABASE_ANON_KEY=ci-placeholder-anon-key
+            NEXT_PUBLIC_CONTACT_EMAIL=ci@ci.invalid
+
+      - name: Build admin image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/admin/Dockerfile
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            NEXT_PUBLIC_ADMIN_URL=https://admin.ci.invalid
+            NEXT_PUBLIC_STOREFRONT_URL=https://ci.invalid
+            NEXT_PUBLIC_SUPABASE_URL=https://ci.supabase.invalid
+            NEXT_PUBLIC_SUPABASE_ANON_KEY=ci-placeholder-anon-key

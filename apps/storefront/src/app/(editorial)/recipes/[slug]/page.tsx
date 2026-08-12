@@ -6,7 +6,7 @@ import { ComingSoonPage } from "@/components/editorial/coming-soon-page";
 import { PageContainer } from "@/components/layout/page-container";
 import { Section } from "@/components/layout/section";
 import { recipeComingSoonPages } from "@/config/coming-soon";
-import { getRecipe, type RecipeIngredient } from "@/lib/sanity/editorial";
+import { getRecipe, type RecipeIngredient } from "@/lib/content/editorial";
 import { siteConfig } from "@/config/site";
 import "../../editorial.css";
 

@@ -1,32 +1,32 @@
 # Testing
 
-## Suites
+## Automated suites
 
-- `pnpm test:unit` runs pure contract, validation, and security-boundary checks without services.
-- `RUN_INTEGRATION_TESTS=true pnpm test:integration` runs against configured Medusa, Sanity, and Meilisearch instances. Seed first and provide test-only credentials/region IDs. These tests skip by default so a missing service is never mistaken for a pass.
-- `pnpm test:e2e` runs Playwright in desktop and mobile Chromium. It starts the local storefront unless `E2E_BASE_URL` targets an existing environment.
-- `pnpm lint`, `pnpm typecheck`, and `pnpm build` are required release gates.
+- `pnpm test:unit` checks shared validation, contracts, and security boundaries without external services.
+- `pnpm --filter @bangla-blend/admin test` checks admin readiness, order transitions, list inputs, and content formatting.
+- `RUN_INTEGRATION_TESTS=true pnpm test:integration` exercises configured Supabase and Meilisearch services with test-only data.
+- `pnpm test:e2e` runs the storefront in desktop and mobile Chromium.
+- `pnpm test:admin-smoke` visits every protected Admin route with a synthetic staff account and verifies the mobile navigation. Set `ADMIN_SMOKE_CREATE_USER=true` in controlled CI to create and remove that account automatically.
+- `pnpm test:checkout-smoke` verifies the cart/checkout/order/admin path without using real customer or payment data.
+- `pnpm lint`, `pnpm typecheck`, and `pnpm build` are release gates.
 
-## Sandbox data and accounts
+Integration suites skip unless explicitly enabled. A skipped external-service test is not release evidence.
 
-Use only synthetic customer names/addresses and provider-published sandbox payment instruments. Store test account credentials in CI secrets. Never use real card, customer, or recipient data. The development seed is visibly marked `isPlaceholder: true`, `verified: false`, or `status: "draft"` and must not be promoted as factual content.
+## Test data
 
-For SSLCOMMERZ, capture evidence for approved, declined, cancelled, expired, tampered amount/currency/reference, duplicate IPN, delayed IPN, and validation outage. Confirm that redirects alone remain unpaid, duplicate processing is harmless, and no credential or sensitive payload reaches logs/browser code.
+Use synthetic customers, addresses, staff identities, and provider-published sandbox payment instruments. Keep smoke credentials in the CI secret manager and remove temporary Auth users after each run. Development records remain unverified, draft, or explicitly marked as placeholders and must never be promoted as factual production content.
 
-## Acceptance checklist
+## Admin acceptance
 
-- Product retrieval, collection filtering/sorting, variant selection, real regional price, eligibility, stock enforcement, promotions, and unavailable states work.
-- Destination changes clear/revalidate incompatible carts; pricing and availability never rely on client conversion.
-- Add, persist, update, remove, restore, and expire cart flows behave safely.
-- Bangladesh addresses, domestic shipping, COD, SSLCOMMERZ, failed/cancelled callbacks, validation, replay, and order creation pass.
-- Billing/delivery country differences and gifts sent to Bangladesh from abroad work; recipient/message/price-hiding/date/instructions reach operations.
-- International checkout stays disabled until a provider, carriers, prices, returns, export, and duties behavior are approved.
-- Registration, login, logout, reset, address ownership, order ownership, inquiry/forms, email failure handling, and rate limits pass.
-- Unified search handles English, Bangla, transliteration, content types, no-results, and selected-market filtering; only verified editorial documents appear.
-- Staff can manage commerce in Medusa and content in Sanity without source changes; signed revalidation and indexing recover from failure.
-- Keyboard navigation, focus visibility, dialogs, form errors, reduced motion, color contrast, image alt text, headings/landmarks, and screen-reader labels pass WCAG-oriented review.
-- Metadata, canonical URLs, sitemap/robots, Product/Recipe/Article/Organization structured data, 404s, redirects, responsive layouts, Core Web Vitals, cache behavior, and broken-link checks pass.
-- CSP/security headers, secure cookies, CORS, CSRF posture, authorization, validation, webhook/payment secrets, dependency scans, backups, rollback, monitoring, and alerting are reviewed.
-- No protected reference-site assets/copy or unverified farmers, certifications, awards, reviews, press, medical, impact, or sustainability claims are shipped.
+- Each role sees only permitted navigation, protected direct routes stay protected, and read-only views cannot mutate data.
+- Product publishing enforces title, description, image alternative text, collection, SKU, price, inventory, market eligibility, and verification readiness.
+- Catalog assignment, inventory changes, order transitions, inquiry triage, settings, staff lifecycle, and content publication produce administrator audit entries.
+- Order transitions reject stale or skipped states. Fulfillment consumes stock and releases reservations transactionally.
+- Lists search, filter, count, paginate, and remain usable at mobile and desktop widths.
+- Invitations, password reset, logout, expired links, disabled staff, self-deactivation, and last-Super-Admin protection work.
 
-Automated tests are necessary but not sufficient for payment settlement, accessibility, culturally accurate editorial review, shipping operations, or legal approval. Record the responsible human sign-off for those gates.
+## Storefront and payment acceptance
+
+Verify product availability, cart persistence, server-calculated totals, Bangladesh address validation, COD, SSLCOMMERZ redirects/IPN, duplicate callbacks, altered amount/currency/reference, order ownership, customer address ownership, content publication, and search indexing. Redirect success alone never counts as payment authorization.
+
+Complete keyboard, focus, screen-reader, contrast, responsive layout, metadata, structured data, security-header, dependency, backup, monitoring, and rollback reviews. Automated tests do not replace payment settlement, shipping operations, accessibility, editorial, legal, or cultural review; record the accountable human approval for each release gate.

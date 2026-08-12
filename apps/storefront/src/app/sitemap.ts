@@ -1,15 +1,7 @@
 import type { MetadataRoute } from "next";
 import { siteConfig } from "@/config/site";
-import { journalCategories } from "@/lib/sanity/fallback-content";
-import { sanityFetch } from "@/lib/sanity/client";
-import { APPROVED_SITEMAP_QUERY } from "@/lib/sanity/queries";
-
-interface ApprovedRoutes {
-  recipes?: string[];
-  articles?: { slug: string; category: string }[];
-  legal?: string[];
-  story?: string[];
-}
+import { journalCategories } from "@/lib/content/fallback-content";
+import { getApprovedSitemapRoutes } from "@/lib/content/queries";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes = [
@@ -19,7 +11,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/recipes", "/recipes/by-region", "/recipes/by-product", "/recipes/traditional", "/recipes/everyday-cooking",
     "/our-story", "/about-bangla-blend", "/wholesale", "/faq", "/contact"
   ];
-  const approved = await sanityFetch<ApprovedRoutes>(APPROVED_SITEMAP_QUERY);
+  const approved = await getApprovedSitemapRoutes();
   const contentRoutes = [
     ...(approved?.recipes ?? []).map((slug) => `/recipes/${slug}`),
     ...(approved?.articles ?? []).filter((article) => article.slug && article.category).map((article) => `/discover-bangladesh/${article.category}/${article.slug}`),

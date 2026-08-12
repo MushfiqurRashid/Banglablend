@@ -24,7 +24,12 @@ export const siteConfig = {
   tagline: "The Taste of Bangladesh",
   description: "Regional flavors, pantry essentials, gifts and stories inspired by Bangladesh.",
   url: deploymentUrl(),
-  contactEmail: process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "hello@banglablend.local"
+  contactEmail: process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "hello@banglablend.local",
+  socialLinks: [
+    { label: "Facebook", href: "https://www.facebook.com/banglablend.spices" },
+    { label: "Instagram", href: "https://www.instagram.com/bangla_blend?igsh=MW1vZzc1MHJ5OGRuMg==" },
+    { label: "YouTube", href: "https://www.youtube.com/@bangla-blend" },
+  ],
 };
 
 export const MARKET_COOKIE = "bb_market";

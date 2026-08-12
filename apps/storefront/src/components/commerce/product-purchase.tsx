@@ -9,19 +9,41 @@ import { AddToCartButton } from "./add-to-cart-button";
 export function ProductPurchase({
   variants,
   previewOnly = false,
-  productTitle = "product"
+  productTitle = "product",
+  productId
 }: {
   variants: ProductVariant[];
   previewOnly?: boolean;
   productTitle?: string;
+  productId?: string;
 }) {
   const [variantId, setVariantId] = useState(variants[0]?.id ?? "");
   const [quantity, setQuantity] = useState(1);
   const [saved, setSaved] = useState(false);
+  const [savingWishlist, setSavingWishlist] = useState(false);
   const variant = useMemo(
     () => variants.find((item) => item.id === variantId) ?? variants[0],
     [variantId, variants]
   );
+
+  const toggleWishlist = async () => {
+    if (!productId || savingWishlist) return;
+    setSavingWishlist(true);
+    const nextSaved = !saved;
+    setSaved(nextSaved);
+    try {
+      const response = await fetch(nextSaved ? "/api/account/wishlist" : `/api/account/wishlist/${productId}`, {
+        method: nextSaved ? "POST" : "DELETE",
+        headers: nextSaved ? { "Content-Type": "application/json" } : undefined,
+        body: nextSaved ? JSON.stringify({ productId }) : undefined,
+      });
+      if (!response.ok) setSaved(!nextSaved);
+    } catch {
+      setSaved(!nextSaved);
+    } finally {
+      setSavingWishlist(false);
+    }
+  };
 
   if (!variant) return <p className="form-error">This product has no purchasable variant.</p>;
   const isOutOfStock = (variant.inventoryQuantity ?? 0) <= 0;
@@ -81,7 +103,8 @@ export function ProductPurchase({
             type="button"
             aria-pressed={saved}
             aria-label={`${saved ? "Remove" : "Save"} ${productTitle} ${saved ? "from" : "to"} wishlist`}
-            onClick={() => setSaved((value) => !value)}
+            disabled={!productId || savingWishlist}
+            onClick={() => void toggleWishlist()}
           >
             <Heart size={20} fill={saved ? "currentColor" : "none"} />
           </button>

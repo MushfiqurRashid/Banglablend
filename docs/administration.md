@@ -1,35 +1,40 @@
 # Administration
 
-## Commerce operations
+Admin runs as a separate private Next.js service. Staff authenticate with Supabase Auth at `/login`; navigation and controls are filtered by the permissions stored in `staff_roles`, and PostgreSQL RLS remains the final authorization boundary.
 
-The custom backend contract can be explored through Swagger UI at `/docs` on the Medusa backend. Use `/openapi.json` for code generation and automated contract checks. Public inquiry endpoints can be tested directly; Admin endpoints require authentication through Swagger's **Authorize** control.
+## Daily workspace
 
-Use Medusa Admin for product/variant identity, SKUs, collections/categories, regional prices, inventory locations and levels, shipping options, promotions, customers, orders, fulfillment, cancellations, and refunds. The Bangla Blend Admin route links the operational areas; the order widget surfaces gift metadata.
+- **Overview:** live operational counts, recent administrator activity, and catalog-readiness exceptions.
+- **Commerce:** orders, products, storefront catalogs, and inventory.
+- **Relationships:** customers, tags, addresses, order history, and inquiry triage.
+- **Storefront:** homepage sections, pages, navigation, promotions, recipes, stories, and content verification.
+- **Insight and control:** reports, append-only payment evidence, and administrator activity.
+- **Administration:** staff invitations, role assignment, account status, and typed application settings.
 
-Before publishing a product:
+Lists provide search, filters, result counts, pagination, stable status badges, and useful empty states. Management-only routes redirect unauthorized staff to the overview; read-only detail views disable mutation controls.
 
-- replace all placeholder descriptions/metadata and remove `isPlaceholder` only after review;
-- attach every sellable variant to approved prices, inventory, sales channels, shipping profiles, and eligible markets;
-- confirm ingredient/allergen/storage/shelf-life text against packaging and legal requirements;
-- verify export and carrier constraints separately for every international destination;
-- connect its stable Medusa product ID/handle to the matching Sanity editorial document.
+## Product release
 
-Never correct price, inventory, order, or payment state in Sanity. Never add a purchasable product only in Sanity.
+Before publishing a product, confirm:
 
-## Orders and gifts
+1. Title, handle, reviewed description, image, alt text, and primary collection are complete.
+2. Every active variant has a unique SKU, positive BDT price, and primary-location inventory.
+3. Eligible markets, storage, shelf life, ingredients, usage notes, and gift classification are reviewed.
+4. `verified=true`, `is_placeholder=false`, and `status=published` are appropriate.
+5. The storefront product page, cart, and intended market have been checked.
 
-Check payment status before fulfillment. A gateway redirect is not proof of payment. For COD, follow the approved carrier/collection process. For gifts, review recipient address, message, price-hiding preference, packaging, requested date, and instructions; do not expose buyer billing details to the recipient. Use role-based access and leave audit context for manual changes.
+Archiving removes a product from storefront discovery while preserving historical order references.
 
-The order detail page includes an operational roadmap: **Order placed -> COD approved/payment verified -> Packed/fulfilled -> Shipped -> Delivered**. The next button runs Medusa's native domain workflow and cannot skip a stage. Creating fulfillment allocates the order items from the primary stock location, shipment records carrier handoff, and delivery requires an existing shipment. Customer notifications can be disabled when no configured channel should send them. Cancellations, returns, partial returns, refunds, and payment exceptions remain visible as exception paths and must use their supported Medusa actions.
+## Orders
 
-Operators and customers see the stable business reference `order_01`, `order_02`, and so on, derived from Medusa's database sequence. The opaque ID such as `order_01K...` remains the immutable identifier used by URLs, API calls, relations, and audit records. Never rewrite internal IDs to make them shorter, and never reuse a business reference after cancellation or deletion.
+The order roadmap is **placed -> payment/COD approval -> packed -> shipped -> delivered**. The server action reloads current state before every transition; stale or crafted requests cannot skip a step. Online orders require authorized or captured payment. Fulfillment consumes primary-location stock through a database trigger in the same transaction that creates fulfillment items.
 
-## Content operations
+`order_01`, `order_02`, and similar values are stable business references. UUIDs remain the immutable relation and URL identifiers.
 
-Use Sanity Studio for narrative content, navigation, campaigns, recipes, places, sourcing profiles, policies, and product/gift storytelling. Draft → in review → verified is mandatory for factual material. Record citations/consent internally, require alt text, and check both language variants. Legal pages require their approval flag and effective date.
+## Content
 
-Publishing triggers cache revalidation only when the webhook is correctly signed. Run the protected `pnpm search:index` job after a verified content or catalog release and test English, Bangla, and transliterated queries. If search is stale, the source systems remain authoritative: repair/rebuild the index rather than editing it manually.
+Factual content follows `draft -> in_review -> verified -> archived`. Public RLS policies expose only verified records. Publishing calls the storefront's signed revalidation route. Legal approval, citations, consent, translations, image rights, and factual claims still require accountable human review.
 
-## Routine checks
+## Immutable evidence
 
-Daily during launch: failed orders/payments, duplicate/rejected callback audits, unfulfilled orders, inventory exceptions, inquiry response queues, and search health. Weekly: prices/promotions, stale drafts, content verification dates, webhook failures, dependency/security alerts, and backup results. Before every market expansion, repeat the export, payment, tax/duties wording, returns, shipping, inventory, and customer-support readiness review.
+Payment audits and administrator audit entries are append-only. Do not add generic edit or delete controls for payment callbacks, orders, fulfillment history, inventory movements, auth identities, secrets, migrations, or search projections. Use explicit operational actions that retain original evidence.

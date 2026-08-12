@@ -37,6 +37,8 @@ interface ShopPageViewProps {
   activeCategory?: string;
   products?: Product[];
   children?: ReactNode;
+  heroImage?: string;
+  heroImageAlt?: string;
 }
 
 export function ShopPageView({
@@ -46,6 +48,8 @@ export function ShopPageView({
   activeCategory,
   products,
   children,
+  heroImage,
+  heroImageAlt,
 }: ShopPageViewProps) {
   const breadcrumbItems =
     title === "Shop"
@@ -66,13 +70,14 @@ export function ShopPageView({
               <h1>{title}</h1>
               <p>{description}</p>
             </div>
-            <div className="shop-hero-media">
+            <div className={heroImage ? "shop-hero-media catalog-hero-media" : "shop-hero-media"}>
               <Image
-                src="/images/campaign/shop-signature-lineup.jpg"
-                alt="Bangla Blend Cox's Bazar Fish Masala, Chatgaiya Mezban Masala and Shahi Garam Masala"
+                src={heroImage || "/images/campaign/shop-signature-lineup.jpg"}
+                alt={heroImageAlt || "Bangla Blend Cox's Bazar Fish Masala, Chatgaiya Mezban Masala and Shahi Garam Masala"}
                 fill
                 priority
                 sizes="(max-width: 900px) 100vw, 58vw"
+                unoptimized={Boolean(heroImage?.startsWith("http"))}
               />
               <span>Three signatures · One Bangla pantry</span>
             </div>

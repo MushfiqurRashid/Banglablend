@@ -12,14 +12,12 @@ import {
   Sprout,
 } from "lucide-react";
 import { getStoreProducts } from "@/lib/commerce/server";
-import { getRecipes } from "@/lib/sanity/editorial";
-import { sanityFetch } from "@/lib/sanity/client";
-import { HOME_QUERY } from "@/lib/sanity/queries";
+import { getRecipes } from "@/lib/content/editorial";
+import { getHomepage } from "@/lib/content/queries";
 import { ProductGrid } from "@/components/commerce/product-grid";
 import { PageContainer } from "@/components/layout/page-container";
 import { Section } from "@/components/layout/section";
 import { WhyBanglaBlend } from "@/components/marketing/why-bangla-blend";
-import { HomeFaqSection } from "@/components/marketing/home-faq-section";
 import "./home.css";
 
 export const dynamic = "force-dynamic";
@@ -111,21 +109,11 @@ const discoverFeatures = [
   { title: "Behind Bangla Blend", href: "/discover-bangladesh/behind-bangla-blend" },
 ];
 
-interface ApprovedHomepage {
-  eyebrow?: string;
-  headline?: string;
-  introduction?: string;
-  heroImage?: string;
-  heroImageAlt?: string;
-  primaryAction?: { label?: string; href?: string };
-  secondaryAction?: { label?: string; href?: string };
-}
-
 export default async function HomePage() {
   const [products, recipes, homepage] = await Promise.all([
     getStoreProducts(),
     getRecipes(),
-    sanityFetch<ApprovedHomepage>(HOME_QUERY),
+    getHomepage(),
   ]);
   const mostPopularProducts = products
     .filter((product) => product.bestSeller === true)
@@ -562,7 +550,6 @@ export default async function HomePage() {
       </Section>
 
       <WhyBanglaBlend />
-      <HomeFaqSection />
     </>
   );
 }

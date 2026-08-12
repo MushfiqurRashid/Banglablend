@@ -1,0 +1,82 @@
+# Production-shaped compose for a single VPS (Hostever, EC2, or similar).
+# See docs/deployment-containers.md. Terminate TLS in a reverse proxy in front of this file --
+# the app ports bind to 127.0.0.1 so only the proxy can reach them.
+#
+#   docker compose -f docker-compose.prod.yml up -d --build
+#
+# Reads values from a .env file beside this one (start from .env.production.example).
+# NEXT_PUBLIC_* are build args: after changing one, rebuild with --build, not just restart.
+
+services:
+  storefront:
+    build:
+      context: .
+      dockerfile: apps/storefront/Dockerfile
+      args:
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+        NEXT_PUBLIC_CONTACT_EMAIL: ${NEXT_PUBLIC_CONTACT_EMAIL}
+        NEXT_PUBLIC_DEFAULT_MARKET: ${NEXT_PUBLIC_DEFAULT_MARKET:-bd}
+        NEXT_PUBLIC_DEFAULT_CURRENCY: ${NEXT_PUBLIC_DEFAULT_CURRENCY:-BDT}
+        NEXT_PUBLIC_DEFAULT_LANGUAGE: ${NEXT_PUBLIC_DEFAULT_LANGUAGE:-en}
+        NEXT_PUBLIC_GTM_ID: ${NEXT_PUBLIC_GTM_ID:-}
+        NEXT_PUBLIC_META_PIXEL_ID: ${NEXT_PUBLIC_META_PIXEL_ID:-}
+    environment:
+      NODE_ENV: production
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+      MEILISEARCH_HOST: ${MEILISEARCH_HOST}
+      MEILISEARCH_SEARCH_KEY: ${MEILISEARCH_SEARCH_KEY}
+      MEILISEARCH_ADMIN_KEY: ${MEILISEARCH_ADMIN_KEY}
+      REVALIDATE_SECRET: ${REVALIDATE_SECRET}
+      ENABLE_INTERNATIONAL_CHECKOUT: ${ENABLE_INTERNATIONAL_CHECKOUT:-false}
+      COD_ENABLED: ${COD_ENABLED:-true}
+      SSLCOMMERZ_ENABLED: ${SSLCOMMERZ_ENABLED:-false}
+      SSLCOMMERZ_SANDBOX: ${SSLCOMMERZ_SANDBOX:-false}
+      SSLCOMMERZ_STORE_ID: ${SSLCOMMERZ_STORE_ID:-}
+      SSLCOMMERZ_STORE_PASSWORD: ${SSLCOMMERZ_STORE_PASSWORD:-}
+      EMAIL_PROVIDER: ${EMAIL_PROVIDER}
+      EMAIL_PROVIDER_API_KEY: ${EMAIL_PROVIDER_API_KEY}
+      EMAIL_FROM_ADDRESS: ${EMAIL_FROM_ADDRESS}
+      ANALYTICS_PROVIDER: ${ANALYTICS_PROVIDER:-}
+      PRODUCT_CATALOG_APPROVED: ${PRODUCT_CATALOG_APPROVED:-false}
+      EDITORIAL_CONTENT_APPROVED: ${EDITORIAL_CONTENT_APPROVED:-false}
+      LEGAL_CONTENT_APPROVED: ${LEGAL_CONTENT_APPROVED:-false}
+      OPERATIONS_RELEASE_APPROVED: ${OPERATIONS_RELEASE_APPROVED:-false}
+      ENABLE_DEVELOPMENT_FALLBACKS: "false"
+    ports:
+      - "127.0.0.1:3000:3000"
+    restart: unless-stopped
+
+  admin:
+    build:
+      context: .
+      dockerfile: apps/admin/Dockerfile
+      args:
+        NEXT_PUBLIC_ADMIN_URL: ${NEXT_PUBLIC_ADMIN_URL}
+        NEXT_PUBLIC_STOREFRONT_URL: ${NEXT_PUBLIC_STOREFRONT_URL}
+        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+    environment:
+      NODE_ENV: production
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+      # Must match the storefront's value: admin calls its /api/revalidate/content with this.
+      REVALIDATE_SECRET: ${REVALIDATE_SECRET}
+    ports:
+      - "127.0.0.1:3100:3100"
+    restart: unless-stopped
+
+  meilisearch:
+    image: getmeili/meilisearch:v1.32
+    environment:
+      MEILI_ENV: production
+      MEILI_MASTER_KEY: ${MEILISEARCH_MASTER_KEY}
+      MEILI_NO_ANALYTICS: "true"
+    volumes:
+      - meili_data:/meili_data
+    ports:
+      - "127.0.0.1:7700:7700"
+    restart: unless-stopped
+
+volumes:
+  meili_data:

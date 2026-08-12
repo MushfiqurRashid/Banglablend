@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { BoxBuilder } from "@/components/commerce/box-builder";
 import { ProductDetailView } from "@/components/commerce/product-detail-view";
@@ -14,8 +15,14 @@ import {
   getStoreProducts,
   getStorefrontCatalogs,
 } from "@/lib/commerce/server";
+import { getCustomerSession } from "@/lib/auth/server";
 import { titleFromSlug } from "@/lib/utils";
 import "../../commerce.css";
+
+// Custom categories can be created, moved, deactivated, or deleted from the separate admin app.
+// Resolve them from Supabase on every request so a removed category does not remain available from
+// Next's full-route cache.
+export const dynamic = "force-dynamic";
 
 const listingSlugs = new Set(["gift-sets", "regional-gifts", "all", "regional", "occasion"]);
 
@@ -55,34 +62,55 @@ export default async function GiftPage({ params }: { params: Promise<{ slug: str
   const catalog = catalogs.find((item) => item.handle === slug);
 
   if (catalog) {
-    const products = (await getStoreProducts()).filter(
-      (product) =>
-        product.variants[0] &&
-        product.catalogs?.some(
-          (assignment) => assignment.section === "gifts" && assignment.handle === catalog.handle,
+    const [products, customer] = await Promise.all([
+      getStoreProducts().then((all) =>
+        all.filter(
+          (product) =>
+            product.variants[0] &&
+            product.catalogs?.some(
+              (assignment) => assignment.section === "gifts" && assignment.handle === catalog.handle,
+            ),
         ),
-    );
+      ),
+      getCustomerSession(),
+    ]);
     return (
       <>
-        <header className="page-hero">
+        <header className={catalog.heroImage ? "shop-landing-hero" : "page-hero"}>
           <PageContainer>
             <Breadcrumbs items={[{ label: "Gifts", href: "/gifts" }, { label: catalog.name }]} />
-            <span className="eyebrow">
-              {catalog.experience === "build_a_box" ? "Made by you" : "Made to share"}
-            </span>
-            <h1>{catalog.name}</h1>
-            <p className="lead">
-              {catalog.description ||
-                (catalog.experience === "build_a_box"
-                  ? `Choose ${catalog.boxSize ?? 3} eligible products to create your own gift box.`
-                  : "A considered selection from Bangla Blend.")}
-            </p>
+            <div className={catalog.heroImage ? "shop-hero-grid" : undefined}>
+              <div className={catalog.heroImage ? "shop-hero-copy" : undefined}>
+                <span className="eyebrow">
+                  {catalog.experience === "build_a_box" ? "Made by you" : "Made to share"}
+                </span>
+                <h1>{catalog.name}</h1>
+                <p className="lead">
+                  {catalog.description ||
+                    (catalog.experience === "build_a_box"
+                      ? `Choose ${catalog.boxSize ?? 3} eligible products to create your own gift box.`
+                      : "A considered selection from Bangla Blend.")}
+                </p>
+              </div>
+              {catalog.heroImage ? (
+                <div className="shop-hero-media catalog-hero-media">
+                  <Image
+                    src={catalog.heroImage}
+                    alt={catalog.heroImageAlt || catalog.name}
+                    fill
+                    priority
+                    sizes="(max-width: 900px) 100vw, 58vw"
+                    unoptimized={catalog.heroImage.startsWith("http")}
+                  />
+                </div>
+              ) : null}
+            </div>
           </PageContainer>
         </header>
         <Section>
           <PageContainer>
             {catalog.experience === "build_a_box" ? (
-              <BoxBuilder products={products} boxSize={catalog.boxSize} />
+              <BoxBuilder products={products} boxSize={catalog.boxSize} catalogId={catalog.id} isSignedIn={Boolean(customer)} />
             ) : (
               <ProductGrid products={products} action="add-to-cart" />
             )}
@@ -95,10 +123,12 @@ export default async function GiftPage({ params }: { params: Promise<{ slug: str
   const comingSoonPage = giftComingSoonPages[slug as keyof typeof giftComingSoonPages];
   if (comingSoonPage) return <ComingSoonPage {...comingSoonPage} />;
   if (listingSlugs.has(slug)) {
+    const requiredGiftType =
+      slug === "gift-sets" ? "set" : slug === "regional-gifts" || slug === "regional" ? "regional" : undefined;
     const products = (await getStoreProducts()).filter(
       (product) =>
         product.collection === "gifts" &&
-        (slug === "regional-gifts" || slug === "regional" ? product.giftType === "regional" : true),
+        (requiredGiftType ? product.giftType === requiredGiftType : true),
     );
     const title =
       slug === "gift-sets" || slug === "all"

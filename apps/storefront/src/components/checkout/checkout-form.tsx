@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,7 +12,15 @@ import {
 } from "@bangla-blend/validation";
 import type { Market } from "@bangla-blend/types";
 import { formatMoney } from "@bangla-blend/commerce-client";
-import { LockKeyhole, Gift, Truck, CreditCard } from "lucide-react";
+import {
+  ArrowRight,
+  CreditCard,
+  Gift,
+  LoaderCircle,
+  LockKeyhole,
+  ShoppingBag,
+  Truck,
+} from "lucide-react";
 import { useCart } from "@/providers/cart-provider";
 
 interface CheckoutAvailability {
@@ -34,7 +43,7 @@ export function CheckoutForm({
   market: Market;
   availability: CheckoutAvailability;
 }) {
-  const { cart, resetCart } = useCart();
+  const { cart, resetCart, isLoading: cartIsLoading } = useCart();
   const [serverError, setServerError] = useState<string>();
   const [shippingOptions, setShippingOptions] = useState<ShippingChoice[]>([]);
   const defaultPayment = market.domestic
@@ -119,7 +128,7 @@ export function CheckoutForm({
           <div className="checkout-step">
             <span>1</span>
             <div>
-              <h3>Contact</h3>
+              <h2>Contact</h2>
               <p>Order and delivery updates</p>
             </div>
           </div>
@@ -141,7 +150,7 @@ export function CheckoutForm({
           <div className="checkout-step">
             <span>2</span>
             <div>
-              <h3>Delivery address</h3>
+              <h2>Delivery address</h2>
               <p>Shipping options are confirmed from this address</p>
             </div>
           </div>
@@ -227,7 +236,7 @@ export function CheckoutForm({
                 <Truck size={18} />
               </span>
               <div>
-                <h3>Delivery method</h3>
+                <h2>Delivery method</h2>
                 <p>Available services for this address</p>
               </div>
             </div>
@@ -254,7 +263,7 @@ export function CheckoutForm({
           <div className="checkout-step">
             <span>3</span>
             <div>
-              <h3>Billing address</h3>
+              <h2>Billing address</h2>
               <p>Keep billing and delivery details separate when needed</p>
             </div>
           </div>
@@ -347,7 +356,7 @@ export function CheckoutForm({
               <Gift size={18} />
             </span>
             <div>
-              <h3>Gift options</h3>
+              <h2>Gift options</h2>
               <p>Buy here, deliver to someone you care about</p>
             </div>
           </div>
@@ -393,7 +402,7 @@ export function CheckoutForm({
           <div className="checkout-step">
             <span>4</span>
             <div>
-              <h3>Payment</h3>
+              <h2>Payment</h2>
               <p>Methods configured for {market.label}</p>
             </div>
           </div>
@@ -447,28 +456,93 @@ export function CheckoutForm({
       </div>
 
       <aside className="checkout-review">
-        <span className="eyebrow">Review</span>
-        <h3>Order summary</h3>
-        {cart?.items.length ? (
-          <div className="checkout-summary-lines">
-            {cart.items.map((line) => (
-              <div key={line.id}>
-                <span>
-                  {line.quantity} × {line.title}
-                </span>
-                <strong>{formatMoney(line.total, cart.currencyCode.toUpperCase())}</strong>
-              </div>
-            ))}
-            <div className="checkout-summary-total">
-              <span>Current total</span>
-              <strong>{formatMoney(cart.total, cart.currencyCode.toUpperCase())}</strong>
-            </div>
-            <p>Delivery and final taxes update from the address and method selected.</p>
+        <div className="checkout-review-heading">
+          <div>
+            <span className="eyebrow">Your bag</span>
+            <h2>Order summary</h2>
           </div>
+          {cart?.items.length ? (
+            <span className="checkout-item-count">
+              {cart.items.reduce((total, line) => total + line.quantity, 0)} items
+            </span>
+          ) : null}
+        </div>
+        {cartIsLoading && !cart ? (
+          <div className="checkout-summary-loading" role="status">
+            <LoaderCircle size={19} aria-hidden="true" /> Loading your bag...
+          </div>
+        ) : cart?.items.length ? (
+          <>
+            <div className="checkout-products">
+              {cart.items.map((line) => (
+                <article className="checkout-product" key={line.id}>
+                  <div className="checkout-product-art">
+                    {line.thumbnail ? (
+                      <Image
+                        src={line.thumbnail}
+                        alt=""
+                        fill
+                        sizes="72px"
+                        unoptimized={line.thumbnail.startsWith("http")}
+                      />
+                    ) : (
+                      <ShoppingBag size={20} aria-hidden="true" />
+                    )}
+                    <span>{line.quantity}</span>
+                  </div>
+                  <div className="checkout-product-copy">
+                    <strong>{line.title}</strong>
+                    {line.variantTitle ? <small>{line.variantTitle}</small> : null}
+                  </div>
+                  <strong className="checkout-product-price">
+                    {formatMoney(line.total, cart.currencyCode.toUpperCase())}
+                  </strong>
+                </article>
+              ))}
+            </div>
+            <div className="checkout-summary-lines">
+              <div>
+                <span>Subtotal</span>
+                <strong>{formatMoney(cart.subtotal, cart.currencyCode.toUpperCase())}</strong>
+              </div>
+              {cart.discountTotal ? (
+                <div className="checkout-summary-discount">
+                  <span>Discount</span>
+                  <strong>
+                    -{formatMoney(cart.discountTotal, cart.currencyCode.toUpperCase())}
+                  </strong>
+                </div>
+              ) : null}
+              <div>
+                <span>Delivery</span>
+                <strong>
+                  {cart.shippingTotal
+                    ? formatMoney(cart.shippingTotal, cart.currencyCode.toUpperCase())
+                    : "Calculated next"}
+                </strong>
+              </div>
+              <div className="checkout-summary-total">
+                <span>Estimated total</span>
+                <strong>{formatMoney(cart.total, cart.currencyCode.toUpperCase())}</strong>
+              </div>
+              <p>Final delivery and taxes update after you confirm the address.</p>
+            </div>
+          </>
         ) : (
-          <p>Your cart summary could not be loaded. Return to the cart before submitting.</p>
+          <div className="checkout-empty-summary">
+            <span aria-hidden="true">
+              <ShoppingBag size={21} />
+            </span>
+            <div>
+              <strong>Your shopping bag is empty</strong>
+              <p>Add a blend or gift before checking out.</p>
+            </div>
+            <Link href="/shop">
+              Explore the collection <ArrowRight size={14} />
+            </Link>
+          </div>
         )}
-        <ul>
+        <ul className="checkout-assurances">
           <li>
             <Truck size={17} /> Delivery matched to your destination
           </li>
@@ -499,17 +573,23 @@ export function CheckoutForm({
           </p>
         ) : null}
         <button
+          type="submit"
           className="button button-primary"
           disabled={isSubmitting || !canSubmit || !cart?.items.length}
         >
+          {isSubmitting ? (
+            <LoaderCircle className="checkout-spinner" size={17} aria-hidden="true" />
+          ) : (
+            <LockKeyhole size={16} aria-hidden="true" />
+          )}
           {isSubmitting
-            ? "Submitting securely…"
+            ? "Submitting securely..."
             : paymentMethod === "cod"
               ? "Place order"
-              : "Continue to secure payment"}
+              : "Continue to payment"}
         </button>
         <p className="secure-note">
-          <LockKeyhole size={14} /> Payment is never confirmed from a browser redirect alone.
+          <LockKeyhole size={13} aria-hidden="true" /> Payment confirmation is verified securely.
         </p>
       </aside>
     </form>

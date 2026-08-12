@@ -10,6 +10,10 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests"
   },
-  "dependencies": { "@bangla-blend/types": "workspace:*" },
+  "dependencies": {
+    "@bangla-blend/types": "workspace:*",
+    "@bangla-blend/supabase-client": "workspace:*",
+    "@supabase/supabase-js": "^2.112.2"
+  },
   "devDependencies": { "typescript": "^5.9.3", "vitest": "^4.0.15" }
 }

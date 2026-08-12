@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { articles, journalCategories } from "@/lib/sanity/fallback-content";
+import { articles, journalCategories } from "@/lib/content/fallback-content";
 
 export default async function JournalSlugPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;

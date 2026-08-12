@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PortableText } from "@portabletext/react";
-import { getArticle } from "@/lib/sanity/editorial";
+import { getArticle } from "@/lib/content/editorial";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { PageContainer } from "@/components/layout/page-container";
 import { Section } from "@/components/layout/section";

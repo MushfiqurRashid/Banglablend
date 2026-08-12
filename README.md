@@ -1,102 +1,91 @@
 # Bangla Blend
 
-Bangla Blend is a custom, dual-market commerce and editorial platform for regional Bangladeshi products, gifts, recipes, and place-based stories. Bangladesh and international shopping are first-class journeys; eligibility, pricing, shipping, and payment behavior are controlled by the selected destination.
-
-The repository deliberately separates the storefront, commerce backend/Admin, content Studio, shared contracts, infrastructure, tests, and documentation. Development fallback content is visibly sample-only and can never be purchased.
+Bangla Blend is a Supabase-backed commerce and editorial platform for Bangladeshi products, gifts, recipes, and place-based stories. It has two Next.js applications: the public storefront and a private operations console.
 
 ## Repository map
 
 ```text
-apps/storefront       Next.js App Router customer experience and server boundary
-apps/medusa           Medusa commerce API, Admin extensions, modules, workflows
-apps/studio           Sanity Studio and individual editorial schemas
-packages/types        Shared TypeScript contracts
-packages/validation   Shared Zod validation
-packages/commerce-client  Medusa adapter and development-only fixtures
-packages/search-client    Meilisearch query contract
-infrastructure        Reviewable search and ingress configuration
-tests                 Unit, integration, and Playwright suites
-docs                  Architecture and operating runbooks
+apps/storefront          Public commerce, accounts, checkout, and editorial experience
+apps/admin               Staff operations, catalog, orders, content, settings, and RBAC
+packages/supabase-client Shared browser, request-scoped, and service-role clients
+packages/commerce-client Typed storefront commerce queries
+packages/types           Shared domain contracts
+packages/validation      Shared Zod validation
+supabase/migrations      Ordered schema, RLS, functions, storage, and hardening changes
+supabase/seed            Local-only development records
+scripts                  Release, smoke-test, bootstrap, and indexing commands
+tests                    Shared unit, integration, and Playwright suites
+docs                     Architecture and operating runbooks
 ```
 
 ## Prerequisites
 
-- Node.js 22 or newer (Node 24 LTS is supported)
+- Node.js 22 or newer
 - pnpm 10 through Corepack
-- Docker Desktop or separately managed PostgreSQL, Redis, and Meilisearch
-- A Sanity project for editable content
-- SSLCOMMERZ sandbox credentials to exercise the gateway path
+- A Supabase project, or Docker Desktop for the Supabase local stack
+- Meilisearch when search indexing is enabled
+- Approved SSLCOMMERZ sandbox credentials for payment testing
 
-## Installation
+## Setup
 
-```bash
+```powershell
 corepack enable
 pnpm install
-copy .env.example .env
-copy apps/storefront/.env.example apps/storefront/.env.local
-copy apps/medusa/.env.example apps/medusa/.env
-copy apps/studio/.env.example apps/studio/.env
+Copy-Item .env.example .env
+Copy-Item apps/storefront/.env.example apps/storefront/.env.local
+Copy-Item apps/admin/.env.example apps/admin/.env.local
 ```
 
-On macOS/Linux use `cp` instead of `copy`. Generate strong independent values for `JWT_SECRET`, `COOKIE_SECRET`, and `SANITY_WEBHOOK_SECRET`. Do not reuse the local examples in a deployed environment.
+Fill the Supabase URL and keys in both application environment files. Keep `SUPABASE_SERVICE_ROLE_KEY`, payment credentials, email credentials, and `REVALIDATE_SECRET` server-only.
 
-## Local setup
+Apply the database migrations before starting either application:
 
-1. Start PostgreSQL, Redis, and Meilisearch: `docker compose up -d`.
-2. Configure Medusa and run `pnpm db:migrate`.
-3. Start Medusa once, create the initial Admin user and publishable API key, and place the key in `apps/storefront/.env.local` as `MEDUSA_PUBLISHABLE_API_KEY`.
-4. Run `pnpm seed`. Sample records are placeholders, not approved product claims.
-5. Configure the Sanity project ID/dataset in both Studio and storefront environments.
-6. Run `pnpm search:index` after the seed.
-7. Start all applications with `pnpm dev`, or use `pnpm dev:storefront`, `pnpm dev:medusa`, and `pnpm dev:studio` separately.
+```powershell
+supabase link --project-ref fwcwhiprbaqqwiyryhpa
+pnpm db:push
+```
 
-After pulling a catalog update into an existing local environment, run `pnpm catalog:sync`. This
-removes retired sample products from the persistent Medusa database and rebuilds Meilisearch
-without stale product documents.
+For a new environment, bootstrap the first administrator using a secure email invitation:
 
-Use the local-only credentials, bootstrap command, native RBAC checklist, and data-ownership rules in
-[Superadmin operations](docs/superadmin.md). Rotate the documented bootstrap password before the
-environment is shared or deployed.
+```powershell
+$env:SUPERADMIN_EMAIL='owner@your-domain.com'
+$env:SUPERADMIN_FULL_NAME='Account Owner'
+pnpm admin:bootstrap
+```
 
-Default local URLs are storefront `http://localhost:3000`, Medusa/Admin `http://localhost:9000`, Studio `http://localhost:3333`, and Meilisearch `http://localhost:7700`.
-
-Interactive Swagger documentation for the custom Bangla Blend backend is available at `http://localhost:9000/docs`. The OpenAPI 3.1 contract is served at `http://localhost:9000/openapi.json`. Admin operations require a Medusa bearer token or Admin API key before Swagger's **Try it out** requests can succeed.
-
-`ENABLE_DEVELOPMENT_FALLBACKS=true` is local-only. When Medusa is unavailable, the storefront may render visibly labeled placeholders for design review, but purchase actions remain disabled. Never set it in production.
-
-## Sanity and search
-
-Create a Sanity dataset, configure its CORS origins, and add a read token only when the dataset is private. In Studio, editorial content moves through draft, in-review, verified, and archived states. The public search indexing script accepts editorial documents only when both `verification.status == "verified"` and `verification.verified == true`.
-
-Configure a publish webhook to the storefront `/api/revalidate/sanity` endpoint with an HMAC SHA-256 signature in `x-bangla-blend-signature`. Trigger `pnpm search:index` from a protected deployment job after verified content changes.
-
-## Payments
-
-Cash on Delivery uses Medusa's system provider. SSLCOMMERZ session creation, credential use, IPN validation, amount/currency checks, and authorization live in the backend. Success redirects do not mark orders paid. Keep sandbox mode enabled until callback, replay/idempotency, failed payment, cancellation, and reconciliation tests pass. See [docs/payments.md](docs/payments.md).
+Start the apps with `pnpm dev`. The storefront runs at `http://localhost:3000`; Admin runs at `http://localhost:3100`.
 
 ## Commands
 
-```bash
+```powershell
 pnpm dev
-pnpm db:migrate
-pnpm seed
-pnpm catalog:sync
-pnpm search:index
+pnpm dev:storefront
+pnpm --filter @bangla-blend/admin dev
 pnpm lint
 pnpm typecheck
 pnpm test
-pnpm test:unit
-RUN_INTEGRATION_TESTS=true pnpm test:integration
+pnpm test:integration
 pnpm test:e2e
+pnpm test:admin-smoke
 pnpm build
+pnpm check:production
+pnpm db:push
+pnpm search:index
 ```
 
-Integration tests expect live dependencies and intentionally skip unless `RUN_INTEGRATION_TESTS=true`. Playwright starts the storefront automatically, or targets `E2E_BASE_URL` when provided.
+`ENABLE_DEVELOPMENT_FALLBACKS=true` is local-only. Sample products remain visibly marked and must never be treated as approved stock, claims, or content.
 
-## Build and deployment
+## Production
 
-Build everything with `pnpm build`, or build a boundary independently with `pnpm build:storefront`, `pnpm build:medusa`, or `pnpm build:studio`. Deploy each application independently, use managed PostgreSQL/Redis/Meilisearch for production, terminate TLS at the edge, and store all secrets in the platform secret manager. Follow [docs/deployment.md](docs/deployment.md) and the prelaunch acceptance list in [docs/testing.md](docs/testing.md).
+Deploy `apps/storefront` and `apps/admin` as separate HTTPS services. Run forward Supabase migrations before application rollout, store secrets in the hosting platform, configure Supabase Auth redirect URLs for the admin callback, and run `pnpm check:production` plus the authenticated smoke tests before traffic is enabled.
 
-Before a production release, run `pnpm check:production` with the deployment environment loaded. It fails closed on missing secrets, insecure service URLs, development fallbacks, unconfigured payment dependencies, and the four recorded human approval gates for catalog, editorial, legal, and operations.
+Both apps build to a standalone Next.js server and ship as containers:
 
-More detail: [architecture](docs/architecture.md), [content model](docs/content-model.md), [commerce model](docs/commerce-model.md), [payments](docs/payments.md), [administration](docs/administration.md), and [testing](docs/testing.md).
+```powershell
+docker build -f apps/storefront/Dockerfile -t bangla-blend-storefront .
+docker build -f apps/admin/Dockerfile -t bangla-blend-admin .
+```
+
+Build from the repository root, and pass every `NEXT_PUBLIC_*` value as a `--build-arg` — they are inlined into the client bundle at build time, so changing one needs a rebuild rather than a restart. Copy [`.env.production.example`](.env.production.example) for the runtime variables.
+
+See [architecture](docs/architecture.md), [administration](docs/administration.md), [Super Admin operations](docs/superadmin.md), [deployment](docs/deployment.md), [container deployment](docs/deployment-containers.md), [payments](docs/payments.md), and [testing](docs/testing.md).

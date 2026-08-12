@@ -24,9 +24,11 @@ export function MegaMenu({ label, href, links }: MegaMenuProps) {
                     <Image
                       src={item.image}
                       alt=""
-                      width={52}
-                      height={52}
+                      fill
+                      sizes="72px"
                       fetchPriority="low"
+                      loading="eager"
+                      unoptimized={item.image.startsWith("http")}
                     />
                   </span>
                   <span className="mega-link-label">{item.label}</span>

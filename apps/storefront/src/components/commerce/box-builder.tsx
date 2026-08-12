@@ -1,16 +1,31 @@
 "use client";
 
 import { useState } from "react";
-import { Check, PackagePlus } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Check, PackagePlus, BookmarkPlus } from "lucide-react";
 import type { Product } from "@bangla-blend/types";
 import { useCart } from "@/providers/cart-provider";
 import { ProductPrice } from "./product-price";
 import { ProductVisual } from "./product-visual";
 
-export function BoxBuilder({ products, boxSize = 3 }: { products: Product[]; boxSize?: number }) {
+export function BoxBuilder({
+  products,
+  boxSize = 3,
+  catalogId,
+  isSignedIn = false,
+}: {
+  products: Product[];
+  boxSize?: number;
+  catalogId?: string;
+  isSignedIn?: boolean;
+}) {
   const cart = useCart();
+  const router = useRouter();
   const [selected, setSelected] = useState<string[]>([]);
   const [adding, setAdding] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
   const requiredSize = Number.isInteger(boxSize) && boxSize >= 2 && boxSize <= 12 ? boxSize : 3;
 
   const toggle = (variantId: string) => {
@@ -23,6 +38,11 @@ export function BoxBuilder({ products, boxSize = 3 }: { products: Product[]; box
     );
   };
 
+  const selectedProductIds = () =>
+    selected
+      .map((variantId) => products.find((product) => product.variants.some((variant) => variant.id === variantId))?.id)
+      .filter((id): id is string => Boolean(id));
+
   const addBox = async () => {
     if (selected.length !== requiredSize) return;
     setAdding(true);
@@ -31,6 +51,28 @@ export function BoxBuilder({ products, boxSize = 3 }: { products: Product[]; box
       setSelected([]);
     } finally {
       setAdding(false);
+    }
+  };
+
+  const saveBox = async () => {
+    if (selected.length !== requiredSize || !catalogId) return;
+    setSaving(true);
+    setSaveError(null);
+    try {
+      const response = await fetch("/api/account/saved-boxes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ catalogId, productIds: selectedProductIds() }),
+      });
+      if (!response.ok) {
+        const body = await response.json().catch(() => null);
+        setSaveError(body?.error ?? "This box could not be saved.");
+        return;
+      }
+      setSaved(true);
+      router.refresh();
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -98,19 +140,37 @@ export function BoxBuilder({ products, boxSize = 3 }: { products: Product[]; box
               : `Choose ${requiredSize - selected.length} more`}
           </h3>
         </div>
-        <button
-          className="button button-primary"
-          type="button"
-          disabled={selected.length !== requiredSize || adding || cart.isLoading}
-          onClick={() => void addBox()}
-        >
-          <PackagePlus size={17} />
-          {adding ? "Adding box…" : "Add box to bag"}
-        </button>
+        <div className="box-builder-buttons">
+          {isSignedIn && catalogId ? (
+            <button
+              className="button box-save-button"
+              type="button"
+              disabled={selected.length !== requiredSize || saving || saved}
+              onClick={() => void saveBox()}
+            >
+              <BookmarkPlus size={17} />
+              {saved ? "Saved" : saving ? "Saving…" : "Save this box for later"}
+            </button>
+          ) : null}
+          <button
+            className="button button-primary"
+            type="button"
+            disabled={selected.length !== requiredSize || adding || cart.isLoading}
+            onClick={() => void addBox()}
+          >
+            <PackagePlus size={17} />
+            {adding ? "Adding box…" : "Add box to bag"}
+          </button>
+        </div>
       </div>
       {cart.error ? (
         <p className="field-error" role="alert">
           {cart.error}
+        </p>
+      ) : null}
+      {saveError ? (
+        <p className="field-error" role="alert">
+          {saveError}
         </p>
       ) : null}
     </div>

@@ -33,7 +33,7 @@ export default defineConfig({
           ...process.env,
           PORT: "3010",
           ENABLE_DEVELOPMENT_FALLBACKS: "true",
-          MEDUSA_COD_ENABLED: "true",
+          COD_ENABLED: "true",
           SSLCOMMERZ_ENABLED: "true"
         }
       }

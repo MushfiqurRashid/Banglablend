@@ -1,116 +1,90 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@bangla-blend/supabase-client";
 import type {
   CurrencyCode,
   MarketCode,
   Product,
+  ProductVariant,
   StorefrontCatalog,
   StorefrontSection,
 } from "@bangla-blend/types";
 import { sampleProducts, withMarketPrices } from "./fixtures";
 
-interface MedusaPrice {
-  amount: number;
-  currency_code: string;
-}
-
-interface MedusaVariant {
-  id: string;
-  title: string;
-  sku?: string | null;
-  inventory_quantity?: number;
-  calculated_price?: { calculated_amount?: number; currency_code?: string };
-  prices?: MedusaPrice[];
-}
-
-interface MedusaProduct {
-  id: string;
-  handle: string;
-  title: string;
-  subtitle?: string | null;
-  description?: string | null;
-  thumbnail?: string | null;
-  images?: Array<{ url: string }>;
-  collection?: { handle?: string | null } | null;
-  categories?: MedusaProductCategory[];
-  tags?: Array<{ value: string }>;
-  metadata?: Record<string, unknown> | null;
-  variants?: MedusaVariant[];
-  created_at?: string;
-}
-
-interface MedusaProductCategory {
-  id: string;
-  name: string;
-  handle: string;
-  description?: string | null;
-  is_active?: boolean;
-  is_internal?: boolean;
-  metadata?: Record<string, unknown> | null;
-  parent_category?: { id?: string; handle?: string | null } | null;
-}
-
-interface MedusaProductCategoryResponse {
-  product_categories: MedusaProductCategory[];
-}
-
-interface MedusaProductResponse {
-  products: MedusaProduct[];
-}
-
 export interface CommerceConfig {
-  backendUrl: string;
-  publishableKey: string;
-  regionId?: string;
+  supabase: SupabaseClient<Database>;
   market: MarketCode;
+  currencyCode: CurrencyCode;
   allowDevelopmentFallback?: boolean;
-  allowedProductHandles?: readonly string[];
-  requiredCatalogRevision?: string;
 }
 
-function isCurrency(value: string): value is CurrencyCode {
-  return ["BDT", "USD", "GBP", "EUR", "CAD", "AUD", "AED"].includes(value);
-}
-
-function safeMediaUrl(value: unknown) {
-  if (typeof value !== "string") return undefined;
-  const url = value.trim();
-  if (!url) return undefined;
-  if (url.startsWith("/") && !url.startsWith("//")) return url;
-  try {
-    const parsed = new URL(url);
-    return parsed.protocol === "http:" || parsed.protocol === "https:" ? url : undefined;
-  } catch {
-    return undefined;
+export class CommerceUnavailableError extends Error {
+  constructor(message = "The commerce service is not configured or unavailable.") {
+    super(message);
+    this.name = "CommerceUnavailableError";
   }
 }
 
-function safeAltText(value: unknown, fallback: string) {
-  if (typeof value !== "string") return fallback;
-  const plainText = Array.from(value.replace(/<[^>]*>/g, " "), (character) => {
-    const codePoint = character.codePointAt(0) ?? 0;
-    return codePoint < 32 || codePoint === 127 ? " " : character;
-  }).join("");
-  const normalized = plainText.replace(/\s+/g, " ").trim().slice(0, 240);
-  return normalized || fallback;
-}
+const PRODUCT_SELECT = `
+  id, handle, title, subtitle, description, status, thumbnail_url, thumbnail_alt, region,
+  storage, shelf_life, usage_notes, ingredients, eligible_markets, badges, best_seller,
+  is_placeholder, verified, gift_type, created_at,
+  collection:product_collections!products_collection_id_fkey ( handle ),
+  images:product_images ( url, alt_text, sort_order ),
+  catalogs:storefront_catalog_products ( catalog:storefront_catalogs ( id, name, handle, description, navigation_image_url, navigation_image_alt, hero_image_url, hero_image_alt, section, experience, box_size, is_active ) ),
+  variants:product_variants (
+    id, title, sku, sort_order,
+    prices:product_prices ( currency_code, amount ),
+    inventory_levels ( stocked_quantity, reserved_quantity )
+  )
+` as const;
 
-function imageAltFromMetadata(
-  metadata: Record<string, unknown>,
-  url: string,
-  index: number,
-  fallback: string,
-) {
-  const values = metadata.image_alt_texts;
-  if (Array.isArray(values)) return safeAltText(values[index], fallback);
-  if (values && typeof values === "object") {
-    return safeAltText((values as Record<string, unknown>)[url], fallback);
-  }
-  return fallback;
-}
-
-function stringList(value: unknown) {
-  return Array.isArray(value)
-    ? value.filter((item): item is string => typeof item === "string" && Boolean(item.trim()))
-    : [];
+interface ProductRow {
+  id: string;
+  handle: string;
+  title: string;
+  subtitle: string | null;
+  description: string | null;
+  status: string;
+  thumbnail_url: string | null;
+  thumbnail_alt: string | null;
+  region: string | null;
+  storage: string | null;
+  shelf_life: string | null;
+  usage_notes: string | null;
+  ingredients: string | null;
+  eligible_markets: string[];
+  badges: string[];
+  best_seller: boolean;
+  is_placeholder: boolean;
+  verified: boolean;
+  gift_type: "corporate" | "set" | "regional" | null;
+  created_at: string;
+  collection: { handle: string } | { handle: string }[] | null;
+  images: Array<{ url: string; alt_text: string | null; sort_order: number }> | null;
+  catalogs: Array<{
+    catalog: {
+      id: string;
+      name: string;
+      handle: string;
+      description: string | null;
+      navigation_image_url: string | null;
+      navigation_image_alt: string | null;
+      hero_image_url: string | null;
+      hero_image_alt: string | null;
+      section: string;
+      experience: string;
+      box_size: number | null;
+      is_active: boolean;
+    } | null;
+  }> | null;
+  variants: Array<{
+    id: string;
+    title: string;
+    sku: string;
+    sort_order: number;
+    prices: Array<{ currency_code: string; amount: number }> | null;
+    inventory_levels: Array<{ stocked_quantity: number; reserved_quantity: number }> | null;
+  }> | null;
 }
 
 const storefrontSections: StorefrontSection[] = [
@@ -126,177 +100,85 @@ function isStorefrontSection(value: unknown): value is StorefrontSection {
   return typeof value === "string" && storefrontSections.includes(value as StorefrontSection);
 }
 
-function adaptCatalog(category: MedusaProductCategory): StorefrontCatalog | undefined {
-  const section = category.parent_category?.handle;
-  if (!isStorefrontSection(section) || category.is_internal === true) return undefined;
-  const metadata = category.metadata ?? {};
-  const experience = metadata.storefront_experience === "build_a_box" ? "build_a_box" : "listing";
-  const rawBoxSize = metadata.box_size;
-  const boxSize =
-    experience === "build_a_box" &&
-    typeof rawBoxSize === "number" &&
-    Number.isInteger(rawBoxSize) &&
-    rawBoxSize >= 2 &&
-    rawBoxSize <= 12
-      ? rawBoxSize
-      : experience === "build_a_box"
-        ? 3
-        : undefined;
-
+function adaptCatalog(row: NonNullable<ProductRow["catalogs"]>[number]["catalog"]): StorefrontCatalog | undefined {
+  if (!row || !row.is_active || !isStorefrontSection(row.section)) return undefined;
   return {
-    id: category.id,
-    name: category.name,
-    handle: category.handle,
-    description: category.description ?? undefined,
-    section,
-    experience,
-    boxSize,
-    active: category.is_active !== false,
+    id: row.id,
+    name: row.name,
+    handle: row.handle,
+    description: row.description ?? undefined,
+    ...(row.navigation_image_url ? { navigationImage: row.navigation_image_url } : {}),
+    ...(row.navigation_image_alt ? { navigationImageAlt: row.navigation_image_alt } : {}),
+    ...(row.hero_image_url ? { heroImage: row.hero_image_url } : {}),
+    ...(row.hero_image_alt ? { heroImageAlt: row.hero_image_alt } : {}),
+    section: row.section,
+    experience: row.experience === "build_a_box" ? "build_a_box" : "listing",
+    boxSize: row.box_size ?? undefined,
+    active: row.is_active,
   };
 }
 
-function adaptProduct(product: MedusaProduct): Product {
-  const metadata = product.metadata ?? {};
-  const eligible = Array.isArray(metadata.eligible_markets)
-    ? (metadata.eligible_markets.filter(
-        (value): value is MarketCode => typeof value === "string",
-      ) as MarketCode[])
-    : (["bd"] as MarketCode[]);
-  const collection = product.collection?.handle ?? "originals";
-  const fallbackAlt = safeAltText(product.title, "Bangla Blend product");
-  const thumbnail = safeMediaUrl(product.thumbnail);
-  const thumbnailAlt = thumbnail ? safeAltText(metadata.thumbnail_alt, fallbackAlt) : undefined;
-  const images = (product.images ?? []).flatMap((image, index) => {
-    const url = safeMediaUrl(image.url);
-    if (!url) return [];
-    const fallback = url === thumbnail ? (thumbnailAlt ?? fallbackAlt) : fallbackAlt;
-    return [{ url, alt: imageAltFromMetadata(metadata, url, index, fallback) }];
-  });
-  const variants = (product.variants ?? [])
-    .map((variant) => {
-      const calculated = variant.calculated_price;
-      const price = variant.prices?.[0];
-      const currency = (calculated?.currency_code ?? price?.currency_code ?? "bdt").toUpperCase();
-      return {
-        id: variant.id,
-        title: variant.title,
-        sku: variant.sku ?? undefined,
-        inventoryQuantity: variant.inventory_quantity,
-        price: {
-          amount: calculated?.calculated_amount ?? price?.amount ?? 0,
-          currencyCode: isCurrency(currency) ? currency : "BDT",
-        },
-      };
-    })
-    .sort(
-      (left, right) =>
-        left.price.amount - right.price.amount ||
-        left.title.localeCompare(right.title, "en", { numeric: true }),
-    );
-  return {
-    id: product.id,
-    handle: product.handle,
-    title: product.title,
-    subtitle: product.subtitle ?? undefined,
-    description: product.description ?? "",
-    collection: [
-      "originals",
-      "reserve",
-      "pantry",
-      "tea-wellness",
-      "lifestyle-accessories",
-      "gifts",
-    ].includes(collection)
-      ? (collection as Product["collection"])
-      : "originals",
-    catalogs: (product.categories ?? [])
-      .map(adaptCatalog)
-      .filter((catalog): catalog is StorefrontCatalog => Boolean(catalog))
-      .filter((catalog) => catalog.active),
-    region: typeof metadata.region === "string" ? metadata.region : undefined,
-    thumbnail,
-    thumbnailAlt,
-    images,
-    badges: Array.from(
-      new Set([
-        ...(product.tags ?? []).map((tag) => tag.value),
-        ...stringList(metadata.product_badges),
-      ]),
-    ),
-    eligibleMarkets: eligible,
-    variants,
-    ingredients: typeof metadata.ingredients === "string" ? metadata.ingredients : undefined,
-    storage: typeof metadata.storage === "string" ? metadata.storage : undefined,
-    shelfLife: typeof metadata.shelf_life === "string" ? metadata.shelf_life : undefined,
-    usage: typeof metadata.usage === "string" ? metadata.usage : undefined,
-    isPlaceholder: metadata.is_placeholder === true,
-    verified: metadata.verified === true,
-    bestSeller: metadata.best_seller === true,
-    giftType:
-      metadata.gift_type === "corporate"
-        ? "corporate"
-        : metadata.gift_type === "regional"
-          ? "regional"
-          : metadata.gift_type === "set"
-            ? "set"
-            : undefined,
-    createdAt: product.created_at,
-  };
-}
-
-export async function listStorefrontCatalogs(
-  config: CommerceConfig,
-  section?: StorefrontSection,
-): Promise<StorefrontCatalog[]> {
-  if (!config.backendUrl || !config.publishableKey) {
-    if (config.allowDevelopmentFallback) return [];
-    throw new CommerceUnavailableError();
-  }
-
-  const url = new URL("/store/product-categories", config.backendUrl);
-  url.searchParams.set("limit", "100");
-  url.searchParams.set(
-    "fields",
-    "id,name,handle,description,is_active,is_internal,metadata,parent_category.id,parent_category.handle",
+function adaptVariant(variant: NonNullable<ProductRow["variants"]>[number], currencyCode: CurrencyCode): ProductVariant {
+  const price = variant.prices?.find((p) => p.currency_code.toUpperCase() === currencyCode);
+  const inventoryQuantity = (variant.inventory_levels ?? []).reduce(
+    (total, level) => total + Math.max(0, level.stocked_quantity - level.reserved_quantity),
+    0,
   );
-
-  try {
-    const response = await fetch(url, {
-      headers: { "x-publishable-api-key": config.publishableKey },
-      cache: "no-store",
-    });
-    if (!response.ok) throw new CommerceUnavailableError(`Medusa returned ${response.status}.`);
-    const payload = (await response.json()) as MedusaProductCategoryResponse;
-    return (payload.product_categories ?? [])
-      .map(adaptCatalog)
-      .filter((catalog): catalog is StorefrontCatalog => Boolean(catalog))
-      .filter((catalog) => catalog.active && (!section || catalog.section === section))
-      .sort((left, right) => left.name.localeCompare(right.name));
-  } catch (error) {
-    if (config.allowDevelopmentFallback) return [];
-    if (error instanceof CommerceUnavailableError) throw error;
-    throw new CommerceUnavailableError(
-      error instanceof Error
-        ? `The commerce catalog service could not be reached: ${error.message}`
-        : undefined,
-    );
-  }
+  return {
+    id: variant.id,
+    title: variant.title,
+    sku: variant.sku ?? undefined,
+    price: { amount: price?.amount ?? 0, currencyCode },
+    inventoryQuantity,
+  };
 }
 
-export class CommerceUnavailableError extends Error {
-  constructor(message = "The commerce service is not configured or unavailable.") {
-    super(message);
-    this.name = "CommerceUnavailableError";
-  }
+function adaptProduct(row: ProductRow, currencyCode: CurrencyCode): Product {
+  const collectionHandle = Array.isArray(row.collection) ? row.collection[0]?.handle : row.collection?.handle;
+  const collection = isStorefrontSection(collectionHandle) ? collectionHandle : "originals";
+  const images = (row.images ?? [])
+    .slice()
+    .sort((a, b) => a.sort_order - b.sort_order)
+    .map((image) => ({ url: image.url, alt: image.alt_text ?? row.title }));
+  const variants = (row.variants ?? [])
+    .slice()
+    .sort((a, b) => a.sort_order - b.sort_order)
+    .map((variant) => adaptVariant(variant, currencyCode));
+  const catalogs = (row.catalogs ?? [])
+    .map((entry) => adaptCatalog(entry.catalog))
+    .filter((catalog): catalog is StorefrontCatalog => Boolean(catalog));
+
+  return {
+    id: row.id,
+    handle: row.handle,
+    title: row.title,
+    subtitle: row.subtitle ?? undefined,
+    description: row.description ?? "",
+    collection,
+    catalogs,
+    region: row.region ?? undefined,
+    thumbnail: row.thumbnail_url ?? undefined,
+    thumbnailAlt: row.thumbnail_alt ?? undefined,
+    images,
+    badges: row.badges ?? [],
+    eligibleMarkets: (row.eligible_markets ?? []) as MarketCode[],
+    variants,
+    ingredients: row.ingredients ?? undefined,
+    storage: row.storage ?? undefined,
+    shelfLife: row.shelf_life ?? undefined,
+    usage: row.usage_notes ?? undefined,
+    isPlaceholder: row.is_placeholder,
+    verified: row.verified,
+    bestSeller: row.best_seller,
+    giftType: row.gift_type ?? undefined,
+    createdAt: row.created_at,
+  };
 }
 
 function fallbackProducts(config: CommerceConfig, query: string) {
-  const allowedHandles = config.allowedProductHandles
-    ? new Set(config.allowedProductHandles)
-    : undefined;
-  return withMarketPrices(sampleProducts, config.market)
-    .filter((product) => !allowedHandles || allowedHandles.has(product.handle))
-    .filter((product) => matchesProductQuery(product, query));
+  return withMarketPrices(sampleProducts, config.market).filter((product) =>
+    matchesProductQuery(product, query),
+  );
 }
 
 function matchesProductQuery(product: Product, query: string) {
@@ -305,14 +187,7 @@ function matchesProductQuery(product: Product, query: string) {
   const catalogTerms = (product.catalogs ?? [])
     .flatMap((catalog) => [catalog.name, catalog.handle, catalog.section])
     .join(" ");
-  return [
-    product.title,
-    product.subtitle,
-    product.description,
-    product.region,
-    product.badges.join(" "),
-    catalogTerms,
-  ]
+  return [product.title, product.subtitle, product.description, product.region, product.badges.join(" "), catalogTerms]
     .filter(Boolean)
     .join(" ")
     .toLowerCase()
@@ -320,78 +195,76 @@ function matchesProductQuery(product: Product, query: string) {
 }
 
 export async function listProducts(config: CommerceConfig, query = ""): Promise<Product[]> {
-  if (!config.backendUrl || !config.publishableKey) {
-    if (config.allowDevelopmentFallback) {
-      return fallbackProducts(config, query);
-    }
-    throw new CommerceUnavailableError();
-  }
-
-  const url = new URL("/store/products", config.backendUrl);
-  url.searchParams.set("limit", "100");
-  url.searchParams.set(
-    "fields",
-    "+variants.calculated_price,+metadata,+tags,+categories.id,+categories.name,+categories.handle,+categories.description,+categories.is_active,+categories.is_internal,+categories.metadata,+categories.parent_category.id,+categories.parent_category.handle",
-  );
-  if (config.regionId) url.searchParams.set("region_id", config.regionId);
-
   try {
-    const response = await fetch(url, {
-      headers: { "x-publishable-api-key": config.publishableKey },
-      cache: "no-store",
-    });
-    if (!response.ok) throw new CommerceUnavailableError(`Medusa returned ${response.status}.`);
-    const payload = (await response.json()) as MedusaProductResponse;
-    const allowedHandles = config.allowedProductHandles
-      ? new Set(config.allowedProductHandles)
-      : undefined;
-    const allowedProducts = payload.products.filter(
-      (product) => !allowedHandles || allowedHandles.has(product.handle),
-    );
-    const hasStaleRevision =
-      Boolean(config.requiredCatalogRevision) &&
-      allowedProducts.some(
-        (product) => product.metadata?.catalog_revision !== config.requiredCatalogRevision,
-      );
-    const currentProducts = allowedProducts.filter(
-      (product) =>
-        !config.requiredCatalogRevision ||
-        product.metadata?.catalog_revision === config.requiredCatalogRevision,
-    );
-    const hasIncompleteCatalog =
-      !query &&
-      Boolean(config.allowedProductHandles?.length) &&
-      new Set(currentProducts.map((product) => product.handle)).size <
-        config.allowedProductHandles!.length;
-    if (config.allowDevelopmentFallback && (hasStaleRevision || hasIncompleteCatalog)) {
-      return fallbackProducts(config, query);
-    }
-    return currentProducts
-      .map(adaptProduct)
-      .filter((product) => product.eligibleMarkets.includes(config.market))
-      .filter(
-        (product) =>
-          (product.verified === true && product.isPlaceholder !== true) ||
-          (config.allowDevelopmentFallback === true && product.isPlaceholder === true),
-      )
-      .filter((product) => matchesProductQuery(product, query));
+    const { data, error } = await config.supabase
+      .from("products")
+      .select(PRODUCT_SELECT)
+      .eq("status", "published")
+      .eq("verified", true)
+      .is("deleted_at", null)
+      .contains("eligible_markets", [config.market]);
+    if (error) throw new CommerceUnavailableError(`Supabase returned: ${error.message}`);
+    const products = ((data ?? []) as unknown as ProductRow[]).map((row) => adaptProduct(row, config.currencyCode));
+    const results = products.filter((product) => matchesProductQuery(product, query));
+    if (results.length === 0 && config.allowDevelopmentFallback) return fallbackProducts(config, query);
+    return results;
   } catch (error) {
     if (config.allowDevelopmentFallback) return fallbackProducts(config, query);
     if (error instanceof CommerceUnavailableError) throw error;
     throw new CommerceUnavailableError(
-      error instanceof Error
-        ? `The commerce service could not be reached: ${error.message}`
-        : undefined,
+      error instanceof Error ? `The commerce catalog service could not be reached: ${error.message}` : undefined,
     );
   }
 }
 
-export async function getProduct(
+export async function getProduct(config: CommerceConfig, handle: string): Promise<Product | undefined> {
+  try {
+    const { data, error } = await config.supabase
+      .from("products")
+      .select(PRODUCT_SELECT)
+      .eq("handle", handle)
+      .eq("status", "published")
+      .eq("verified", true)
+      .is("deleted_at", null)
+      .maybeSingle();
+    if (error) throw new CommerceUnavailableError(`Supabase returned: ${error.message}`);
+    if (!data) {
+      if (config.allowDevelopmentFallback) return fallbackProducts(config, "").find((p) => p.handle === handle);
+      return undefined;
+    }
+    return adaptProduct(data as unknown as ProductRow, config.currencyCode);
+  } catch (error) {
+    if (config.allowDevelopmentFallback) return fallbackProducts(config, "").find((p) => p.handle === handle);
+    if (error instanceof CommerceUnavailableError) throw error;
+    throw new CommerceUnavailableError(
+      error instanceof Error ? `The commerce catalog service could not be reached: ${error.message}` : undefined,
+    );
+  }
+}
+
+export async function listStorefrontCatalogs(
   config: CommerceConfig,
-  handle: string,
-): Promise<Product | undefined> {
-  const products = await listProducts(config);
-  return products.find((product) => product.handle === handle);
+  section?: StorefrontSection,
+): Promise<StorefrontCatalog[]> {
+  try {
+    let request = config.supabase
+      .from("storefront_catalogs")
+      .select("id, name, handle, description, navigation_image_url, navigation_image_alt, hero_image_url, hero_image_alt, section, experience, box_size, is_active")
+      .eq("is_active", true);
+    if (section) request = request.eq("section", section);
+    const { data, error } = await request;
+    if (error) throw new CommerceUnavailableError(`Supabase returned: ${error.message}`);
+    return (data ?? [])
+      .map((row) => adaptCatalog(row as never))
+      .filter((catalog): catalog is StorefrontCatalog => Boolean(catalog))
+      .sort((left, right) => left.name.localeCompare(right.name));
+  } catch (error) {
+    if (config.allowDevelopmentFallback) return [];
+    if (error instanceof CommerceUnavailableError) throw error;
+    throw new CommerceUnavailableError(
+      error instanceof Error ? `The commerce catalog service could not be reached: ${error.message}` : undefined,
+    );
+  }
 }
 
 export function formatMoney(amount: number, currencyCode: string, locale = "en-BD") {

@@ -1,18 +1,23 @@
 import { describe, expect, it } from "vitest";
-import { runIntegration, storeFetch } from "./helpers";
+import { anonSupabaseClient, runIntegration } from "./helpers";
 
-describe.runIf(runIntegration)("inventory and product eligibility", () => {
-  it("retrieves published products with variants and market-calculated prices", async () => {
-    const response = await storeFetch(`/store/products?limit=20&region_id=${encodeURIComponent(process.env.TEST_REGION_ID || "")}&fields=*variants.calculated_price`);
-    const body = await response.json() as { products: Array<{ status?: string; variants?: Array<{ calculated_price?: { currency_code?: string } }> }> };
-    expect(body.products.length).toBeGreaterThan(0);
-    expect(body.products.every((product) => product.variants?.length)).toBe(true);
+describe.runIf(runIntegration)("product catalog eligibility", () => {
+  it("only returns published, verified products with priced variants", async () => {
+    const supabase = anonSupabaseClient();
+    const { data, error } = await supabase
+      .from("products")
+      .select("status, verified, deleted_at, product_variants ( id, product_prices ( amount ) )")
+      .limit(20);
+    expect(error).toBeNull();
+    const products = (data ?? []) as Array<{ status: string; verified: boolean; product_variants: unknown[] }>;
+    expect(products.length).toBeGreaterThan(0);
+    expect(products.every((product) => product.status === "published" && product.verified && product.product_variants.length > 0)).toBe(true);
   });
 
-  it("supports collection filtering and deterministic sorting", async () => {
-    const response = await storeFetch("/store/products?limit=20&order=title");
-    const body = await response.json() as { products: Array<{ title: string }> };
-    const titles = body.products.map((product) => product.title);
+  it("supports deterministic sorting by title", async () => {
+    const supabase = anonSupabaseClient();
+    const { data } = await supabase.from("products").select("title").order("title").limit(20);
+    const titles = (data ?? []).map((row) => (row as { title: string }).title);
     expect(titles).toEqual([...titles].sort((a, b) => a.localeCompare(b)));
   });
 });

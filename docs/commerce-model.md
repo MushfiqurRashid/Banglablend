@@ -1,31 +1,27 @@
 # Commerce model
 
-Medusa owns transactional state. A product groups one or more purchasable variants; variants own SKUs, option values, prices, and inventory relationships. Collections provide each product's single primary storefront and reporting section: Originals, Reserve, Pantry, Tea & Wellness, Lifestyle Accessories, or Gifts.
+Supabase PostgreSQL owns products, variants, prices, stock, catalogs, carts, shipping, orders, fulfillment, customers, and payment state. RLS protects browser access; trusted storefront and Admin server routes use the service role only where the workflow requires it.
 
-Nested Medusa product categories provide reusable storefront catalogs. A product can belong to many of these catalogs without changing its primary collection. For example, an Originals product can also be assigned to `Gifts → Build a Box`. Active managed catalogs are projected into storefront routes, navigation, product filtering, and search. A listing catalog renders a normal product grid; a Build a Box catalog also stores the required box size and renders the box builder. Catalog assignment never overrides price, inventory, market eligibility, or product publishing rules.
+A product groups purchasable variants. Variants own unique SKUs and currency prices. A product has one primary collection and may also belong to multiple storefront catalogs, including Build a Box catalogs. Catalog assignment never overrides price, inventory, market eligibility, verification, or publishing status.
 
-## Markets, prices, and eligibility
+## Markets and prices
 
-The Bangladesh region uses BDT and domestic shipping/payment methods. Initial sample international regions use GBP and USD but remain operationally disabled until export eligibility, carriers, duties wording, payment provider, returns, and service levels are approved. `product-market` records and product metadata express eligible markets; backend region and price rules remain authoritative.
+Bangladesh uses BDT and the approved domestic shipping/payment methods. International markets stay disabled until product eligibility, local prices, carriers, duties, returns, payment collection, and service levels are approved. Do not convert BDT prices in the browser; each enabled market needs an approved price in its own currency.
 
-Do not convert a BDT display price in the browser. Each enabled region needs an approved price list in its own currency. A destination change invalidates the current cart because region, inventory, promotions, tax, shipping, and payment availability may all change.
+Changing destination invalidates an incompatible cart because price, inventory, promotions, shipping, tax, and payment availability may differ.
 
 ## Inventory and fulfillment
 
-Production variants should use inventory items and stock locations. Domestic chilled/fresh products must only attach to supported Bangladesh shipping/service zones. Exportable ambient products must be explicitly approved per destination. Overselling, backorders, preorder rules, and safety-stock thresholds are operational decisions configured in Medusa, not UI assumptions.
+Every active variant requires a real inventory level at a stock location. `stocked_quantity` is physical stock and `reserved_quantity` is committed but not yet fulfilled; the database prevents reservation from exceeding stock. Publishing readiness requires a positive price and primary-location stock.
 
-The guided product creator requires an initial stock quantity for every variant and creates its inventory level at the store's primary stock location. A product cannot be published from that workflow with zero initial stock. Draft products may start at zero and must remain unavailable until an operator records real stock in Medusa.
+Order line items retain title, SKU, quantity, and unit-price snapshots. Creating fulfillment items consumes stock and releases the same reservation in one database transaction. Never edit historical order lines to reflect later catalog changes.
 
-The included catalog seed disables inventory management only for visibly marked sample variants so a fresh development install can render. Replace these fixtures with verified products, locations, inventory levels, and shipping options before acceptance testing.
+## Cart and order lifecycle
 
-## Cart, promotions, and orders
+The storefront keeps a cart ID in a secure cookie. Server routes validate variants, market, price, shipping, inventory, addresses, and payment method, and then call restricted database functions. The browser cannot invoke checkout functions directly.
 
-A cart belongs to one region/market. The Next.js server keeps its ID in a secure cookie, while all price totals are recalculated by Medusa. Quantity updates and promotions must pass inventory and eligibility checks. Checkout adds addresses, selects a backend-provided shipping option, creates a payment collection/session, then completes the cart into an order.
-
-Order state is authoritative in Medusa. Email and fulfillment integrations subscribe to order events. Account pages query customer-owned orders using the server-held auth token; an order ID in a URL is never authorization by itself.
+The operational order roadmap is `pending -> processing -> completed`, with cancellation as an explicit terminal path. Payment and fulfillment have separate state machines. Admin reloads the current record before each transition and rejects stale or skipped actions. Customer order routes verify ownership from the authenticated session; a URL ID alone grants no access.
 
 ## Gifts
 
-Gift fields—recipient, message, hidden prices, packaging preference, delivery date, and instructions—are captured by validated checkout input and stored in order metadata. The gift workflow projects them into a dedicated `gift-order` module record for operations. Billing and delivery countries may differ; the selected delivery market controls product and shipping eligibility.
-
-Gift catalogs are managed in Medusa Admin under **Superadmin → Storefront catalogs**. `Gifts → Build a Box` is seeded for local development, and the sample products are assigned to it so the earlier build-a-box selection remains available. Operators can add or remove assignments from both the guided product creator and the Superadmin catalog editor.
+Recipient, message, hidden-price preference, packaging, requested delivery date, and instructions are validated at checkout and retained with the order. The delivery market controls commercial eligibility even when billing and delivery countries differ. Staff manage gift/catalog assignments under **Storefront catalogs**.

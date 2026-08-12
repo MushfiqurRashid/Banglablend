@@ -1,45 +1,33 @@
 # Architecture
 
-## System view
-
 ```mermaid
 flowchart LR
-  Browser[Customer browser] -->|HTTPS| Storefront[Next.js storefront]
-  Staff[Commerce staff] --> Admin[Medusa Admin]
-  Editors[Content editors] --> Studio[Sanity Studio]
-  Storefront -->|server-side Store API| Medusa[Medusa backend]
-  Storefront -->|verified content queries| Sanity[(Sanity)]
-  Storefront -->|search-only key| Meili[(Meilisearch)]
-  Medusa --> Postgres[(PostgreSQL)]
-  Medusa --> Redis[(Redis)]
-  Medusa -->|session + validation| SSL[SSLCOMMERZ]
-  SSL -->|IPN/callback| Medusa
-  Medusa -->|order events| Email[Email adapter]
-  Sanity -->|signed webhook| Storefront
-  Medusa -->|protected indexing job| Meili
-  Sanity -->|verified records via indexing job| Meili
+  Customer[Customer browser] --> Storefront[Next.js storefront]
+  Staff[Staff browser] --> Admin[Next.js Admin]
+  Storefront --> Supabase[(Supabase Auth, Postgres, Storage)]
+  Admin --> Supabase
+  Storefront --> SSL[SSLCOMMERZ]
+  SSL --> Storefront
+  Storefront --> Meili[(Meilisearch)]
+  Admin -->|signed content revalidation| Storefront
 ```
 
-## Application boundaries
+## Ownership
 
-- The storefront owns presentation, destination/language state, server-only commerce proxy routes, public validation, structured data, and accessible interaction behavior. It does not own products, payment truth, or editorial truth.
-- Medusa owns catalog identity, variants, regional prices, inventory, carts, promotions, customers, orders, fulfillment state, gift order metadata, inquiries, and payment audit records. Its Admin extensions expose Bangla Blend operations without mixing admin code into the storefront.
-- Sanity owns narrative product enrichment, recipes, regions, sourcing stories, authors, pages, campaigns, translations, and editorial verification evidence. Medusa IDs are references, not duplicated commerce state.
-- Meilisearch owns a disposable search projection. It is rebuilt from Medusa and verified Sanity records and is never the source of truth.
-- Shared packages define narrow contracts and validation without coupling application runtimes.
+- Supabase Postgres is authoritative for products, prices, inventory, carts, orders, payments, customers, editorial content, settings, inquiries, and audit evidence.
+- Supabase Auth stores customer and staff identities. `staff_members`, `staff_roles`, RLS, and `has_permission()` form the staff authorization layer.
+- Supabase Storage holds public product media. Upload and mutation policies require `catalog:manage`.
+- Meilisearch is a disposable projection rebuilt from verified Supabase records.
+- The storefront owns customer-facing workflows and same-origin server routes. The Admin app owns authorized business operations.
 
-## Data and request flows
+## Trust boundaries
 
-The browser sends cart, account, checkout, and inquiry mutations to same-origin Next.js routes. Those routes validate input, attach server-held credentials/cookies, and call Medusa. Cart and auth identifiers use `HttpOnly`, `SameSite=Lax`, secure-in-production cookies. Search calls the server route, which applies the selected-market filter before querying Meilisearch.
+Browser code receives only the Supabase anon key. Customer and staff sessions remain RLS-scoped. Service-role credentials are imported only by server actions, route handlers, release scripts, and trusted payment/webhook code.
 
-Product pages join live Medusa commerce data with optional verified Sanity enrichment. If a service is unavailable during local development, a labeled fixture can render; it cannot be added to cart. Production fails closed instead of inventing stock, price, provenance, or certification data.
+Guest cart, checkout, inquiry, and payment writes pass through same-origin Next.js routes. Checkout RPC execution is restricted to `service_role`; public callers cannot invoke money-moving functions directly. Staff mutations are checked in both the server action and RLS policy. Important changes write to an append-only administrator ledger.
 
-SSLCOMMERZ begins at Medusa. The provider creates a server-side session and returns only the gateway URL. IPN data is remotely validated and checked against amount, currency, and order reference before authorization. Redirect routes only communicate status to the customer.
+Admin auth cookies are refreshed in `apps/admin/src/proxy.ts`. Cross-site unsafe requests are rejected, and production responses set CSP, HSTS, clickjacking, MIME-sniffing, referrer, opener, resource, and permissions policies.
 
-## Security boundaries
+## Failure behavior
 
-- Gateway, Sanity write, Meilisearch admin, database, and email credentials are server-only.
-- CSP and other security headers are set by the storefront. Production ingress adds TLS, request-size limits, bot controls, and rate limits.
-- Public input is schema-validated; Medusa authorization protects staff APIs. Browser content renders through React/Portable Text serializers, not arbitrary HTML.
-- Webhooks use provider validation or an HMAC signature and must be replay-safe. Payment audit records store safe fields and hashes, not credentials or raw card data.
-- Market selection never overrides backend inventory, regional pricing, shipping, or product eligibility.
+Production never invents stock, price, payment, provenance, or verified content. If Supabase is unavailable, authenticated operations fail closed. Storefront fixtures are local-only and non-purchasable. Cache-revalidation failures are recorded and surfaced to editors without pretending a database save failed.

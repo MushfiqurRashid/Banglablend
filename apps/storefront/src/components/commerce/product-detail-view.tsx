@@ -137,6 +137,7 @@ export function ProductDetailView({
               variants={product.variants}
               previewOnly={product.isPlaceholder === true}
               productTitle={product.title}
+              productId={product.id}
             />
           </div>
         </section>

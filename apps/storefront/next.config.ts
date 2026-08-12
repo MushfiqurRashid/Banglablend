@@ -1,11 +1,11 @@
+import path from "node:path";
 import type { NextConfig } from "next";
 
 const developmentScriptPolicy =
   process.env.NODE_ENV === "production"
     ? "script-src 'self' 'unsafe-inline'"
     : "script-src 'self' 'unsafe-inline' 'unsafe-eval'";
-const commerceBackend =
-  process.env.MEDUSA_BACKEND_URL ?? process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL;
+const commerceBackend = process.env.NEXT_PUBLIC_SUPABASE_URL;
 let commerceOrigin = "";
 
 try {
@@ -33,6 +33,13 @@ const contentSecurityPolicy = [
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // Keep Turbopack's development graph away from the production build. Reusing `.next` after
+  // `next build` can leave the Windows dev server indefinitely compiling the proxy entrypoint.
+  distDir: process.env.NODE_ENV === "development" ? ".next-dev" : ".next",
+  // Self-contained server bundle for the container image. outputFileTracingRoot points at the
+  // workspace root so tracing follows the pnpm symlinks into packages/* and node_modules/.pnpm.
+  output: "standalone",
+  outputFileTracingRoot: path.join(import.meta.dirname, "../../"),
   images: {
     unoptimized: process.env.NODE_ENV === "development",
     formats: ["image/webp"],
@@ -40,7 +47,7 @@ const nextConfig: NextConfig = {
     imageSizes: [32, 48, 64, 96, 128, 256, 384],
     qualities: [70, 75, 85],
     remotePatterns: [
-      { protocol: "https", hostname: "cdn.sanity.io" },
+      { protocol: "https", hostname: "**.supabase.co" },
       { protocol: "https", hostname: "**.amazonaws.com" },
       { protocol: "https", hostname: "**.r2.dev" },
     ],

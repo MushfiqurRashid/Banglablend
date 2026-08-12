@@ -41,6 +41,10 @@ export interface StorefrontCatalog {
   name: string;
   handle: string;
   description?: string;
+  navigationImage?: string;
+  navigationImageAlt?: string;
+  heroImage?: string;
+  heroImageAlt?: string;
   section: StorefrontSection;
   experience: StorefrontCatalogExperience;
   boxSize?: number;

@@ -4,6 +4,7 @@ import { DesktopHeader } from "@/components/navigation/desktop-header";
 import { Footer } from "@/components/layout/footer";
 import { NewsletterSection } from "@/components/layout/newsletter-section";
 import { CartDrawer } from "@/components/commerce/cart-drawer";
+import { FaqChatWidget } from "@/components/marketing/faq-chat-widget";
 import { AppProviders } from "@/providers/app-providers";
 import { getActiveMarket, getStorefrontCatalogs } from "@/lib/commerce/server";
 import { siteConfig } from "@/config/site";
@@ -49,6 +50,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     name: siteConfig.name,
     url: siteConfig.url,
     logo: new URL("/images/bangla-blend-logo-final-v3.webp", siteConfig.url).toString(),
+    sameAs: siteConfig.socialLinks.map((social) => social.href),
   };
   return (
     <html lang="en" data-scroll-behavior="smooth">
@@ -64,6 +66,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           <NewsletterSection />
           <Footer catalogs={catalogs} />
           <CartDrawer />
+          <FaqChatWidget />
           <CookieBanner />
         </AppProviders>
         <script

@@ -10,31 +10,31 @@ import { LanguageSelector } from "./language-selector";
 import type { StorefrontCatalog } from "@bangla-blend/types";
 
 const shopLinks = [
-  { label: "Shop All", href: "/shop/all", image: "/images/hero-spice-still-life.webp" },
-  { label: "Originals", href: "/shop/originals", image: "/images/home-hero-hathajari.jpg" },
-  { label: "Reserve", href: "/shop/reserve", image: "/images/recipe-mezban-gosh.webp" },
-  { label: "Pantry", href: "/shop/pantry", image: "/images/recipe-chana-dal-bhuna.webp" },
+  { label: "Shop All", href: "/shop/all", image: "/images/campaign/shop-signature-lineup.jpg" },
+  { label: "Originals", href: "/shop/originals", image: "/images/products/shahi-garam-masala-product.webp" },
+  { label: "Reserve", href: "/shop/reserve", image: "/images/navigation/category-reserve-v2.jpg" },
+  { label: "Pantry", href: "/shop/pantry", image: "/images/navigation/category-pantry-v2.jpg" },
   { label: "Tea & Wellness", href: "/shop/tea-wellness", image: "/images/recipe-masala-chai.webp" },
   {
     label: "Lifestyle Accessories",
     href: "/shop/lifestyle-accessories",
-    image: "/images/gifts-hero.webp",
+    image: "/images/navigation/category-lifestyle-accessories-v2.jpg",
   },
   {
     label: "Best Sellers",
     href: "/shop/best-sellers",
-    image: "/images/shorisha-ilish-recipe.webp",
+    image: "/images/products/shahi-garam-masala-lifestyle.jpg",
   },
-  { label: "New Arrivals", href: "/shop/new-arrivals", image: "/images/recipe-grilled-hilsa.webp" },
+  { label: "New Arrivals", href: "/shop/new-arrivals", image: "/images/navigation/category-new-arrivals-v2.jpg" },
 ];
 const giftLinks = [
-  { label: "Gift Sets", href: "/gifts/gift-sets", image: "/images/gifts-hero.webp" },
+  { label: "Gift Sets", href: "/gifts/gift-sets", image: "/images/gifts/presentation-trio.jpg" },
   {
     label: "Regional Gifts",
     href: "/gifts/regional-gifts",
-    image: "/images/bangladesh-river-landscape.webp",
+    image: "/images/navigation/category-regional-gifts-v2.jpg",
   },
-  { label: "Corporate Gifting", href: "/gifts/corporate", image: "/images/our-story-craft.webp" },
+  { label: "Corporate Gifting", href: "/gifts/corporate", image: "/images/navigation/category-corporate-gifting-v2.jpg" },
 ];
 const discoverLinks = [
   {
@@ -86,14 +86,14 @@ export function DesktopHeader({ catalogs = [] }: { catalogs?: StorefrontCatalog[
     .map((catalog) => ({
       label: catalog.name,
       href: `/shop/${catalog.section}/${catalog.handle}`,
-      image: "/images/hero-spice-still-life.webp",
+      image: catalog.navigationImage || "/images/hero-spice-still-life.webp",
     }));
   const dynamicGiftLinks = catalogs
     .filter((catalog) => catalog.section === "gifts")
     .map((catalog) => ({
       label: catalog.name,
       href: `/gifts/${catalog.handle}`,
-      image: "/images/gifts-hero.webp",
+      image: catalog.navigationImage || "/images/gifts-hero.webp",
     }));
 
   return (

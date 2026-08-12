@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
-import { journalCategories } from "@/lib/sanity/fallback-content";
-import { getArticles } from "@/lib/sanity/editorial";
+import { journalCategories } from "@/lib/content/fallback-content";
+import { getArticles } from "@/lib/content/editorial";
 import { ComingSoonPage } from "@/components/editorial/coming-soon-page";
 import { ArticleCard } from "@/components/editorial/article-card";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
