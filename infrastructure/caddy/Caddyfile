@@ -1,0 +1,17 @@
+# Install this file at /etc/caddy/Caddyfile on the VPS. Caddy obtains and renews HTTPS
+# certificates automatically after the apex, www, and bpanel DNS records point to the VPS and ports 80/443 are
+# open. The application containers themselves stay private on 127.0.0.1.
+
+banglablend.store {
+	encode zstd gzip
+	reverse_proxy 127.0.0.1:3000
+}
+
+www.banglablend.store {
+	redir https://banglablend.store{uri} permanent
+}
+
+bpanel.banglablend.store {
+	encode zstd gzip
+	reverse_proxy 127.0.0.1:3100
+}

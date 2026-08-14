@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { contactSchema, inquirySchema, newsletterSchema } from "@bangla-blend/validation";
 import { createSupabaseServiceRoleClient } from "@bangla-blend/supabase-client";
+import { sendTransactionalEmail } from "@/lib/email/server";
 
 const requestLog = new Map<string, number[]>();
 
@@ -43,7 +44,28 @@ export async function POST(request: Request) {
   };
 
   const supabase = createSupabaseServiceRoleClient();
-  const { error } = await supabase.from("inquiries").insert(row);
-  if (error) return NextResponse.json({ error: "The inquiry service is unavailable." }, { status: 503 });
+  const { data: inquiry, error } = await supabase.from("inquiries").insert(row).select("id").returns<{ id: string }[]>().single();
+  if (error || !inquiry) return NextResponse.json({ error: "The inquiry service is unavailable." }, { status: 503 });
+
+  const notificationAddress = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim();
+  if (notificationAddress) {
+    await sendTransactionalEmail({
+      to: notificationAddress,
+      replyTo: row.email,
+      subject: `New Bangla Blend ${String(type).replaceAll("_", " ")} inquiry`,
+      idempotencyKey: `inquiry-received/${inquiry.id}`,
+      text: [
+        `Type: ${type}`,
+        `Contact: ${row.contact_person ?? "Not supplied"}`,
+        `Email: ${row.email}`,
+        `Company: ${row.company ?? "Not supplied"}`,
+        `Telephone: ${row.telephone ?? "Not supplied"}`,
+        `Notes: ${row.notes ?? "Not supplied"}`,
+        `Inquiry ID: ${inquiry.id}`,
+      ].join("\n"),
+    }).catch((emailError: unknown) => {
+      console.error("Inquiry notification email failed", emailError instanceof Error ? emailError.message : emailError);
+    });
+  }
   return NextResponse.json({ accepted: true }, { status: 202 });
 }

@@ -1,11 +1,21 @@
+/* global console, process */
+
 import { createClient } from "@supabase/supabase-js";
+import { randomBytes } from "node:crypto";
+import { writeFile } from "node:fs/promises";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const email = process.env.SUPERADMIN_EMAIL?.trim().toLowerCase();
 const fullName = process.env.SUPERADMIN_FULL_NAME?.trim() || null;
-const bootstrapPassword = process.env.SUPERADMIN_BOOTSTRAP_PASSWORD;
+let bootstrapPassword = process.env.SUPERADMIN_BOOTSTRAP_PASSWORD;
+const generatePassword = process.argv.includes("--generate-password");
+const credentialFile = process.env.SUPERADMIN_CREDENTIAL_FILE;
 const adminUrl = process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:3100";
+
+if (generatePassword && !bootstrapPassword) {
+  bootstrapPassword = `${randomBytes(24).toString("base64url")}Aa1!`;
+}
 
 if (!url || !serviceRoleKey || !email) {
   throw new Error("NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, and SUPERADMIN_EMAIL are required.");
@@ -40,6 +50,14 @@ if (!authUser) {
   if (result.error || !result.data.user) throw new Error(result.error?.message ?? "The Supabase Auth user could not be created.");
   authUser = result.data.user;
   createdUser = true;
+} else if (bootstrapPassword) {
+  const { data, error } = await supabase.auth.admin.updateUserById(authUser.id, {
+    password: bootstrapPassword,
+    email_confirm: true,
+    user_metadata: { full_name: fullName },
+  });
+  if (error || !data.user) throw new Error(error?.message ?? "The existing Supabase Auth user could not be updated.");
+  authUser = data.user;
 }
 
 const { error: staffError } = await supabase.from("staff_members").upsert({
@@ -54,4 +72,16 @@ if (staffError) {
   throw new Error(staffError.message);
 }
 
-console.log(`${createdUser ? "Created" : "Updated"} Super Admin access for ${email}. ${bootstrapPassword ? "Password bootstrap used." : "Invitation email requested."}`);
+if (credentialFile && bootstrapPassword) {
+  await writeFile(
+    credentialFile,
+    `SUPERADMIN_EMAIL=${email}\nSUPERADMIN_BOOTSTRAP_PASSWORD=${bootstrapPassword}\n`,
+    { mode: 0o600 },
+  );
+}
+
+console.log(
+  `${createdUser ? "Created" : "Updated"} Super Admin access for ${email}. ${
+    bootstrapPassword ? "Password bootstrap used." : "Invitation email requested."
+  }${credentialFile && bootstrapPassword ? ` Credentials saved to ${credentialFile}.` : ""}`,
+);

@@ -8,7 +8,7 @@ if (!existingOrderId && process.env.CHECKOUT_SMOKE_ALLOW_ORDER !== "true") {
 }
 
 const storefrontOrigin = process.env.STOREFRONT_SMOKE_ORIGIN ?? "http://localhost:3000";
-const adminOrigin = process.env.ADMIN_SMOKE_ORIGIN ?? "http://localhost:3100";
+const adminOrigin = (process.env.ADMIN_SMOKE_ORIGIN ?? "http://localhost:3100").replace(/\/+$/, "");
 const adminEmail = process.env.ADMIN_SMOKE_EMAIL;
 const adminPassword = process.env.ADMIN_SMOKE_PASSWORD;
 

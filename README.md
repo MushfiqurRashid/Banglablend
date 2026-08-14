@@ -11,9 +11,8 @@ packages/supabase-client Shared browser, request-scoped, and service-role client
 packages/commerce-client Typed storefront commerce queries
 packages/types           Shared domain contracts
 packages/validation      Shared Zod validation
-supabase/migrations      Ordered schema, RLS, functions, storage, and hardening changes
-supabase/seed            Local-only development records
-scripts                  Release, smoke-test, bootstrap, and indexing commands
+supabase/migrations      Versioned schema, RLS, storage, and production baseline changes for Cloud
+scripts                  Release, smoke-test, bootstrap, and VPS deployment commands
 tests                    Shared unit, integration, and Playwright suites
 docs                     Architecture and operating runbooks
 ```
@@ -22,8 +21,7 @@ docs                     Architecture and operating runbooks
 
 - Node.js 22 or newer
 - pnpm 10 through Corepack
-- A Supabase project, or Docker Desktop for the Supabase local stack
-- Meilisearch when search indexing is enabled
+- Access to the Bangla Blend Supabase Cloud project
 - Approved SSLCOMMERZ sandbox credentials for payment testing
 
 ## Setup
@@ -36,13 +34,13 @@ Copy-Item apps/storefront/.env.example apps/storefront/.env.local
 Copy-Item apps/admin/.env.example apps/admin/.env.local
 ```
 
-Fill the Supabase URL and keys in both application environment files. Keep `SUPABASE_SERVICE_ROLE_KEY`, payment credentials, email credentials, and `REVALIDATE_SECRET` server-only.
+Fill the Supabase Cloud keys in both application environment files. Keep `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ACCESS_TOKEN`, the database password, payment credentials, email credentials, and `REVALIDATE_SECRET` server-only. Do not use local Supabase keys.
 
-Apply the database migrations before starting either application:
+For first-time setup, put `SUPABASE_ACCESS_TOKEN` and `SUPABASE_DB_PASSWORD` in the ignored root
+`.env`, then configure and synchronize the exact Cloud project before starting either application:
 
 ```powershell
-supabase link --project-ref fwcwhiprbaqqwiyryhpa
-pnpm db:push
+pnpm db:configure
 ```
 
 For a new environment, bootstrap the first administrator using a secure email invitation:
@@ -69,15 +67,27 @@ pnpm test:e2e
 pnpm test:admin-smoke
 pnpm build
 pnpm check:production
+pnpm db:configure
 pnpm db:push
-pnpm search:index
 ```
+
+`pnpm db:push` is cloud-only and guarded: it verifies the exact linked project, rejects localhost,
+runs a dry-run, applies pending migrations, and synchronizes production Auth callback settings.
+The local reset workflow is intentionally not available.
+
+`pnpm db:configure` retrieves the project's public/server keys without printing them, updates both
+apps, links the project, and runs the guarded migration sync.
 
 `ENABLE_DEVELOPMENT_FALLBACKS=true` is local-only. Sample products remain visibly marked and must never be treated as approved stock, claims, or content.
 
+Production baseline records live in ordered migrations; local seed files are not part of the
+repository. Checkout smoke tests create an explicitly marked temporary order only when
+`CHECKOUT_SMOKE_ALLOW_ORDER=true`; remove it after verification and never run that test against
+live customer data.
+
 ## Production
 
-Deploy `apps/storefront` and `apps/admin` as separate HTTPS services. Run forward Supabase migrations before application rollout, store secrets in the hosting platform, configure Supabase Auth redirect URLs for the admin callback, and run `pnpm check:production` plus the authenticated smoke tests before traffic is enabled.
+Deploy `apps/storefront` and `apps/admin` as separate HTTPS services: the storefront at `banglablend.store` and Admin at `bpanel.banglablend.store`. Run forward Supabase migrations before application rollout, store secrets in the hosting platform, configure Supabase Auth redirect URLs for the Admin callback, and run `pnpm check:production` plus the authenticated smoke tests before traffic is enabled.
 
 Both apps build to a standalone Next.js server and ship as containers:
 
@@ -87,5 +97,9 @@ docker build -f apps/admin/Dockerfile -t bangla-blend-admin .
 ```
 
 Build from the repository root, and pass every `NEXT_PUBLIC_*` value as a `--build-arg` — they are inlined into the client bundle at build time, so changing one needs a rebuild rather than a restart. Copy [`.env.production.example`](.env.production.example) for the runtime variables.
+
+For the Hostinger VPS, `sh scripts/deploy-vps.sh` validates the filled `.env`, builds both images,
+and starts the localhost-bound containers. Install `infrastructure/caddy/Caddyfile` as
+`/etc/caddy/Caddyfile` to route `banglablend.store` to the storefront and `bpanel.banglablend.store` to Admin over HTTPS.
 
 See [architecture](docs/architecture.md), [administration](docs/administration.md), [Super Admin operations](docs/superadmin.md), [deployment](docs/deployment.md), [container deployment](docs/deployment-containers.md), [payments](docs/payments.md), and [testing](docs/testing.md).

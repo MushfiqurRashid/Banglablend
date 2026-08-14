@@ -23,7 +23,12 @@ export async function proxy(request: NextRequest) {
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (url && anonKey) {
     const supabase = createServerClient(url, anonKey, {
-      cookieOptions: { name: "banglablend-admin-auth" },
+      cookieOptions: {
+        name: "banglablend-admin-auth",
+        path: "/",
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+      },
       cookies: {
         getAll: () => request.cookies.getAll(),
         setAll: (cookiesToSet) => {

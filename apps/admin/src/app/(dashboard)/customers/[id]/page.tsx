@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { getStaffSession, getSupabaseForRequest, hasPermission } from "@/lib/auth";
 import { CustomerTagEditor } from "./tag-editor";
 
@@ -98,9 +99,9 @@ export default async function CustomerProfilePage({ params }: { params: Promise<
               {orders.map((order) => (
                 <tr key={order.id}>
                   <td>
-                    <a href={`/orders/${order.id}`} style={{ fontWeight: 600, textDecoration: "none" }}>
+                    <Link href={`/orders/${order.id}`} style={{ fontWeight: 600, textDecoration: "none" }}>
                       order_{String(order.display_id).padStart(2, "0")}
-                    </a>
+                    </Link>
                   </td>
                   <td>
                     <span className="badge badge-neutral">{order.status}</span>

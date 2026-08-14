@@ -2,9 +2,8 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getSupabaseForRequest } from "@/lib/auth/server";
 
-// Not z.uuid(): migrated orders/products/customers use md5(...)::uuid ids (see
-// supabase/seed/002_migrated_customers_and_orders.sql), which are UUID-shaped but don't satisfy
-// RFC 9562 version/variant bits that z.uuid() enforces. Same lenient pattern as the existing
+// Not z.uuid(): deterministic migration IDs use md5(...)::uuid values, which are UUID-shaped but
+// don't satisfy RFC 9562 version/variant bits that z.uuid() enforces. Same lenient pattern as the existing
 // /account/orders/[id] page's UUID_RE.
 const idSchema = z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
 

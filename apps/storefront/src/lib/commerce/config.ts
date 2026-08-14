@@ -1,13 +1,13 @@
 import "server-only";
 import type { MarketCode } from "@bangla-blend/types";
 import type { CommerceConfig } from "@bangla-blend/commerce-client";
-import { createSupabaseServerClient, type NextCookieStore } from "@bangla-blend/supabase-client";
+import { createSupabasePublicClient } from "@bangla-blend/supabase-client";
 import { getMarket } from "@/config/site";
 
-export function getCommerceConfig(marketCode: MarketCode, cookieStore: NextCookieStore): CommerceConfig {
+export function getCommerceConfig(marketCode: MarketCode): CommerceConfig {
   const market = getMarket(marketCode);
   return {
-    supabase: createSupabaseServerClient(cookieStore, { cookieName: "banglablend-storefront-auth" }),
+    supabase: createSupabasePublicClient(),
     market: marketCode,
     currencyCode: market.currency,
     allowDevelopmentFallback:

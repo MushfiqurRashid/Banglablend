@@ -4,10 +4,10 @@
 
 - `pnpm test:unit` checks shared validation, contracts, and security boundaries without external services.
 - `pnpm --filter @bangla-blend/admin test` checks admin readiness, order transitions, list inputs, and content formatting.
-- `RUN_INTEGRATION_TESTS=true pnpm test:integration` exercises configured Supabase and Meilisearch services with test-only data.
+- `RUN_INTEGRATION_TESTS=true pnpm test:integration` exercises configured Supabase services with test-only data.
 - `pnpm test:e2e` runs the storefront in desktop and mobile Chromium.
 - `pnpm test:admin-smoke` visits every protected Admin route with a synthetic staff account and verifies the mobile navigation. Set `ADMIN_SMOKE_CREATE_USER=true` in controlled CI to create and remove that account automatically.
-- `pnpm test:checkout-smoke` verifies the cart/checkout/order/admin path without using real customer or payment data.
+- `pnpm test:checkout-smoke` verifies the cart/checkout/order/admin path without using real customer or payment data. It refuses to create an order unless `CHECKOUT_SMOKE_ALLOW_ORDER=true`; delete the marked smoke order after the run.
 - `pnpm lint`, `pnpm typecheck`, and `pnpm build` are release gates.
 
 Integration suites skip unless explicitly enabled. A skipped external-service test is not release evidence.
@@ -27,6 +27,6 @@ Use synthetic customers, addresses, staff identities, and provider-published san
 
 ## Storefront and payment acceptance
 
-Verify product availability, cart persistence, server-calculated totals, Bangladesh address validation, COD, SSLCOMMERZ redirects/IPN, duplicate callbacks, altered amount/currency/reference, order ownership, customer address ownership, content publication, and search indexing. Redirect success alone never counts as payment authorization.
+Verify product availability, cart persistence, server-calculated totals, Bangladesh address validation, COD, SSLCOMMERZ redirects/IPN, duplicate callbacks, altered amount/currency/reference, order ownership, customer address ownership, content publication, and Supabase-backed search. Redirect success alone never counts as payment authorization.
 
 Complete keyboard, focus, screen-reader, contrast, responsive layout, metadata, structured data, security-header, dependency, backup, monitoring, and rollback reviews. Automated tests do not replace payment settlement, shipping operations, accessibility, editorial, legal, or cultural review; record the accountable human approval for each release gate.

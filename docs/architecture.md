@@ -8,7 +8,6 @@ flowchart LR
   Admin --> Supabase
   Storefront --> SSL[SSLCOMMERZ]
   SSL --> Storefront
-  Storefront --> Meili[(Meilisearch)]
   Admin -->|signed content revalidation| Storefront
 ```
 
@@ -17,7 +16,7 @@ flowchart LR
 - Supabase Postgres is authoritative for products, prices, inventory, carts, orders, payments, customers, editorial content, settings, inquiries, and audit evidence.
 - Supabase Auth stores customer and staff identities. `staff_members`, `staff_roles`, RLS, and `has_permission()` form the staff authorization layer.
 - Supabase Storage holds public product media. Upload and mutation policies require `catalog:manage`.
-- Meilisearch is a disposable projection rebuilt from verified Supabase records.
+- Storefront search reads eligible products and verified editorial records directly from Supabase.
 - The storefront owns customer-facing workflows and same-origin server routes. The Admin app owns authorized business operations.
 
 ## Trust boundaries

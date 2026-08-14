@@ -31,11 +31,11 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check:production": "node scripts/verify-production-config.mjs",
-    "db:push": "supabase db push",
-    "db:reset": "supabase db reset",
+    "db:configure": "node scripts/configure-supabase-cloud.mjs",
+    "db:link": "supabase link --project-ref fwcwhiprbaqqwiyryhpa",
+    "db:push": "node scripts/sync-supabase-cloud.mjs",
     "db:types": "corepack pnpm --filter @bangla-blend/supabase-client db:types",
-    "admin:bootstrap": "node scripts/bootstrap-admin.mjs",
-    "search:index": "node --experimental-strip-types scripts/search-index.ts"
+    "admin:bootstrap": "node scripts/bootstrap-admin.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
@@ -43,7 +43,6 @@
     "@supabase/supabase-js": "^2.112.2",
     "@types/node": "^24.10.1",
     "eslint": "^9.39.1",
-    "meilisearch": "^0.59.0",
     "prettier": "^3.7.4",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "supabase": "2.113.0",

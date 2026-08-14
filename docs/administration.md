@@ -37,4 +37,4 @@ Factual content follows `draft -> in_review -> verified -> archived`. Public RLS
 
 ## Immutable evidence
 
-Payment audits and administrator audit entries are append-only. Do not add generic edit or delete controls for payment callbacks, orders, fulfillment history, inventory movements, auth identities, secrets, migrations, or search projections. Use explicit operational actions that retain original evidence.
+Payment audits and administrator audit entries are append-only. Do not add generic edit or delete controls for payment callbacks, orders, fulfillment history, inventory movements, auth identities, secrets, migrations, or derived caches. Use explicit operational actions that retain original evidence.

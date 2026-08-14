@@ -12,7 +12,6 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/storefront/package.json apps/storefront/
 COPY apps/admin/package.json apps/admin/
 COPY packages/commerce-client/package.json packages/commerce-client/
-COPY packages/search-client/package.json packages/search-client/
 COPY packages/supabase-client/package.json packages/supabase-client/
 COPY packages/types/package.json packages/types/
 COPY packages/validation/package.json packages/validation/

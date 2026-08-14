@@ -10,7 +10,7 @@ Long-form fields appear as normal paragraph text in Admin and are stored as Port
 2. Move it to `in_review` when editorial work is complete.
 3. Review names, translations, alt text, dates, product references, factual claims, and legal/packaging language.
 4. Set `verification_status=verified` and `verified=true` only after accountable approval.
-5. Admin calls the signed storefront revalidation route; the search indexing job then projects verified records.
+5. Admin calls the signed storefront revalidation route; search reads newly verified records directly from Supabase.
 6. Archive superseded material while retaining the evidence for why it changed.
 
 Public RLS policies expose only eligible verified content. A saved database record is not automatically approved for publication.

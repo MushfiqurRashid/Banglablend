@@ -3,7 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { mkdir } from "node:fs/promises";
 import path from "node:path";
 
-const baseUrl = process.env.ADMIN_SMOKE_BASE_URL ?? "http://localhost:3100";
+const baseUrl = (process.env.ADMIN_SMOKE_BASE_URL ?? "http://localhost:3100").replace(/\/+$/, "");
 const screenshotDir = process.env.ADMIN_SMOKE_SCREENSHOT_DIR;
 let email = process.env.ADMIN_SMOKE_EMAIL;
 let password = process.env.ADMIN_SMOKE_PASSWORD;
@@ -79,7 +79,7 @@ try {
   await page.getByLabel("Work email").fill(email);
   await page.locator("#password").fill(password);
   await page.getByRole("button", { name: "Sign in" }).click();
-  await page.waitForURL(`${baseUrl}/`, { timeout: 20_000 });
+  await page.waitForURL((url) => url.href === baseUrl || url.href === `${baseUrl}/`, { timeout: 20_000 });
 
   if (screenshotDir) {
     await mkdir(screenshotDir, { recursive: true });

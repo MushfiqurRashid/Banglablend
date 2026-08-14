@@ -3,7 +3,7 @@ import { z } from "zod";
 import { getSupabaseForRequest } from "@/lib/auth/server";
 
 // Not z.uuid(): migrated products use md5(...)::uuid ids (see
-// supabase/seed/001_migrated_dev_data.sql), which are UUID-shaped but don't satisfy the RFC 9562
+// historical imported records, which are UUID-shaped but don't satisfy the RFC 9562
 // version/variant bits that z.uuid() enforces.
 const mutationSchema = z.object({ productId: z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i) });
 

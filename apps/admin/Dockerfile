@@ -12,7 +12,6 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/storefront/package.json apps/storefront/
 COPY apps/admin/package.json apps/admin/
 COPY packages/commerce-client/package.json packages/commerce-client/
-COPY packages/search-client/package.json packages/search-client/
 COPY packages/supabase-client/package.json packages/supabase-client/
 COPY packages/types/package.json packages/types/
 COPY packages/validation/package.json packages/validation/
@@ -27,7 +26,7 @@ COPY . .
 
 # NEXT_PUBLIC_* values are inlined into the client bundle at build time, and next.config.ts reads
 # NEXT_PUBLIC_SUPABASE_URL to build the CSP -- so these must be present now, not just at runtime.
-# NEXT_PUBLIC_ADMIN_URL is also the origin Supabase emails staff invitation/reset links from.
+# NEXT_PUBLIC_ADMIN_URL is also the public base URL used in staff invitation/reset links.
 ARG NEXT_PUBLIC_ADMIN_URL
 ARG NEXT_PUBLIC_STOREFRONT_URL
 ARG NEXT_PUBLIC_SUPABASE_URL

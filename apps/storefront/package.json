@@ -12,7 +12,6 @@
   },
   "dependencies": {
     "@bangla-blend/commerce-client": "workspace:*",
-    "@bangla-blend/search-client": "workspace:*",
     "@bangla-blend/supabase-client": "workspace:*",
     "@bangla-blend/types": "workspace:*",
     "@bangla-blend/validation": "workspace:*",

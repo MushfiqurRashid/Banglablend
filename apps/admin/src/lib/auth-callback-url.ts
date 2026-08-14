@@ -1,7 +1,7 @@
 import "server-only";
 
 // Supabase emails this URL to staff for invitations and password resets, so it has to be the real
-// public admin origin. Falling back to localhost in production would send a recipient to a machine
+// public Admin URL. Falling back to localhost in production would send a recipient to a machine
 // they don't have and silently break onboarding, so only development is allowed to fall back.
 export function adminAuthCallbackUrl(next: string) {
   const configured = process.env.NEXT_PUBLIC_ADMIN_URL?.trim();

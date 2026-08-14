@@ -40,7 +40,7 @@ jobs:
         env:
           NEXT_PUBLIC_SITE_URL: https://ci.invalid
           NEXT_PUBLIC_STOREFRONT_URL: https://ci.invalid
-          NEXT_PUBLIC_ADMIN_URL: https://admin.ci.invalid
+          NEXT_PUBLIC_ADMIN_URL: https://bpanel.ci.invalid
           NEXT_PUBLIC_CONTACT_EMAIL: ci@ci.invalid
           NEXT_PUBLIC_SUPABASE_URL: https://ci.supabase.invalid
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder-anon-key
@@ -79,7 +79,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
-            NEXT_PUBLIC_ADMIN_URL=https://admin.ci.invalid
+            NEXT_PUBLIC_ADMIN_URL=https://bpanel.ci.invalid
             NEXT_PUBLIC_STOREFRONT_URL=https://ci.invalid
             NEXT_PUBLIC_SUPABASE_URL=https://ci.supabase.invalid
             NEXT_PUBLIC_SUPABASE_ANON_KEY=ci-placeholder-anon-key

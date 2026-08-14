@@ -13,15 +13,15 @@ export async function getActiveMarket() {
 
 export async function getStoreProducts(query = "", marketCode?: MarketCode) {
   const market = marketCode ? getMarket(marketCode) : await getActiveMarket();
-  return listProducts(getCommerceConfig(market.code, await cookies()), query);
+  return listProducts(getCommerceConfig(market.code), query);
 }
 
 export async function getStoreProduct(handle: string) {
   const market = await getActiveMarket();
-  return getProduct(getCommerceConfig(market.code, await cookies()), handle);
+  return getProduct(getCommerceConfig(market.code), handle);
 }
 
 export async function getStorefrontCatalogs(section?: StorefrontSection) {
   const market = await getActiveMarket();
-  return listStorefrontCatalogs(getCommerceConfig(market.code, await cookies()), section);
+  return listStorefrontCatalogs(getCommerceConfig(market.code), section);
 }

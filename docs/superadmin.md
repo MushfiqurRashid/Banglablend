@@ -7,7 +7,7 @@ The Super Admin owns access, release controls, and operational accountability. D
 Apply migrations first, configure Supabase Auth SMTP, and add the final callback URL to the Supabase Auth redirect allowlist:
 
 ```text
-https://admin.your-domain.com/auth/callback
+https://bpanel.your-domain.com/auth/callback
 ```
 
 Then run:
@@ -15,7 +15,7 @@ Then run:
 ```powershell
 $env:NEXT_PUBLIC_SUPABASE_URL='https://PROJECT.supabase.co'
 $env:SUPABASE_SERVICE_ROLE_KEY='...'
-$env:NEXT_PUBLIC_ADMIN_URL='https://admin.your-domain.com'
+$env:NEXT_PUBLIC_ADMIN_URL='https://bpanel.your-domain.com'
 $env:SUPERADMIN_EMAIL='owner@your-domain.com'
 $env:SUPERADMIN_FULL_NAME='Account Owner'
 pnpm admin:bootstrap

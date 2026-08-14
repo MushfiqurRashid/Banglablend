@@ -7,6 +7,7 @@ import { getActiveMarket } from "@/lib/commerce/server";
 import { getCustomerSession } from "@/lib/auth/server";
 import { createSslCommerzSession } from "@/lib/payments/sslcommerz";
 import { siteConfig } from "@/config/site";
+import { sendTransactionalEmail } from "@/lib/email/server";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -227,6 +228,24 @@ export async function POST(request: Request) {
     const orderRow = order as OrderRow;
     await supabase.from("payment_collections").update({ order_id: orderRow.id, status: provider === "cod" ? "authorized" : "awaiting" }).eq("id", collection.id);
     await supabase.from("orders").update({ payment_status: provider === "cod" ? "authorized" : "awaiting" }).eq("id", orderRow.id);
+
+    const orderReference = `order_${String(orderRow.display_id).padStart(2, "0")}`;
+    await sendTransactionalEmail({
+      to: parsed.data.email,
+      subject: `Bangla Blend received ${orderReference}`,
+      idempotencyKey: `order-received/${orderRow.id}`,
+      text: [
+        `Thank you. We received ${orderReference}.`,
+        `Total: ${total.toFixed(2)} ${cart.currency_code.toUpperCase()}`,
+        `Delivery method: ${option.name}`,
+        provider === "cod"
+          ? "Payment method: Cash on Delivery. Please keep the payment ready for delivery."
+          : "Payment method: SSLCOMMERZ. The order remains pending until the gateway confirms payment.",
+        `You can contact us at ${siteConfig.contactEmail}.`,
+      ].join("\n\n"),
+    }).catch((emailError: unknown) => {
+      console.error("Order receipt email failed", emailError instanceof Error ? emailError.message : emailError);
+    });
 
     if (provider === "sslcommerz") {
       if (!gatewayUrl) return NextResponse.json({ error: "The payment gateway did not return a secure redirect URL." }, { status: 502 });
