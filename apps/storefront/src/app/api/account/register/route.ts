@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { createSupabaseServiceRoleClient } from "@bangla-blend/supabase-client";
 import { getSupabaseForRequest } from "@/lib/auth/server";
+import { ensureCustomerProfile } from "@/lib/auth/customer-provisioning";
+import { siteConfig } from "@/config/site";
 
 const schema = z.object({
   firstName: z.string().min(1).max(80),
@@ -19,22 +20,27 @@ export async function POST(request: Request) {
   const { data, error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
-    options: { data: { first_name: parsed.data.firstName, last_name: parsed.data.lastName } },
+    options: {
+      data: { first_name: parsed.data.firstName, last_name: parsed.data.lastName },
+      emailRedirectTo: `${siteConfig.url}/auth/callback?next=/account`,
+    },
   });
   if (error || !data.user) {
     return NextResponse.json({ error: error?.message ?? "Registration failed." }, { status: 400 });
   }
 
-  // Link to (or create) the customer profile row. Uses the service role because this is
-  // system-managed provisioning, not the user editing their own already-linked row -- a guest
-  // checkout under the same email may have left an unlinked customer row to attach to here.
-  const admin = createSupabaseServiceRoleClient();
-  const { data: existing } = await admin.from("customers").select("id").eq("email", parsed.data.email).is("auth_user_id", null).order("created_at", { ascending: false }).limit(1).maybeSingle();
-  if (existing) {
-    await admin.from("customers").update({ auth_user_id: data.user.id, first_name: parsed.data.firstName, last_name: parsed.data.lastName }).eq("id", existing.id);
-  } else {
-    await admin.from("customers").insert({ auth_user_id: data.user.id, email: parsed.data.email, first_name: parsed.data.firstName, last_name: parsed.data.lastName });
+  // Supabase intentionally returns an obfuscated user for an already-registered address. Do not
+  // attempt to provision that synthetic id; the login path provisions the real user instead.
+  const isNewIdentity = (data.user.identities?.length ?? 0) > 0;
+  if (isNewIdentity) {
+    const provisioningError = await ensureCustomerProfile(data.user);
+    if (provisioningError) {
+      return NextResponse.json({ error: "Your account was created, but its customer profile could not be prepared. Try signing in." }, { status: 503 });
+    }
   }
 
-  return NextResponse.json({ authenticated: Boolean(data.session) }, { status: 201 });
+  return NextResponse.json(
+    { authenticated: Boolean(data.session), confirmationRequired: !data.session },
+    { status: 201 },
+  );
 }
