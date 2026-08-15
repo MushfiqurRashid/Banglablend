@@ -1,12 +1,37 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+function firstForwardedValue(value: string | null) {
+  return value?.split(",", 1)[0]?.trim() || null;
+}
+
+function publicRequestOrigin(request: NextRequest) {
+  const configuredAdminUrl = process.env.NEXT_PUBLIC_ADMIN_URL?.trim();
+  if (configuredAdminUrl) {
+    try {
+      return new URL(configuredAdminUrl).origin;
+    } catch {
+      // Fall through to the proxy headers so a malformed optional value does not break every request.
+    }
+  }
+
+  const host = firstForwardedValue(request.headers.get("x-forwarded-host")) ?? request.headers.get("host");
+  const protocol = firstForwardedValue(request.headers.get("x-forwarded-proto")) ?? request.nextUrl.protocol.replace(":", "");
+  return host ? `${protocol}://${host}` : request.nextUrl.origin;
+}
+
 function isUnsafeCrossSiteRequest(request: NextRequest) {
   if (["GET", "HEAD", "OPTIONS"].includes(request.method)) return false;
   const fetchSite = request.headers.get("sec-fetch-site");
   if (fetchSite === "cross-site") return true;
   const origin = request.headers.get("origin");
-  return Boolean(origin && origin !== request.nextUrl.origin);
+  if (!origin) return false;
+
+  try {
+    return new URL(origin).origin !== publicRequestOrigin(request);
+  } catch {
+    return true;
+  }
 }
 
 export async function proxy(request: NextRequest) {
