@@ -15,14 +15,14 @@ export async function POST(request: Request) {
 
   if (parsed.data.action === "request") {
     const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {
-      redirectTo: `${siteConfig.url}/account/reset-password`,
+      redirectTo: `${siteConfig.url}/auth/callback?next=/account/reset-password`,
     });
     if (error) return NextResponse.json({ error: "Password instructions could not be requested." }, { status: 503 });
     return NextResponse.json({ accepted: true }, { status: 202 });
   }
 
-  // Requires an active recovery session, established client-side when the user follows the
-  // emailed reset link (Supabase Auth sets that session from the link's token automatically).
+  // Requires the recovery session established by /auth/callback after the user follows the
+  // emailed reset link.
   const { error } = await supabase.auth.updateUser({ password: parsed.data.password });
   if (error) return NextResponse.json({ error: "This reset link is invalid or has expired. Request a new one." }, { status: 400 });
   return NextResponse.json({ updated: true });

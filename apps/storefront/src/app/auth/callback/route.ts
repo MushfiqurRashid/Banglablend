@@ -10,7 +10,7 @@ export async function GET(request: Request) {
   const tokenHash = url.searchParams.get("token_hash");
   const type = url.searchParams.get("type") as EmailOtpType | null;
   const requestedNext = url.searchParams.get("next");
-  const next = requestedNext === "/account" ? requestedNext : "/account";
+  const next = requestedNext === "/account/reset-password" ? requestedNext : "/account";
   const supabase = await getSupabaseForRequest();
 
   const verification = code
