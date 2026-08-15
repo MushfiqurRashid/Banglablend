@@ -2,6 +2,7 @@ import type { EmailOtpType } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import { getSupabaseForRequest } from "@/lib/auth/server";
 import { ensureCustomerProfile } from "@/lib/auth/customer-provisioning";
+import { siteConfig } from "@/config/site";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -17,12 +18,12 @@ export async function GET(request: Request) {
     : tokenHash && type
       ? await supabase.auth.verifyOtp({ token_hash: tokenHash, type })
       : { error: new Error("Missing confirmation token") };
-  if (verification.error) return NextResponse.redirect(new URL("/account/login?confirmation=failed", url.origin));
+  if (verification.error) return NextResponse.redirect(new URL("/account/login?confirmation=failed", siteConfig.url));
 
   const { data } = await supabase.auth.getUser();
   if (!data.user || (await ensureCustomerProfile(data.user))) {
     await supabase.auth.signOut();
-    return NextResponse.redirect(new URL("/account/login?confirmation=failed", url.origin));
+    return NextResponse.redirect(new URL("/account/login?confirmation=failed", siteConfig.url));
   }
-  return NextResponse.redirect(new URL(next, url.origin));
+  return NextResponse.redirect(new URL(next, siteConfig.url));
 }
