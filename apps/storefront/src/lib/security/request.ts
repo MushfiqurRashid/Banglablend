@@ -1,3 +1,14 @@
+function firstForwardedValue(value: string | null) {
+  return value?.split(",", 1)[0]?.trim() || null;
+}
+
+function publicRequestOrigin(request: Pick<Request, "headers" | "url">) {
+  const internalUrl = new URL(request.url);
+  const host = firstForwardedValue(request.headers.get("x-forwarded-host")) ?? request.headers.get("host") ?? internalUrl.host;
+  const protocol = firstForwardedValue(request.headers.get("x-forwarded-proto")) ?? internalUrl.protocol.replace(":", "");
+  return `${protocol}://${host}`;
+}
+
 export function isUnsafeCrossSiteRequest(request: Pick<Request, "method" | "headers" | "url">) {
   if (["GET", "HEAD", "OPTIONS"].includes(request.method.toUpperCase())) return false;
   const fetchSite = request.headers.get("sec-fetch-site");
@@ -5,7 +16,7 @@ export function isUnsafeCrossSiteRequest(request: Pick<Request, "method" | "head
   const origin = request.headers.get("origin");
   if (!origin) return false;
   try {
-    return new URL(origin).origin !== new URL(request.url).origin;
+    return new URL(origin).origin !== publicRequestOrigin(request);
   } catch {
     return true;
   }
