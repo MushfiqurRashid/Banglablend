@@ -1,6 +1,7 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { isStorefrontSessionRoute } from "@/lib/auth/session-route";
+import { getCanonicalStorefrontUrl } from "@/lib/canonical-origin";
 import { isUnsafeCrossSiteRequest } from "@/lib/security/request";
 
 const AUTH_COOKIE_NAME = "banglablend-storefront-auth";
@@ -58,6 +59,9 @@ async function refreshedSessionCookies(request: NextRequest) {
 }
 
 export async function proxy(request: NextRequest) {
+  const canonicalUrl = getCanonicalStorefrontUrl(request.url);
+  if (canonicalUrl) return NextResponse.redirect(canonicalUrl, 308);
+
   const externallyAuthenticated =
     request.nextUrl.pathname.startsWith("/api/payments/sslcommerz/") ||
     request.nextUrl.pathname === "/api/revalidate/content";
