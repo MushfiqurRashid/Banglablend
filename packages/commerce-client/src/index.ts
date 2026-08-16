@@ -32,7 +32,7 @@ const PRODUCT_SELECT = `
   images:product_images ( url, alt_text, sort_order ),
   catalogs:storefront_catalog_products ( catalog:storefront_catalogs ( id, name, handle, description, navigation_image_url, navigation_image_alt, hero_image_url, hero_image_alt, section, experience, box_size, is_active ) ),
   variants:product_variants (
-    id, title, sku, sort_order,
+    id, title, sku, sort_order, deleted_at,
     prices:product_prices ( currency_code, amount ),
     inventory_levels ( stocked_quantity, reserved_quantity )
   )
@@ -82,6 +82,7 @@ interface ProductRow {
     title: string;
     sku: string;
     sort_order: number;
+    deleted_at: string | null;
     prices: Array<{ currency_code: string; amount: number }> | null;
     inventory_levels: Array<{ stocked_quantity: number; reserved_quantity: number }> | null;
   }> | null;
@@ -141,6 +142,7 @@ function adaptProduct(row: ProductRow, currencyCode: CurrencyCode): Product {
     .sort((a, b) => a.sort_order - b.sort_order)
     .map((image) => ({ url: image.url, alt: image.alt_text ?? row.title }));
   const variants = (row.variants ?? [])
+    .filter((variant) => !variant.deleted_at)
     .slice()
     .sort((a, b) => a.sort_order - b.sort_order)
     .map((variant) => adaptVariant(variant, currencyCode));
@@ -202,6 +204,7 @@ export async function listProducts(config: CommerceConfig, query = ""): Promise<
       .eq("status", "published")
       .eq("verified", true)
       .is("deleted_at", null)
+      .is("variants.deleted_at", null)
       .contains("eligible_markets", [config.market]);
     if (error) throw new CommerceUnavailableError(`Supabase returned: ${error.message}`);
     const products = ((data ?? []) as unknown as ProductRow[]).map((row) => adaptProduct(row, config.currencyCode));
@@ -226,6 +229,7 @@ export async function getProduct(config: CommerceConfig, handle: string): Promis
       .eq("status", "published")
       .eq("verified", true)
       .is("deleted_at", null)
+      .is("variants.deleted_at", null)
       .maybeSingle();
     if (error) throw new CommerceUnavailableError(`Supabase returned: ${error.message}`);
     if (!data) {

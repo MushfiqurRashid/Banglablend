@@ -214,6 +214,39 @@ describe("storefront catalog discovery", () => {
 });
 
 describe("product publishing visibility", () => {
+  it("removes soft-deleted variants from every storefront product", async () => {
+    const config = baseConfig(
+      fakeSupabase("products", [
+        productRow({
+          variants: [
+            {
+              id: "variant_deleted",
+              title: "60 g",
+              sku: "MEDIA-60",
+              sort_order: 0,
+              deleted_at: "2026-08-16T07:58:24.091Z",
+              prices: [{ currency_code: "bdt", amount: 420 }],
+            },
+            {
+              id: "variant_active",
+              title: "100 g",
+              sku: "MEDIA-100",
+              sort_order: 1,
+              deleted_at: null,
+              prices: [{ currency_code: "bdt", amount: 200 }],
+            },
+          ],
+        }),
+      ]),
+    );
+
+    const [product] = await listProducts(config);
+
+    expect(product?.variants).toEqual([
+      expect.objectContaining({ id: "variant_active", title: "100 g", price: { amount: 200, currencyCode: "BDT" } }),
+    ]);
+  });
+
   it("shows placeholder products only when development fallbacks are enabled and Supabase returns none", async () => {
     const config: CommerceConfig = { ...baseConfig(fakeSupabase("products", [])), allowDevelopmentFallback: true };
     const products = await listProducts(config);
