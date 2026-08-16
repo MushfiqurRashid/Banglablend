@@ -31,6 +31,27 @@ invitation/reset callback is:
 https://bpanel.banglablend.store/auth/callback
 ```
 
+### Google account sign-in
+
+Create a **Web application** OAuth client in Google Auth Platform with:
+
+- Authorized JavaScript origin: `https://banglablend.store`
+- Authorized redirect URI: `https://fwcwhiprbaqqwiyryhpa.supabase.co/auth/v1/callback`
+
+Save its client ID and secret as `GOOGLE_OAUTH_CLIENT_ID` and
+`GOOGLE_OAUTH_CLIENT_SECRET` in the ignored root `.env`, alongside the existing
+`SUPABASE_ACCESS_TOKEN`. Then enable the provider and merge the storefront callback into the
+Supabase redirect allowlist:
+
+```sh
+pnpm auth:configure-google
+```
+
+Google redirects to Supabase first; Supabase then sends the browser to
+`https://banglablend.store/auth/callback`, where the storefront exchanges the PKCE code, creates
+or links the customer profile, and opens the account dashboard. Verify both a new Google account
+and an existing email account in a private browser window after each Auth configuration change.
+
 Register the storefront's HTTPS SSLCOMMERZ success, failure, cancellation, and IPN endpoints with the merchant account. HSTS must only be enabled after HTTPS is working everywhere.
 
 ## Operations

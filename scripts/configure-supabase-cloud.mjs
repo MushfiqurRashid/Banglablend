@@ -78,6 +78,8 @@ if (process.argv.includes("--scrub-examples")) {
     SSLCOMMERZ_STORE_ID: "",
     SSLCOMMERZ_STORE_PASSWORD: "",
     EMAIL_PROVIDER_API_KEY: "",
+    GOOGLE_OAUTH_CLIENT_ID: "",
+    GOOGLE_OAUTH_CLIENT_SECRET: "",
   };
   updateEnvironmentFile(".env.example", secretDefaults, ["SUPABASE_DB_URL"]);
   updateEnvironmentFile(".env.production.example", secretDefaults, ["SUPABASE_DB_URL"]);

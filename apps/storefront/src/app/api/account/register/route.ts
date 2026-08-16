@@ -5,9 +5,9 @@ import { ensureCustomerProfile } from "@/lib/auth/customer-provisioning";
 import { siteConfig } from "@/config/site";
 
 const schema = z.object({
-  firstName: z.string().min(1).max(80),
-  lastName: z.string().min(1).max(80),
-  email: z.email(),
+  firstName: z.string().trim().min(1).max(80),
+  lastName: z.string().trim().min(1).max(80),
+  email: z.string().trim().toLowerCase().pipe(z.email()),
   password: z.string().min(10).max(200),
 });
 

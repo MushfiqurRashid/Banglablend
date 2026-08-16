@@ -3,7 +3,10 @@ import { z } from "zod";
 import { getSupabaseForRequest } from "@/lib/auth/server";
 import { ensureCustomerProfile } from "@/lib/auth/customer-provisioning";
 
-const schema = z.object({ email: z.email(), password: z.string().min(8).max(200) });
+const schema = z.object({
+  email: z.string().trim().toLowerCase().pipe(z.email()),
+  password: z.string().min(8).max(200),
+});
 
 export async function POST(request: Request) {
   const parsed = schema.safeParse(await request.json().catch(() => null));

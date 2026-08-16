@@ -35,6 +35,7 @@
     "db:link": "supabase link --project-ref fwcwhiprbaqqwiyryhpa",
     "db:push": "node scripts/sync-supabase-cloud.mjs",
     "db:types": "corepack pnpm --filter @bangla-blend/supabase-client db:types",
+    "auth:configure-google": "node scripts/configure-google-auth.mjs",
     "admin:bootstrap": "node scripts/bootstrap-admin.mjs"
   },
   "devDependencies": {

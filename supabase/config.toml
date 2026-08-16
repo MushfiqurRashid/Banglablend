@@ -158,6 +158,7 @@ site_url = "https://banglablend.store"
 external_url = "https://fwcwhiprbaqqwiyryhpa.supabase.co/auth/v1"
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
 additional_redirect_urls = [
+  "https://banglablend.store/auth/callback",
   "https://banglablend.store/account/reset-password",
   "https://bpanel.banglablend.store/auth/callback",
 ]
