@@ -8,6 +8,7 @@ import { getCustomerSession } from "@/lib/auth/server";
 import { createSslCommerzSession } from "@/lib/payments/sslcommerz";
 import { siteConfig } from "@/config/site";
 import { sendTransactionalEmail } from "@/lib/email/server";
+import { buildOrderEmails } from "@/lib/email/order-messages";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -26,6 +27,8 @@ interface ShippingOptionRow {
 }
 
 interface LineItemAmountRow {
+  title: string;
+  variant_title: string | null;
   quantity: number;
   unit_price: number;
 }
@@ -164,7 +167,11 @@ export async function POST(request: Request) {
 
     await supabase.from("cart_shipping_methods").upsert({ cart_id: cartId, shipping_option_id: option.id, name: option.name, amount: option.amount });
 
-    const { data: lineItems } = await supabase.from("cart_line_items").select("quantity, unit_price").eq("cart_id", cartId).returns<LineItemAmountRow[]>();
+    const { data: lineItems } = await supabase
+      .from("cart_line_items")
+      .select("title, variant_title, quantity, unit_price")
+      .eq("cart_id", cartId)
+      .returns<LineItemAmountRow[]>();
     const subtotal = (lineItems ?? []).reduce((sum, item) => sum + item.quantity * item.unit_price, 0);
     const total = subtotal + option.amount;
 
@@ -230,22 +237,52 @@ export async function POST(request: Request) {
     await supabase.from("orders").update({ payment_status: provider === "cod" ? "authorized" : "awaiting" }).eq("id", orderRow.id);
 
     const orderReference = `order_${String(orderRow.display_id).padStart(2, "0")}`;
-    await sendTransactionalEmail({
-      to: parsed.data.email,
-      subject: `Bangla Blend received ${orderReference}`,
-      idempotencyKey: `order-received/${orderRow.id}`,
-      text: [
-        `Thank you. We received ${orderReference}.`,
-        `Total: ${total.toFixed(2)} ${cart.currency_code.toUpperCase()}`,
-        `Delivery method: ${option.name}`,
-        provider === "cod"
-          ? "Payment method: Cash on Delivery. Please keep the payment ready for delivery."
-          : "Payment method: SSLCOMMERZ. The order remains pending until the gateway confirms payment.",
-        `You can contact us at ${siteConfig.contactEmail}.`,
-      ].join("\n\n"),
-    }).catch((emailError: unknown) => {
-      console.error("Order receipt email failed", emailError instanceof Error ? emailError.message : emailError);
+    const currencyCode = cart.currency_code.toUpperCase();
+    const paymentMethod =
+      provider === "cod"
+        ? "Cash on Delivery — payment due at delivery"
+        : "SSLCOMMERZ — awaiting gateway confirmation";
+    const adminBaseUrl = process.env.NEXT_PUBLIC_ADMIN_URL?.trim().replace(/\/+$/, "");
+    const emails = buildOrderEmails({
+      orderId: orderRow.id,
+      orderReference,
+      customerEmail: parsed.data.email,
+      customerName: `${shippingAddress.first_name} ${shippingAddress.last_name}`.trim(),
+      customerPhone: shippingAddress.phone,
+      deliveryAddress: [
+        shippingAddress.address_1,
+        shippingAddress.address_2,
+        [shippingAddress.city, shippingAddress.province, shippingAddress.postal_code].filter(Boolean).join(", "),
+        shippingAddress.country_code.toUpperCase(),
+      ].filter((line): line is string => Boolean(line)),
+      deliveryMethod: option.name,
+      paymentMethod,
+      currencyCode,
+      subtotal,
+      shippingTotal: option.amount,
+      total,
+      lines: (lineItems ?? []).map((line) => ({
+        title: line.title,
+        variantTitle: line.variant_title,
+        quantity: line.quantity,
+        unitPrice: line.unit_price,
+      })),
+      merchantEmail: siteConfig.contactEmail,
+      contactEmail: siteConfig.contactEmail,
+      ...(adminBaseUrl ? { adminOrderUrl: `${adminBaseUrl}/orders/${orderRow.id}` } : {}),
     });
+    const emailResults = await Promise.allSettled([
+      sendTransactionalEmail(emails.customer),
+      sendTransactionalEmail(emails.merchant),
+    ]);
+    for (const [index, result] of emailResults.entries()) {
+      if (result.status === "rejected") {
+        console.error(
+          index === 0 ? "Order receipt email failed" : "Merchant order notification email failed",
+          result.reason instanceof Error ? result.reason.message : result.reason,
+        );
+      }
+    }
 
     if (provider === "sslcommerz") {
       if (!gatewayUrl) return NextResponse.json({ error: "The payment gateway did not return a secure redirect URL." }, { status: 502 });

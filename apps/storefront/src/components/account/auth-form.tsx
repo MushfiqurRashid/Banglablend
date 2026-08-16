@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { CUSTOMER_DASHBOARD_PATH } from "@/lib/auth/destination";
 
 const configuredSiteOrigin = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "");
 const googleAuthHref = configuredSiteOrigin ? `${configuredSiteOrigin}/auth/google` : "/auth/google";
@@ -86,7 +87,7 @@ export function AuthForm({
           )
             setSent(true);
           else {
-            router.push("/account");
+            router.push(CUSTOMER_DASHBOARD_PATH);
             router.refresh();
           }
         } catch {

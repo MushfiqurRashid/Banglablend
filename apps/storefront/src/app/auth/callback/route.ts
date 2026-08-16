@@ -2,6 +2,7 @@ import type { EmailOtpType } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import { getSupabaseForRequest } from "@/lib/auth/server";
 import { ensureCustomerProfile } from "@/lib/auth/customer-provisioning";
+import { customerAuthDestination } from "@/lib/auth/destination";
 import { siteConfig } from "@/config/site";
 
 export async function GET(request: Request) {
@@ -9,8 +10,7 @@ export async function GET(request: Request) {
   const code = url.searchParams.get("code");
   const tokenHash = url.searchParams.get("token_hash");
   const type = url.searchParams.get("type") as EmailOtpType | null;
-  const requestedNext = url.searchParams.get("next");
-  const next = requestedNext === "/account/reset-password" ? requestedNext : "/account";
+  const next = customerAuthDestination(url.searchParams.get("next"));
   const supabase = await getSupabaseForRequest();
 
   if (url.searchParams.has("error")) {

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getSupabaseForRequest } from "@/lib/auth/server";
 import { ensureCustomerProfile } from "@/lib/auth/customer-provisioning";
+import { CUSTOMER_DASHBOARD_PATH } from "@/lib/auth/destination";
 import { siteConfig } from "@/config/site";
 
 const schema = z.object({
@@ -22,7 +23,7 @@ export async function POST(request: Request) {
     password: parsed.data.password,
     options: {
       data: { first_name: parsed.data.firstName, last_name: parsed.data.lastName },
-      emailRedirectTo: `${siteConfig.url}/auth/callback?next=/account`,
+      emailRedirectTo: `${siteConfig.url}/auth/callback?next=${encodeURIComponent(CUSTOMER_DASHBOARD_PATH)}`,
     },
   });
   if (error || !data.user) {
