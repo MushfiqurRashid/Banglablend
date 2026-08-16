@@ -4,6 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+const configuredSiteOrigin = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "");
+const googleAuthHref = configuredSiteOrigin ? `${configuredSiteOrigin}/auth/google` : "/auth/google";
+
 function GoogleMark() {
   return (
     <svg aria-hidden="true" className="google-mark" viewBox="0 0 24 24">
@@ -173,7 +176,7 @@ export function AuthForm({
           <a
             aria-disabled={googlePending || pending}
             className="button google-auth-button"
-            href="/auth/google"
+            href={googleAuthHref}
             onClick={(event) => {
               if (googlePending || pending) event.preventDefault();
               else setGooglePending(true);

@@ -17,10 +17,9 @@ test("account registration offers a low-friction Google or email path", async ({
 
   const accountForm = page.locator("form.auth-card");
   await expect(page.getByRole("heading", { name: "Create your account", level: 2 })).toBeVisible();
-  await expect(accountForm.getByRole("link", { name: "Continue with Google" })).toHaveAttribute(
-    "href",
-    "/auth/google",
-  );
+  await expect(
+    accountForm.getByRole("link", { name: "Continue with Google" }),
+  ).toHaveAttribute("href", /\/auth\/google$/);
   await expect(accountForm.getByRole("button", { name: "Create account" })).toBeVisible();
   await expect(
     accountForm.locator('button[type="submit"] + .auth-divider + a.google-auth-button'),
