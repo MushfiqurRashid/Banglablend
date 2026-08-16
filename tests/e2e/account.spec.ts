@@ -7,6 +7,9 @@ test("account entry points render without exposing tokens", async ({ page }) => 
   await expect(accountForm.getByRole("link", { name: "Continue with Google" })).toBeVisible();
   await expect(accountForm.getByRole("textbox", { name: "Email", exact: true })).toBeVisible();
   await expect(accountForm.getByLabel("Password", { exact: true })).toBeVisible();
+  await expect(
+    accountForm.locator('button[type="submit"] + .auth-divider + a.google-auth-button'),
+  ).toBeVisible();
 });
 
 test("account registration offers a low-friction Google or email path", async ({ page }) => {
@@ -19,6 +22,9 @@ test("account registration offers a low-friction Google or email path", async ({
     "/auth/google",
   );
   await expect(accountForm.getByRole("button", { name: "Create account" })).toBeVisible();
+  await expect(
+    accountForm.locator('button[type="submit"] + .auth-divider + a.google-auth-button'),
+  ).toBeVisible();
   await expect(
     accountForm.getByText("Use at least 10 characters for your password."),
   ).toBeVisible();

@@ -103,25 +103,6 @@ export function AuthForm({
               ? "Choose a new password"
               : "Reset your password"}
       </h2>
-      {supportsGoogle ? (
-        <>
-          <a
-            aria-disabled={googlePending}
-            className="button google-auth-button"
-            href="/auth/google"
-            onClick={(event) => {
-              if (googlePending) event.preventDefault();
-              else setGooglePending(true);
-            }}
-          >
-            <GoogleMark />
-            {googlePending ? "Connecting to Google…" : "Continue with Google"}
-          </a>
-          <div className="auth-divider" role="separator">
-            <span>or continue with email</span>
-          </div>
-        </>
-      ) : null}
       {mode === "register" ? (
         <div className="form-grid two">
           <label className="field">
@@ -183,6 +164,25 @@ export function AuthForm({
                   ? "Update password"
                   : "Send instructions"}
         </button>
+      ) : null}
+      {!sent && supportsGoogle ? (
+        <>
+          <div className="auth-divider" role="separator">
+            <span>or</span>
+          </div>
+          <a
+            aria-disabled={googlePending || pending}
+            className="button google-auth-button"
+            href="/auth/google"
+            onClick={(event) => {
+              if (googlePending || pending) event.preventDefault();
+              else setGooglePending(true);
+            }}
+          >
+            <GoogleMark />
+            {googlePending ? "Connecting to Google…" : "Continue with Google"}
+          </a>
+        </>
       ) : null}
       {mode === "login" ? (
         <>
