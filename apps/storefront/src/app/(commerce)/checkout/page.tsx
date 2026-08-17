@@ -1,15 +1,42 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, Check, LockKeyhole, ShieldCheck } from "lucide-react";
+import { createSupabasePublicClient } from "@bangla-blend/supabase-client";
 import { PageContainer } from "@/components/layout/page-container";
-import { CheckoutForm } from "@/components/checkout/checkout-form";
+import { CheckoutForm, type ShippingChoice } from "@/components/checkout/checkout-form";
 import { getActiveMarket } from "@/lib/commerce/server";
 import "../commerce.css";
 
 export const metadata: Metadata = { title: "Checkout", robots: { index: false, follow: false } };
 
+async function getShippingOptions(marketCode: string): Promise<ShippingChoice[]> {
+  const supabase = createSupabasePublicClient();
+  const { data: region, error: regionError } = await supabase
+    .from("regions")
+    .select("id")
+    .eq("market_code", marketCode)
+    .eq("is_active", true)
+    .maybeSingle();
+  if (regionError || !region) return [];
+
+  const { data, error } = await supabase
+    .from("shipping_options")
+    .select("id, name, amount, currency_code")
+    .eq("region_id", region.id)
+    .eq("is_active", true)
+    .order("amount", { ascending: true });
+  if (error) return [];
+  return (data ?? []).map((option) => ({
+    id: option.id,
+    name: option.name,
+    amount: option.amount,
+    currencyCode: option.currency_code.toUpperCase(),
+  }));
+}
+
 export default async function CheckoutPage() {
   const market = await getActiveMarket();
+  const shippingOptions = await getShippingOptions(market.code);
   const developmentPreview =
     process.env.NODE_ENV === "development" && process.env.ENABLE_DEVELOPMENT_FALLBACKS === "true";
   const releaseApproved =
@@ -70,7 +97,11 @@ export default async function CheckoutPage() {
       </header>
       <section className="checkout-section">
         <PageContainer>
-          <CheckoutForm market={market} availability={availability} />
+          <CheckoutForm
+            market={market}
+            availability={availability}
+            shippingOptions={shippingOptions}
+          />
         </PageContainer>
       </section>
     </div>

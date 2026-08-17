@@ -147,6 +147,7 @@ export async function POST(request: Request) {
       .select("id, name, amount, currency_code")
       .eq("region_id", cart.region_id)
       .eq("is_active", true)
+      .order("amount", { ascending: true })
       .returns<ShippingOptionRow[]>();
     const options = shippingOptions ?? [];
     if (!options.length) {

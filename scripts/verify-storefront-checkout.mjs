@@ -73,6 +73,9 @@ try {
       .locator('textarea[name="recipient.instructions"]')
       .fill("Automated verification order - do not fulfill");
     await page.locator('input[name="termsAccepted"]').check();
+    const initialShippingOption = page.getByRole("radio", { name: /Inside Dhaka.*BDT 80/i });
+    await initialShippingOption.waitFor({ state: "visible", timeout: 30_000 });
+    await initialShippingOption.check();
 
     const submitCheckout = async () => {
       const responsePromise = page.waitForResponse(

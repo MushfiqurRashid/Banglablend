@@ -29,23 +29,25 @@ interface CheckoutAvailability {
   sslcommerzEnabled: boolean;
 }
 
-interface ShippingChoice {
+export interface ShippingChoice {
   id: string;
   name: string;
-  amount?: number;
+  amount: number;
   currencyCode: string;
 }
 
 export function CheckoutForm({
   market,
   availability,
+  shippingOptions: initialShippingOptions,
 }: {
   market: Market;
   availability: CheckoutAvailability;
+  shippingOptions: ShippingChoice[];
 }) {
   const { cart, resetCart, isLoading: cartIsLoading } = useCart();
   const [serverError, setServerError] = useState<string>();
-  const [shippingOptions, setShippingOptions] = useState<ShippingChoice[]>([]);
+  const [shippingOptions, setShippingOptions] = useState<ShippingChoice[]>(initialShippingOptions);
   const defaultPayment = market.domestic
     ? availability.codEnabled
       ? "cod"
@@ -63,6 +65,7 @@ export function CheckoutForm({
       billingSameAsShipping: true,
       isGift: false,
       paymentMethod: defaultPayment,
+      shippingOptionId: initialShippingOptions.length === 1 ? initialShippingOptions[0]?.id : undefined,
       shippingAddress: { countryCode: market.code.toUpperCase() },
       termsAccepted: false,
     },
@@ -70,6 +73,8 @@ export function CheckoutForm({
   const isGift = watch("isGift");
   const billingSameAsShipping = watch("billingSameAsShipping");
   const paymentMethod = watch("paymentMethod");
+  const shippingOptionId = watch("shippingOptionId");
+  const selectedShippingOption = shippingOptions.find((option) => option.id === shippingOptionId);
   const billingToggle = register("billingSameAsShipping");
   const noDomesticPayment =
     market.domestic && !availability.codEnabled && !availability.sslcommerzEnabled;
@@ -82,6 +87,10 @@ export function CheckoutForm({
         setServerError(undefined);
         if (!canSubmit) {
           setServerError("Checkout is not enabled for this destination.");
+          return;
+        }
+        if (shippingOptions.length > 1 && !input.shippingOptionId) {
+          setServerError("Choose Inside Dhaka or Outside Dhaka delivery before placing the order.");
           return;
         }
         const response = await fetch("/api/checkout", {
@@ -97,8 +106,7 @@ export function CheckoutForm({
         };
         if (payload.requiresShippingSelection && payload.shippingOptions?.length) {
           setShippingOptions(payload.shippingOptions);
-          setValue("shippingOptionId", payload.shippingOptions[0]!.id, { shouldValidate: true });
-          setServerError("Choose a delivery method, then submit the order again.");
+          setServerError("Choose a delivery area, then submit the order again.");
           return;
         }
         if (!response.ok || !payload.redirect) {
@@ -237,20 +245,23 @@ export function CheckoutForm({
               </span>
               <div>
                 <h2>Delivery method</h2>
-                <p>Available services for this address</p>
+                <p>Choose the area where this order will be delivered</p>
               </div>
             </div>
             <div className="payment-options">
               {shippingOptions.map((option) => (
                 <label key={option.id}>
-                  <input type="radio" value={option.id} {...register("shippingOptionId")} />
+                  <input
+                    type="radio"
+                    value={option.id}
+                    required={shippingOptions.length > 1}
+                    {...register("shippingOptionId")}
+                  />
                   <Truck />
                   <span>
                     <strong>{option.name}</strong>
                     <small>
-                      {typeof option.amount === "number"
-                        ? formatMoney(option.amount, option.currencyCode)
-                        : "Calculated by the carrier"}
+                      {formatMoney(option.amount, option.currencyCode)} delivery charge
                     </small>
                   </span>
                 </label>
@@ -516,16 +527,21 @@ export function CheckoutForm({
               <div>
                 <span>Delivery</span>
                 <strong>
-                  {cart.shippingTotal
-                    ? formatMoney(cart.shippingTotal, cart.currencyCode.toUpperCase())
-                    : "Calculated next"}
+                  {selectedShippingOption
+                    ? formatMoney(selectedShippingOption.amount, cart.currencyCode.toUpperCase())
+                    : "Choose delivery area"}
                 </strong>
               </div>
               <div className="checkout-summary-total">
                 <span>Estimated total</span>
-                <strong>{formatMoney(cart.total, cart.currencyCode.toUpperCase())}</strong>
+                <strong>
+                  {formatMoney(
+                    cart.total - cart.shippingTotal + (selectedShippingOption?.amount ?? 0),
+                    cart.currencyCode.toUpperCase(),
+                  )}
+                </strong>
               </div>
-              <p>Final delivery and taxes update after you confirm the address.</p>
+              <p>The selected delivery charge is included in this estimated total.</p>
             </div>
           </>
         ) : (
