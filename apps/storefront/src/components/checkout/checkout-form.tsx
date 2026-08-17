@@ -431,8 +431,8 @@ export function CheckoutForm({
           {showDeliveryAreas ? (
             <div className="checkout-delivery-areas">
               <div className="checkout-delivery-heading">
-                <h3>Choose your delivery area</h3>
-                <p>The delivery charge will be added to your order total.</p>
+                <h3>Delivery method</h3>
+                <p>Choose your delivery area. The charge will be added to your order total.</p>
               </div>
               <div className="payment-options checkout-delivery-options">
                 {shippingOptions.map((option) => (
