@@ -69,7 +69,7 @@ test("our story page presents its sections, imagery and supporting navigation", 
   }
 
   const expectedCtas = [
-    [page.locator("#about-bangla-blend"), "Our journey", "/our-story/about-bangla-blend"],
+    [page.locator("#about-bangla-blend"), "Our journey", "/about-bangla-blend"],
     [page.locator("#our-philosophy"), "Our philosophy", "/our-story/our-philosophy"],
     [page.locator("#our-impact"), "See our impact", "/our-story/our-impact"],
     [page.locator("#meet-annapurna"), "Meet Annapurna", "/our-story/meet-annapurna"],

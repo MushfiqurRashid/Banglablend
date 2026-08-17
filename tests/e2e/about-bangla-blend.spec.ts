@@ -23,4 +23,12 @@ test("About Bangla Blend is a separate footer-linked page", async ({ page }) => 
 
   await page.goto("/our-story");
   await expect(page.getByRole("heading", { name: "Our Story", level: 1 })).toBeVisible();
+  await page
+    .locator("#about-bangla-blend")
+    .getByRole("link", { name: "Our journey", exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/about-bangla-blend$/);
+  await expect(
+    page.getByRole("heading", { name: /More Than Spices\.\s+It's Our Heritage\./, level: 1 }),
+  ).toBeVisible();
 });

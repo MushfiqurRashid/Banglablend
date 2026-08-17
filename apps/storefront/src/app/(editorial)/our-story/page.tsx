@@ -141,7 +141,7 @@ export default function OurStoryPage() {
               From source to kitchen, we are building a collection of honest spices and blends made
               with care and a clear respect for origin.
             </p>
-            <Link className="story-cta" href="/our-story/about-bangla-blend">
+            <Link className="story-cta" href="/about-bangla-blend">
               Our journey
               <ArrowRight size={15} aria-hidden="true" />
             </Link>
