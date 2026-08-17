@@ -48,11 +48,7 @@ export function CheckoutForm({
   const { cart, resetCart, isLoading: cartIsLoading } = useCart();
   const [serverError, setServerError] = useState<string>();
   const [shippingOptions, setShippingOptions] = useState<ShippingChoice[]>(initialShippingOptions);
-  const defaultPayment = market.domestic
-    ? availability.codEnabled
-      ? "cod"
-      : "sslcommerz"
-    : "international";
+  const defaultPayment = market.domestic ? undefined : "international";
   const {
     register,
     handleSubmit,
@@ -79,6 +75,8 @@ export function CheckoutForm({
   const noDomesticPayment =
     market.domestic && !availability.codEnabled && !availability.sslcommerzEnabled;
   const canSubmit = availability.checkoutEnabled && !noDomesticPayment;
+  const showDeliveryAreas =
+    market.domestic && Boolean(paymentMethod) && shippingOptions.length > 0;
 
   return (
     <form
@@ -236,39 +234,6 @@ export function CheckoutForm({
             </Field>
           </div>
         </section>
-
-        {shippingOptions.length ? (
-          <section className="checkout-card">
-            <div className="checkout-step">
-              <span>
-                <Truck size={18} />
-              </span>
-              <div>
-                <h2>Delivery method</h2>
-                <p>Choose the area where this order will be delivered</p>
-              </div>
-            </div>
-            <div className="payment-options">
-              {shippingOptions.map((option) => (
-                <label key={option.id}>
-                  <input
-                    type="radio"
-                    value={option.id}
-                    required={shippingOptions.length > 1}
-                    {...register("shippingOptionId")}
-                  />
-                  <Truck />
-                  <span>
-                    <strong>{option.name}</strong>
-                    <small>
-                      {formatMoney(option.amount, option.currencyCode)} delivery charge
-                    </small>
-                  </span>
-                </label>
-              ))}
-            </div>
-          </section>
-        ) : null}
 
         <section className="checkout-card">
           <div className="checkout-step">
@@ -463,6 +428,33 @@ export function CheckoutForm({
           {errors.paymentMethod ? (
             <span className="field-error">{errors.paymentMethod.message}</span>
           ) : null}
+          {showDeliveryAreas ? (
+            <div className="checkout-delivery-areas">
+              <div className="checkout-delivery-heading">
+                <h3>Choose your delivery area</h3>
+                <p>The delivery charge will be added to your order total.</p>
+              </div>
+              <div className="payment-options checkout-delivery-options">
+                {shippingOptions.map((option) => (
+                  <label key={option.id}>
+                    <input
+                      type="radio"
+                      value={option.id}
+                      required={shippingOptions.length > 1}
+                      {...register("shippingOptionId")}
+                    />
+                    <Truck />
+                    <span>
+                      <strong>{option.name}</strong>
+                      <small>
+                        {formatMoney(option.amount, option.currencyCode)} delivery charge
+                      </small>
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </section>
       </div>
 
@@ -529,7 +521,9 @@ export function CheckoutForm({
                 <strong>
                   {selectedShippingOption
                     ? formatMoney(selectedShippingOption.amount, cart.currencyCode.toUpperCase())
-                    : "Choose delivery area"}
+                    : paymentMethod
+                      ? "Choose delivery area"
+                      : "Choose payment method"}
                 </strong>
               </div>
               <div className="checkout-summary-total">
@@ -591,7 +585,7 @@ export function CheckoutForm({
         <button
           type="submit"
           className="button button-primary"
-          disabled={isSubmitting || !canSubmit || !cart?.items.length}
+          disabled={isSubmitting || !canSubmit || !cart?.items.length || !paymentMethod}
         >
           {isSubmitting ? (
             <LoaderCircle className="checkout-spinner" size={17} aria-hidden="true" />
@@ -600,9 +594,11 @@ export function CheckoutForm({
           )}
           {isSubmitting
             ? "Submitting securely..."
-            : paymentMethod === "cod"
-              ? "Place order"
-              : "Continue to payment"}
+            : !paymentMethod
+              ? "Choose payment method"
+              : paymentMethod === "cod"
+                ? "Place order"
+                : "Continue to payment"}
         </button>
         <p className="secure-note">
           <LockKeyhole size={13} aria-hidden="true" /> Payment confirmation is verified securely.

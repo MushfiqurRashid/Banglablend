@@ -2276,6 +2276,26 @@
   color: var(--color-muted);
   font-size: 0.7rem;
 }
+.checkout-delivery-areas {
+  padding-top: 1.25rem;
+  margin-top: 1.25rem;
+  border-top: 1px solid var(--color-border);
+}
+.checkout-delivery-heading {
+  margin-bottom: 0.85rem;
+}
+.checkout-delivery-heading h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+.checkout-delivery-heading p {
+  margin: 0.25rem 0 0;
+  color: var(--color-muted);
+  font-size: 0.75rem;
+}
+.checkout-delivery-options {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
 .checkout-review {
   position: sticky;
   top: 8rem;
@@ -2578,6 +2598,9 @@
   }
   .checkout-step h2 {
     font-size: 1.2rem;
+  }
+  .checkout-delivery-options {
+    grid-template-columns: 1fr;
   }
   .checkout-product {
     grid-template-columns: 3.4rem minmax(0, 1fr) auto;
