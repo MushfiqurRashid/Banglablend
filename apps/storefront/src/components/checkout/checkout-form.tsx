@@ -16,6 +16,7 @@ import {
   ArrowRight,
   CreditCard,
   Gift,
+  Globe2,
   LoaderCircle,
   LockKeyhole,
   ShoppingBag,
@@ -432,7 +433,7 @@ export function CheckoutForm({
             <div className="checkout-delivery-areas">
               <div className="checkout-delivery-heading">
                 <h3>Delivery method</h3>
-                <p>Choose your delivery area. The charge will be added to your order total.</p>
+                <p>Choose your delivery area. Local charges will be added to your order total.</p>
               </div>
               <div className="payment-options checkout-delivery-options">
                 {shippingOptions.map((option) => (
@@ -452,6 +453,18 @@ export function CheckoutForm({
                     </span>
                   </label>
                 ))}
+                <Link
+                  className="checkout-international-option"
+                  href="/contact#contact-form"
+                  aria-label="International delivery — We will contact shortly"
+                >
+                  <span className="checkout-option-marker" aria-hidden="true" />
+                  <Globe2 aria-hidden="true" />
+                  <span>
+                    <strong>International</strong>
+                    <small>We will contact shortly</small>
+                  </span>
+                </Link>
               </div>
             </div>
           ) : null}
