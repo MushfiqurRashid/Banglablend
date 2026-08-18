@@ -22,6 +22,8 @@
   --font-body: "Segoe UI Variable Text", "Segoe UI", "Nirmala UI", Arial, sans-serif;
   --page-gutter: clamp(1.25rem, 4vw, 4.5rem);
   --max-width: 90rem;
+  --section-space: clamp(2.25rem, 4.5vh, 3.25rem);
+  --section-space-compact: clamp(1.75rem, 3.5vh, 2.5rem);
   --shadow-soft: 0 18px 50px rgb(42 33 29 / 0.1);
 }
 
@@ -136,13 +138,13 @@ main > div {
 }
 
 .section {
-  padding-block: clamp(4.5rem, 8vw, 8rem);
+  padding-block: var(--section-space);
   content-visibility: auto;
   contain-intrinsic-size: auto 48rem;
 }
 
 .section-compact {
-  padding-block: clamp(3rem, 5vw, 5rem);
+  padding-block: var(--section-space-compact);
 }
 
 .display,
@@ -1139,7 +1141,7 @@ body:has(.cookie-banner) .faq-chat-widget { bottom: 6.5rem; }
 }
 
 .page-hero {
-  padding-block: clamp(2.5rem, 4vw, 3.75rem) clamp(2.5rem, 4vw, 4rem);
+  padding-block: var(--section-space);
   border-bottom: 1px solid var(--color-border);
 }
 

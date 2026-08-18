@@ -2,7 +2,7 @@
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  padding-block: clamp(3.25rem, 4.5vw, 4.5rem);
+  padding-block: var(--section-space);
   border-block: 1px solid #ded1c0;
   background:
     radial-gradient(circle at 50% -25%, rgb(200 164 93 / 0.17), transparent 39rem),

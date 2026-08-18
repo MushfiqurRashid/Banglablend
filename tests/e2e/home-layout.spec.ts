@@ -92,15 +92,17 @@ test("desktop home hero and its calls to action fit in the initial viewport", as
   }
 });
 
-test("shared page heroes avoid an oversized gap below the site header", async ({ page }) => {
+test("shared page and section spacing stays compact on desktop", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/search", { waitUntil: "domcontentloaded" });
 
-  const topPadding = await page
-    .locator(".page-hero")
-    .evaluate((hero) => Number.parseFloat(getComputedStyle(hero).paddingTop));
+  for (const selector of [".page-hero", ".section"]) {
+    const topPadding = await page
+      .locator(selector)
+      .evaluate((section) => Number.parseFloat(getComputedStyle(section).paddingTop));
 
-  expect(topPadding).toBeLessThanOrEqual(60);
+    expect(topPadding).toBeLessThanOrEqual(52);
+  }
 });
 
 test("home page keeps the promise band and section rhythm compact", async ({ page, isMobile }) => {
@@ -147,20 +149,19 @@ test("home page keeps the promise band and section rhythm compact", async ({ pag
   const whySectionPadding = await whyBanglaBlend.evaluate((element) =>
     Number.parseFloat(getComputedStyle(element).paddingTop),
   );
-  expect(whySectionPadding).toBeLessThanOrEqual(72);
+  expect(whySectionPadding).toBeLessThanOrEqual(52);
 
-  for (const selector of [
-    ".category-section",
-    ".most-popular-section",
-    ".impact-section",
-    ".market-section",
-    ".recipe-feature-section",
-  ]) {
+  for (const selector of [".category-section", ".most-popular-section", ".recipe-feature-section"]) {
     const sectionPadding = await page.locator(selector).evaluate((element) =>
       Number.parseFloat(getComputedStyle(element).paddingTop),
     );
-    expect(sectionPadding).toBeLessThanOrEqual(72);
+    expect(sectionPadding).toBeLessThanOrEqual(40);
   }
+
+  const impactSectionPadding = await page.locator(".impact-section").evaluate((element) =>
+    Number.parseFloat(getComputedStyle(element).paddingTop),
+  );
+  expect(impactSectionPadding).toBeLessThanOrEqual(52);
 
   const firstStoryLink = await page.locator(".feature-link").first().boundingBox();
   expect(firstStoryLink).not.toBeNull();

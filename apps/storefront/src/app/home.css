@@ -838,7 +838,7 @@
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  padding-block: clamp(3.25rem, 5vw, 5rem);
+  padding-block: var(--section-space);
   border-block: 1px solid rgb(200 164 93 / 0.32);
   color: var(--color-white);
   background:
@@ -1774,7 +1774,7 @@
 .category-section,
 .most-popular-section,
 .recipe-feature-section {
-  padding-block: clamp(2.75rem, 4vw, 4.5rem);
+  padding-block: var(--section-space-compact);
 }
 
 @media (max-width: 1050px) {
