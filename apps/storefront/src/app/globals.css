@@ -1139,7 +1139,7 @@ body:has(.cookie-banner) .faq-chat-widget { bottom: 6.5rem; }
 }
 
 .page-hero {
-  padding-block: clamp(4rem, 9vw, 8rem) clamp(3rem, 6vw, 5rem);
+  padding-block: clamp(2.5rem, 4vw, 3.75rem) clamp(2.5rem, 4vw, 4rem);
   border-bottom: 1px solid var(--color-border);
 }
 

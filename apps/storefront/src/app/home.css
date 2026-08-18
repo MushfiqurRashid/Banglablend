@@ -628,7 +628,8 @@
 
 /* Premium homepage system: structured from the approved Bangla Blend brand book. */
 .home-hero {
-  min-height: min(76vh, 49rem);
+  min-height: min(49rem, calc(100vh - 7.6rem));
+  min-height: min(49rem, calc(100svh - 7.6rem));
   border-bottom: 1px solid var(--color-border);
   background: var(--color-parchment);
 }
@@ -644,8 +645,11 @@
 }
 
 .home-hero-inner {
-  min-height: min(76vh, 49rem);
-  padding-block: clamp(4rem, 8vw, 7rem);
+  min-height: min(49rem, calc(100vh - 7.6rem));
+  min-height: min(49rem, calc(100svh - 7.6rem));
+  align-items: flex-start;
+  padding-block: clamp(2.75rem, 6vh, 4rem);
+  padding-block: clamp(2.75rem, 6svh, 4rem);
 }
 
 .home-hero-copy {
@@ -653,8 +657,8 @@
 }
 
 .home-hero h1 {
-  max-width: 9ch;
-  font-size: clamp(4.2rem, 7.4vw, 7.2rem);
+  max-width: 11ch;
+  font-size: clamp(3.75rem, 5.5vw, 5.5rem);
 }
 
 .home-hero .lead {

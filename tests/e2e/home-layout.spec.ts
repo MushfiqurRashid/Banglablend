@@ -63,6 +63,46 @@ test("home page serves the premium campaign hero and reference copy", async ({ p
   expect(overflow).toBeLessThanOrEqual(1);
 });
 
+test("desktop home hero and its calls to action fit in the initial viewport", async ({ page }) => {
+  const viewports = [
+    { width: 1366, height: 768 },
+    { width: 1440, height: 900 },
+    { width: 1920, height: 1080 },
+  ] as const;
+
+  for (const viewport of viewports) {
+    await page.setViewportSize(viewport);
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+
+    const metrics = await page.locator(".home-hero").evaluate((hero) => {
+      const heroBox = hero.getBoundingClientRect();
+      const copyBox = hero.querySelector<HTMLElement>(".home-hero-copy")!.getBoundingClientRect();
+      const actionsBox = hero.querySelector<HTMLElement>(".hero-actions")!.getBoundingClientRect();
+
+      return {
+        heroBottom: heroBox.bottom,
+        copyTopGap: copyBox.top - heroBox.top,
+        actionsBottom: actionsBox.bottom,
+      };
+    });
+
+    expect(metrics.heroBottom).toBeLessThanOrEqual(viewport.height + 1);
+    expect(metrics.actionsBottom).toBeLessThanOrEqual(viewport.height + 1);
+    expect(metrics.copyTopGap).toBeLessThanOrEqual(65);
+  }
+});
+
+test("shared page heroes avoid an oversized gap below the site header", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/search", { waitUntil: "domcontentloaded" });
+
+  const topPadding = await page
+    .locator(".page-hero")
+    .evaluate((hero) => Number.parseFloat(getComputedStyle(hero).paddingTop));
+
+  expect(topPadding).toBeLessThanOrEqual(60);
+});
+
 test("home page keeps the promise band and section rhythm compact", async ({ page, isMobile }) => {
   await page.goto("/");
 
