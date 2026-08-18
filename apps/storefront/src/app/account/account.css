@@ -1,10 +1,10 @@
-.account-shell { display: grid; grid-template-columns: 15rem 1fr; gap: clamp(2rem, 6vw, 6rem); align-items: start; }
+.account-shell { display: grid; grid-template-columns: 15rem 1fr; gap: clamp(1.5rem, 3vw, 3rem); align-items: start; }
 .account-nav { position: sticky; top: 8rem; display: grid; padding: 1.2rem; border: 1px solid var(--color-border); background: var(--color-parchment-light); }
 .account-nav a, .account-nav button { display: block; width: 100%; padding: 0.65rem 0.4rem; border: 0; border-bottom: 1px solid var(--color-border); background: transparent; font-size: 0.78rem; text-align: left; color: var(--color-ink); cursor: pointer; }
 .account-nav a:last-of-type, .account-nav button:last-of-type { border-bottom: 0; }
 .account-nav a:hover, .account-nav button:hover { color: var(--color-deep-chilli); }
-.auth-wrap { display: grid; min-height: 65vh; place-items: center; padding: 4rem var(--page-gutter); }
-.auth-card { display: grid; width: min(100%, 32rem); gap: 1rem; padding: clamp(1.6rem, 5vw, 3rem); border: 1px solid var(--color-border); background: var(--color-parchment-light); box-shadow: var(--shadow-soft); }
+.auth-wrap { display: grid; min-height: auto; place-items: center; padding: var(--section-space) var(--page-gutter); }
+.auth-card { display: grid; width: min(100%, 32rem); gap: 1rem; padding: clamp(1.4rem, 3vw, 2rem); border: 1px solid var(--color-border); background: var(--color-parchment-light); box-shadow: var(--shadow-soft); }
 .auth-card h2 { margin-bottom: 1rem; }
 .auth-card .text-link { width: fit-content; margin-top: 0.5rem; }
 .auth-card > p { margin: 0; color: var(--color-muted); font-size: 0.78rem; }
@@ -17,11 +17,11 @@
 .auth-divider::before, .auth-divider::after { height: 1px; flex: 1; background: var(--color-border); content: ""; }
 .auth-divider span { white-space: nowrap; }
 .account-dashboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
-.account-panel { min-height: 13rem; padding: 1.6rem; border: 1px solid var(--color-border); background: var(--color-parchment-light); }
+.account-panel { min-height: 10rem; padding: 1.6rem; border: 1px solid var(--color-border); background: var(--color-parchment-light); }
 .account-panel p { margin-top: 0.7rem; color: var(--color-muted); font-size: 0.83rem; }
 .account-action-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin: 2rem 0 1rem; }
 .account-action-row h2 { margin: 0; }
-.address-card { display: flex; min-height: 15rem; flex-direction: column; }
+.address-card { display: flex; min-height: 12rem; flex-direction: column; }
 .address-card > div:first-child { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
 .address-badge { padding: 0.25rem 0.5rem; border-radius: 999px; background: var(--color-turmeric-pale); font-size: 0.65rem; font-style: normal; text-transform: uppercase; letter-spacing: 0.06em; }
 .address-actions { display: flex; gap: 1rem; margin-top: auto; padding-top: 1.5rem; }
@@ -44,7 +44,7 @@
 .account-stat-card-heading { font-weight: 700; color: var(--color-ink) !important; }
 .account-stat-card p { margin: 0; color: var(--color-muted); font-size: 0.78rem; }
 .account-stat-card a { color: var(--color-deep-chilli); font-size: 0.75rem; text-decoration: underline; }
-.account-panel-add { display: grid; place-items: center; gap: 0.5rem; min-height: 13rem; border: 1px dashed var(--color-border); color: var(--color-muted); text-decoration: none; text-align: center; }
+.account-panel-add { display: grid; place-items: center; gap: 0.5rem; min-height: 10rem; border: 1px dashed var(--color-border); color: var(--color-muted); text-decoration: none; text-align: center; }
 .account-panel-add span { display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 999px; border: 1px solid var(--color-border); font-size: 1.2rem; }
 
 /* My Orders / dashboard recent-orders table --------------------------------------------- */

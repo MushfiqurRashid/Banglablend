@@ -20,7 +20,7 @@
 
 .contact-hero-grid {
   display: grid;
-  min-height: clamp(27rem, 36vw, 33rem);
+  min-height: clamp(22rem, 30vw, 27rem);
   grid-template-columns: minmax(21rem, 0.78fr) minmax(0, 1.22fr);
 }
 
@@ -31,11 +31,11 @@
   align-items: flex-start;
   flex-direction: column;
   justify-content: center;
-  padding: clamp(2.7rem, 5vw, 5rem) clamp(2rem, 5vw, 5rem) clamp(2.7rem, 5vw, 5rem) 0;
+  padding: var(--section-space) clamp(1.5rem, 3vw, 3rem) var(--section-space) 0;
 }
 
 .contact-hero-copy .breadcrumb-list {
-  margin-bottom: clamp(1.6rem, 3vw, 2.5rem);
+  margin-bottom: 1.25rem;
   color: #39342f;
   font-size: 0.78rem;
   font-weight: 520;
@@ -50,7 +50,7 @@
 
 .contact-hero-copy h1 {
   color: var(--contact-olive);
-  font-size: clamp(3.35rem, 5.7vw, 5.5rem);
+  font-size: var(--page-title-size);
   font-weight: 500;
   letter-spacing: -0.045em;
   line-height: 0.95;
@@ -141,7 +141,7 @@
 .contact-content {
   display: grid;
   gap: clamp(1.15rem, 2vw, 1.8rem);
-  padding-block: clamp(2.3rem, 4vw, 4rem) clamp(3.5rem, 6vw, 5.5rem);
+  padding-block: var(--section-space);
 }
 
 .contact-primary-grid {

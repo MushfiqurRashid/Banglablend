@@ -16,13 +16,13 @@
 }
 
 .about-brand-hero {
-  padding-block: clamp(1rem, 2vw, 1.8rem) clamp(2rem, 4vw, 3.5rem);
+  padding-block: var(--page-hero-space);
 }
 
 .about-brand-hero-grid {
   display: grid;
   grid-template-columns: minmax(23rem, 0.95fr) minmax(0, 1.15fr);
-  min-height: clamp(28rem, 42vw, 37rem);
+  min-height: clamp(24rem, 34vw, 30rem);
   padding: 0;
   overflow: hidden;
   border: 1px solid rgb(91 71 44 / 0.16);
@@ -36,7 +36,7 @@
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  padding: clamp(2.25rem, 5vw, 5rem);
+  padding: clamp(1.75rem, 3vw, 3rem);
 }
 
 .about-brand-kicker,
@@ -74,7 +74,7 @@
 
 .about-brand-hero-copy > p {
   max-width: 32rem;
-  margin: 1.6rem 0 2rem;
+  margin: 1rem 0 1.25rem;
   color: #665b4e;
   font-size: clamp(0.98rem, 1.25vw, 1.1rem);
   line-height: 1.75;
@@ -122,7 +122,7 @@
 
 .about-brand-mission,
 .about-brand-difference {
-  padding-block: 0 clamp(2.5rem, 5vw, 4.5rem);
+  padding-block: 0 var(--section-space);
 }
 
 .about-brand-panel {
@@ -175,7 +175,7 @@
 .about-brand-value-grid article,
 .about-brand-difference-grid article {
   min-width: 0;
-  padding: clamp(1.5rem, 3vw, 2.5rem);
+  padding: clamp(1.25rem, 2.5vw, 1.75rem);
   text-align: center;
 }
 
@@ -221,7 +221,7 @@
 }
 
 .about-brand-founder {
-  padding-block: clamp(1rem, 2.8vw, 2.5rem) clamp(3rem, 6vw, 5.5rem);
+  padding-block: var(--section-space);
 }
 
 .about-brand-founder-grid {
@@ -233,7 +233,7 @@
 
 .about-brand-founder-media {
   position: relative;
-  min-height: clamp(28rem, 45vw, 40rem);
+  min-height: clamp(24rem, 36vw, 32rem);
   overflow: hidden;
   box-shadow: 0 24px 60px rgb(58 40 20 / 0.12);
 }
@@ -279,7 +279,7 @@
 .about-brand-founder-copy h2 {
   max-width: 12ch;
   color: var(--about-olive);
-  font-size: clamp(2.5rem, 4.8vw, 4.8rem);
+  font-size: var(--section-title-size);
   line-height: 0.98;
 }
 
@@ -325,7 +325,7 @@
 }
 
 .about-brand-journey {
-  padding-block: clamp(2.5rem, 5vw, 4.5rem) clamp(3.2rem, 6vw, 5.5rem);
+  padding-block: var(--section-space);
 }
 
 .about-brand-journey .about-brand-section-heading {
@@ -407,7 +407,7 @@
 
 .about-brand-closing {
   position: relative;
-  padding-block: clamp(3rem, 6vw, 6rem);
+  padding-block: var(--section-space);
   background:
     linear-gradient(rgb(25 36 12 / 0.36), rgb(25 36 12 / 0.5)),
     url("/images/bangladesh-river-landscape.webp") center 54% / cover;

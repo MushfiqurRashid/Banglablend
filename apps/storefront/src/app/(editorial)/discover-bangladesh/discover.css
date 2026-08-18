@@ -17,7 +17,7 @@
 
 .discover-hero-layout {
   display: grid;
-  min-height: 16rem;
+  min-height: 14rem;
   grid-template-columns: minmax(20rem, 0.82fr) minmax(0, 1.18fr);
   gap: clamp(2rem, 5vw, 5.5rem);
   align-items: stretch;
@@ -28,11 +28,11 @@
   align-items: flex-start;
   flex-direction: column;
   justify-content: center;
-  padding-block: clamp(1.65rem, 3vw, 2.5rem);
+  padding-block: var(--page-hero-space);
 }
 
 .discover-hero-copy .breadcrumb-list {
-  margin-bottom: 1.35rem;
+  margin-bottom: 1rem;
   color: #575b4d;
   font-size: 0.68rem;
   font-weight: 650;
@@ -68,7 +68,7 @@
 
 .discover-hero-media {
   position: relative;
-  min-height: 16rem;
+  min-height: 14rem;
   overflow: hidden;
   background: #d5c6ae;
 }
@@ -90,11 +90,11 @@
 .discover-featured-section {
   max-width: 100%;
   overflow: hidden;
-  padding-block: clamp(1.65rem, 3.25vw, 3rem) clamp(1.8rem, 3.25vw, 3.1rem);
+  padding-block: var(--section-space-compact);
 }
 
 .discover-topics-section {
-  padding-block: 0 clamp(2rem, 3.5vw, 3.5rem);
+  padding-block: 0 var(--section-space-compact);
 }
 
 .discover-section-heading {
@@ -501,7 +501,7 @@
 
   .discover-hero-copy {
     width: min(calc(100% - (var(--page-gutter) * 2)), var(--max-width));
-    padding-block: 2.4rem 2.7rem;
+    padding-block: var(--page-hero-space);
     margin-inline: auto;
   }
 
@@ -577,7 +577,7 @@
   }
 
   .discover-featured-section {
-    padding-top: 2.7rem;
+    padding-top: var(--section-space-compact);
   }
 
   .discover-section-heading {

@@ -15,7 +15,7 @@
 
 .faq-hero-grid {
   display: grid;
-  min-height: 18rem;
+  min-height: 15rem;
   grid-template-columns: minmax(19rem, 0.75fr) minmax(0, 1.25fr);
   gap: clamp(2rem, 4.5vw, 4.5rem);
   align-items: stretch;
@@ -26,11 +26,11 @@
   align-items: flex-start;
   flex-direction: column;
   justify-content: center;
-  padding-block: clamp(2rem, 3.5vw, 3.25rem);
+  padding-block: var(--page-hero-space);
 }
 
 .faq-hero-copy .breadcrumb-list {
-  margin-bottom: 1.4rem;
+  margin-bottom: 1rem;
   color: #555b4d;
   font-size: 0.68rem;
   font-weight: 650;
@@ -41,7 +41,7 @@
 .faq-hero h1 {
   color: var(--faq-olive-dark);
   font-family: var(--faq-serif);
-  font-size: clamp(3.9rem, 6.4vw, 6rem);
+  font-size: var(--page-title-size);
   font-weight: 700;
   line-height: 0.9;
   letter-spacing: -0.045em;
@@ -52,7 +52,7 @@
   display: block;
   width: 9.3rem;
   height: 1px;
-  margin-block: 1.65rem 1.35rem;
+  margin-block: 1rem;
   background: #777b70;
 }
 
@@ -87,7 +87,7 @@
 
 .faq-hero-media {
   position: relative;
-  min-height: 18rem;
+  min-height: 15rem;
   overflow: hidden;
   background: #d7c6aa;
 }
@@ -110,7 +110,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1.92fr) minmax(17rem, 0.9fr);
   gap: clamp(1.7rem, 3.8vw, 3.4rem);
-  padding-block: clamp(1.8rem, 3.5vw, 3.2rem);
+  padding-block: var(--section-space-compact);
 }
 
 .faq-main > h2,
@@ -459,7 +459,7 @@
 
   .faq-hero-copy {
     width: min(calc(100% - (var(--page-gutter) * 2)), var(--max-width));
-    padding-block: 2.4rem 2.7rem;
+    padding-block: var(--page-hero-space);
     margin-inline: auto;
   }
 
@@ -482,7 +482,7 @@
 
 @media (max-width: 600px) {
   .faq-hero h1 {
-    font-size: clamp(3.6rem, 19vw, 5rem);
+    font-size: clamp(3rem, 15vw, 4.2rem);
   }
 
   .faq-ornament {
@@ -490,7 +490,7 @@
   }
 
   .faq-content {
-    padding-block: 2rem 2.6rem;
+    padding-block: var(--section-space-compact);
   }
 
   .faq-main > h2 {

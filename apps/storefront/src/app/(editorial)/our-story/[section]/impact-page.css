@@ -29,8 +29,8 @@ body:has(.impact-page) .desktop-nav > .nav-link[href="/our-story"] {
   display: grid;
   grid-template-columns: minmax(18rem, 0.78fr) minmax(0, 1.32fr);
   align-items: stretch;
-  gap: clamp(2.2rem, 5vw, 5.5rem);
-  padding-block: clamp(1.4rem, 2.7vw, 2.8rem);
+  gap: clamp(2rem, 4vw, 4rem);
+  padding-block: var(--page-hero-space);
 }
 
 .impact-page-hero-copy {
@@ -41,7 +41,7 @@ body:has(.impact-page) .desktop-nav > .nav-link[href="/our-story"] {
 }
 
 .impact-page .breadcrumb-list {
-  margin-bottom: clamp(1.2rem, 2vw, 2rem);
+  margin-bottom: 1rem;
   color: #6d6259;
   font-size: 0.68rem;
 }
@@ -76,7 +76,7 @@ body:has(.impact-page) .desktop-nav > .nav-link[href="/our-story"] {
 .impact-page-hero h1 {
   margin-top: 0.8rem;
   color: var(--impact-green-deep);
-  font-size: clamp(3.3rem, 6vw, 5.8rem);
+  font-size: var(--display-title-size);
   line-height: 0.88;
 }
 
@@ -128,7 +128,7 @@ body:has(.impact-page) .desktop-nav > .nav-link[href="/our-story"] {
 
 .impact-page-hero-media {
   position: relative;
-  min-height: clamp(24rem, 42vw, 36rem);
+  min-height: clamp(20rem, 32vw, 30rem);
   overflow: hidden;
   border-radius: 0.3rem;
   background: #d9decf;
@@ -205,7 +205,7 @@ body:has(.impact-page) .desktop-nav > .nav-link[href="/our-story"] {
 .impact-work-section,
 .impact-glimpses-section,
 .impact-principles-section {
-  padding-block: clamp(3.2rem, 5vw, 5.2rem);
+  padding-block: var(--section-space);
 }
 
 .impact-work-section {
@@ -298,7 +298,7 @@ body:has(.impact-page) .desktop-nav > .nav-link[href="/our-story"] {
 
 .impact-process-section {
   scroll-margin-top: 6rem;
-  padding-block: clamp(3.4rem, 5.5vw, 5.8rem);
+  padding-block: var(--section-space);
   color: white;
   background:
     radial-gradient(circle at 4% 105%, rgb(200 164 93 / 0.16), transparent 24rem),
@@ -422,7 +422,7 @@ body:has(.impact-page) .desktop-nav > .nav-link[href="/our-story"] {
 }
 
 .impact-together-section {
-  padding-block: clamp(2.3rem, 4vw, 3.7rem);
+  padding-block: var(--section-space-compact);
   border-top: 1px solid var(--impact-rule);
   color: var(--color-ink);
   background: #ffffff;

@@ -5,7 +5,7 @@
 
 .order-success-hero {
   position: relative;
-  padding-block: clamp(2.5rem, 5vw, 5rem);
+  padding-block: var(--page-hero-space);
   border-bottom: 1px solid var(--color-border);
   background:
     radial-gradient(circle at 7% 12%, rgb(214 163 58 / 0.18), transparent 20rem),
@@ -31,7 +31,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1.02fr) minmax(24rem, 0.98fr);
   align-items: center;
-  gap: clamp(3rem, 7vw, 7.5rem);
+  gap: clamp(2rem, 4vw, 4rem);
 }
 
 .order-success-copy {
@@ -64,7 +64,7 @@
 
 .order-success-copy h1 {
   max-width: 44rem;
-  font-size: clamp(3.4rem, 6.1vw, 6.5rem);
+  font-size: var(--display-title-size);
   line-height: 0.93;
   text-wrap: balance;
 }
@@ -116,7 +116,7 @@
 
 .order-success-visual {
   position: relative;
-  min-height: clamp(30rem, 49vw, 43rem);
+  min-height: clamp(22rem, 38vw, 32rem);
   overflow: hidden;
   border: 1px solid rgb(255 255 255 / 0.28);
   box-shadow: 0 30px 80px rgb(50 33 18 / 0.22);
@@ -179,7 +179,7 @@
 }
 
 .order-success-details {
-  padding-block: clamp(3.5rem, 7vw, 7rem);
+  padding-block: var(--section-space);
   background: var(--color-parchment-light);
 }
 

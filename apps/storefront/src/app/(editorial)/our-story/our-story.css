@@ -22,8 +22,8 @@ body:has(.our-story-page) .desktop-nav > .nav-link[href="/our-story"] {
   display: grid;
   grid-template-columns: minmax(20rem, 0.78fr) minmax(0, 1.35fr);
   align-items: center;
-  gap: clamp(2.5rem, 6vw, 6.5rem);
-  padding-block: clamp(1.5rem, 2.5vw, 2.75rem);
+  gap: clamp(2rem, 4vw, 4rem);
+  padding-block: var(--page-hero-space);
 }
 
 .story-hero-copy {
@@ -34,7 +34,7 @@ body:has(.our-story-page) .desktop-nav > .nav-link[href="/our-story"] {
 }
 
 .story-hero .breadcrumb-list {
-  margin-bottom: clamp(1.5rem, 2.5vw, 2.5rem);
+  margin-bottom: 1.25rem;
   color: var(--color-muted);
   font-size: 0.7rem;
   font-weight: 600;
@@ -201,7 +201,7 @@ body:has(.our-story-page) .desktop-nav > .nav-link[href="/our-story"] {
 }
 
 .story-section {
-  padding-block: clamp(2.5rem, 4vw, 4rem);
+  padding-block: var(--section-space);
   border-bottom: 1px solid var(--story-rule);
 }
 
@@ -522,7 +522,7 @@ body:has(.our-story-page) .desktop-nav > .nav-link[href="/our-story"] {
   }
 
   .story-hero .breadcrumb-list {
-    margin-bottom: 2.5rem;
+    margin-bottom: 1.25rem;
   }
 
   .story-tabs .shell {
@@ -557,7 +557,7 @@ body:has(.our-story-page) .desktop-nav > .nav-link[href="/our-story"] {
   }
 
   .story-hero .breadcrumb-list {
-    margin-bottom: 2rem;
+    margin-bottom: 1.25rem;
   }
 
   .story-hero h1 {
@@ -569,7 +569,7 @@ body:has(.our-story-page) .desktop-nav > .nav-link[href="/our-story"] {
   }
 
   .story-section {
-    padding-block: 4rem;
+    padding-block: var(--section-space);
   }
 
   .story-principles {
@@ -590,7 +590,7 @@ body:has(.our-story-page) .desktop-nav > .nav-link[href="/our-story"] {
   }
 
   .story-philosophy {
-    padding-block: 1.25rem 3.5rem;
+    padding-block: 1.25rem var(--section-space);
   }
 
   .story-philosophy-copy {

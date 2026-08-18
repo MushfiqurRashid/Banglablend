@@ -75,7 +75,9 @@ for (const viewport of viewports) {
   });
 }
 
-test("mobile header keeps the brand and controls separated at every compact size", async ({ page }) => {
+test("mobile header keeps the brand and controls separated at every compact size", async ({
+  page,
+}) => {
   await acceptEssentialCookies(page);
 
   for (const viewport of viewports.filter(({ width }) => width <= 900)) {
@@ -119,6 +121,9 @@ test("mobile navigation fills the usable viewport and remains scrollable", async
   await expect(menu.getByRole("link", { name: "Bangla Blend home" })).toBeVisible();
   await expect(menu.getByRole("link", { name: "Search" })).toBeVisible();
   await expect(menu.getByRole("combobox", { name: /delivery destination/i })).toBeVisible();
+  await expect
+    .poll(async () => (await menu.boundingBox())?.x ?? Number.NEGATIVE_INFINITY)
+    .toBeCloseTo(0, 0);
 
   const box = await menu.boundingBox();
   expect(box).not.toBeNull();
