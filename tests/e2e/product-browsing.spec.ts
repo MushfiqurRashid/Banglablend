@@ -76,7 +76,7 @@ test("the shared detail experience renders across the six approved products", as
   }
 });
 
-test("Shop All contains only the six approved products", async ({ page }) => {
+test("All Spices contains only the six approved products", async ({ page }) => {
   await page.goto("/shop/all");
 
   const cards = page.locator(".shop-product-card");

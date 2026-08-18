@@ -32,7 +32,7 @@ const columns = [
   {
     title: "Shop",
     links: [
-      ["Shop All", "/shop/all"],
+      ["All Spices", "/shop/all"],
       ["Originals", "/shop/originals"],
       ["Reserve", "/shop/reserve"],
       ["Pantry", "/shop/pantry"],

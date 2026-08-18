@@ -24,7 +24,7 @@ test("primary navigation exposes both commerce and culture", async ({ page, isMo
   await shopLink.hover();
   const shopDropdown = shopLink.locator("..").locator(".mega-menu");
   await expect(shopDropdown).toBeVisible();
-  await expect(shopDropdown.getByRole("link", { name: "Shop All" })).toBeVisible();
+  await expect(shopDropdown.getByRole("link", { name: "All Spices" })).toBeVisible();
   const dropdownBox = await shopDropdown.boundingBox();
   const viewport = page.viewportSize();
   expect(dropdownBox).not.toBeNull();

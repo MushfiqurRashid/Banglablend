@@ -197,8 +197,8 @@ export default async function HomePage() {
               <span className="eyebrow">The collection</span>
               <h2>Shop by category</h2>
             </div>
-            <Link href="/shop" className="text-link">
-              Shop all
+            <Link href="/shop/all" className="text-link">
+              All Spices
               <ArrowUpRight size={14} />
             </Link>
           </div>

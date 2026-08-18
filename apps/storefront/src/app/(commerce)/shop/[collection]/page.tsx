@@ -25,7 +25,7 @@ const collectionContent: Record<
   { title: string; eyebrow: string; description: string }
 > = {
   all: {
-    title: "Shop All",
+    title: "All Spices",
     eyebrow: "The complete collection",
     description:
       "Explore every Bangla Blend product currently available for your delivery destination.",

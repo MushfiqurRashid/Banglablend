@@ -18,7 +18,7 @@ const categoryCards: Array<{
   href: string;
   icon: LucideIcon;
 }> = [
-  { slug: "all", title: "Shop All", copy: "The full collection", href: "/shop/all", icon: LayoutGrid },
+  { slug: "all", title: "All Spices", copy: "The full collection", href: "/shop/all", icon: LayoutGrid },
   { slug: "originals", title: "Originals", copy: "Signature blends", href: "/shop/originals", icon: Leaf },
   { slug: "reserve", title: "Reserve", copy: "Spices from one origin", href: "/shop/reserve", icon: Sparkles },
   { slug: "pantry", title: "Pantry", copy: "Everyday essentials", href: "/shop/pantry", icon: Package },

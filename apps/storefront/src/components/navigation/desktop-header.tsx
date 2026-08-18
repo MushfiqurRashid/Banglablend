@@ -10,7 +10,7 @@ import { LanguageSelector } from "./language-selector";
 import type { StorefrontCatalog } from "@bangla-blend/types";
 
 const shopLinks = [
-  { label: "Shop All", href: "/shop/all", image: "/images/campaign/shop-signature-lineup.jpg" },
+  { label: "All Spices", href: "/shop/all", image: "/images/campaign/shop-signature-lineup.jpg" },
   { label: "Originals", href: "/shop/originals", image: "/images/products/shahi-garam-masala-product.webp" },
   { label: "Reserve", href: "/shop/reserve", image: "/images/navigation/category-reserve-v2.jpg" },
   { label: "Pantry", href: "/shop/pantry", image: "/images/navigation/category-pantry-v2.jpg" },

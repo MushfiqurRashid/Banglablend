@@ -20,7 +20,7 @@ const groups: NavigationGroup[] = [
     label: "Shop",
     href: "/shop",
     children: [
-      ["Shop All", "/shop/all"],
+      ["All Spices", "/shop/all"],
       ["Originals", "/shop/originals"],
       ["Reserve", "/shop/reserve"],
       ["Pantry", "/shop/pantry"],
