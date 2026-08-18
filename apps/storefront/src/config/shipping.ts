@@ -1,0 +1,1 @@
+export const INTERNATIONAL_SHIPPING_OPTION_ID = "bf85aa9d-5f9f-4e11-b8ac-15e5715a85c0";

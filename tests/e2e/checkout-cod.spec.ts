@@ -5,8 +5,8 @@ test("Bangladesh checkout exposes Cash on Delivery", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Complete your order", level: 1 })).toBeVisible();
   const insideDhaka = page.getByRole("radio", { name: /Inside Dhaka.*BDT 80/i });
   const outsideDhaka = page.getByRole("radio", { name: /Outside Dhaka.*BDT 120/i });
-  const international = page.getByRole("link", {
-    name: /International delivery.*We will contact shortly/i,
+  const international = page.getByRole("radio", {
+    name: /International.*We will contact shortly/i,
   });
   const cashOnDelivery = page.getByRole("radio", { name: /cash on delivery/i });
   const deliveryMethod = page.getByRole("heading", { name: "Delivery method", level: 3 });
@@ -23,14 +23,14 @@ test("Bangladesh checkout exposes Cash on Delivery", async ({ page }) => {
   await expect(insideDhaka).toBeVisible();
   await expect(outsideDhaka).toBeVisible();
   await expect(international).toBeVisible();
-  await expect(international).toHaveAttribute("href", "/contact#contact-form");
   await expect(insideDhaka).not.toBeChecked();
   await expect(outsideDhaka).not.toBeChecked();
+  await expect(international).not.toBeChecked();
 
   const [insideBox, outsideBox, internationalBox] = await Promise.all([
     insideDhaka.locator("..").boundingBox(),
     outsideDhaka.locator("..").boundingBox(),
-    international.boundingBox(),
+    international.locator("..").boundingBox(),
   ]);
   expect(insideBox).not.toBeNull();
   expect(outsideBox).not.toBeNull();
@@ -38,4 +38,9 @@ test("Bangladesh checkout exposes Cash on Delivery", async ({ page }) => {
   expect(internationalBox!.y).toBeGreaterThanOrEqual(
     Math.max(insideBox!.y + insideBox!.height, outsideBox!.y + outsideBox!.height),
   );
+
+  await international.check();
+  await expect(international).toBeChecked();
+  await expect(page.getByLabel("Country code")).not.toHaveAttribute("readonly");
+  await expect(page.getByText("No charge added", { exact: true })).toBeVisible();
 });

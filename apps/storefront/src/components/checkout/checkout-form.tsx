@@ -23,6 +23,7 @@ import {
   Truck,
 } from "lucide-react";
 import { useCart } from "@/providers/cart-provider";
+import { INTERNATIONAL_SHIPPING_OPTION_ID } from "@/config/shipping";
 
 interface CheckoutAvailability {
   checkoutEnabled: boolean;
@@ -72,7 +73,20 @@ export function CheckoutForm({
   const paymentMethod = watch("paymentMethod");
   const shippingOptionId = watch("shippingOptionId");
   const selectedShippingOption = shippingOptions.find((option) => option.id === shippingOptionId);
+  const internationalDelivery = shippingOptionId === INTERNATIONAL_SHIPPING_OPTION_ID;
+  const displayedShippingOptions = [
+    ...shippingOptions.filter((option) => option.id !== INTERNATIONAL_SHIPPING_OPTION_ID),
+    ...shippingOptions.filter((option) => option.id === INTERNATIONAL_SHIPPING_OPTION_ID),
+  ];
   const billingToggle = register("billingSameAsShipping");
+  const shippingOptionRegistration = register("shippingOptionId", {
+    onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+      setValue(
+        "shippingAddress.countryCode",
+        event.target.value === INTERNATIONAL_SHIPPING_OPTION_ID ? "" : market.code.toUpperCase(),
+      );
+    },
+  });
   const noDomesticPayment =
     market.domestic && !availability.codEnabled && !availability.sslcommerzEnabled;
   const canSubmit = availability.checkoutEnabled && !noDomesticPayment;
@@ -89,7 +103,7 @@ export function CheckoutForm({
           return;
         }
         if (shippingOptions.length > 1 && !input.shippingOptionId) {
-          setServerError("Choose Inside Dhaka or Outside Dhaka delivery before placing the order.");
+          setServerError("Choose a delivery method before placing the order.");
           return;
         }
         const response = await fetch("/api/checkout", {
@@ -219,8 +233,9 @@ export function CheckoutForm({
               <input
                 className="input"
                 autoComplete="country"
-                readOnly
-                aria-readonly="true"
+                maxLength={2}
+                readOnly={!internationalDelivery}
+                aria-readonly={!internationalDelivery}
                 {...register("shippingAddress.countryCode")}
               />
             </Field>
@@ -436,35 +451,31 @@ export function CheckoutForm({
                 <p>Choose your delivery area. Local charges will be added to your order total.</p>
               </div>
               <div className="payment-options checkout-delivery-options">
-                {shippingOptions.map((option) => (
-                  <label key={option.id}>
-                    <input
-                      type="radio"
-                      value={option.id}
-                      required={shippingOptions.length > 1}
-                      {...register("shippingOptionId")}
-                    />
-                    <Truck />
-                    <span>
-                      <strong>{option.name}</strong>
-                      <small>
-                        {formatMoney(option.amount, option.currencyCode)} delivery charge
-                      </small>
-                    </span>
-                  </label>
-                ))}
-                <Link
-                  className="checkout-international-option"
-                  href="/contact#contact-form"
-                  aria-label="International delivery — We will contact shortly"
-                >
-                  <span className="checkout-option-marker" aria-hidden="true" />
-                  <Globe2 aria-hidden="true" />
-                  <span>
-                    <strong>International</strong>
-                    <small>We will contact shortly</small>
-                  </span>
-                </Link>
+                {displayedShippingOptions.map((option) => {
+                  const isInternational = option.id === INTERNATIONAL_SHIPPING_OPTION_ID;
+                  return (
+                    <label
+                      className={isInternational ? "checkout-international-option" : undefined}
+                      key={option.id}
+                    >
+                      <input
+                        type="radio"
+                        value={option.id}
+                        required={shippingOptions.length > 1}
+                        {...shippingOptionRegistration}
+                      />
+                      {isInternational ? <Globe2 /> : <Truck />}
+                      <span>
+                        <strong>{option.name}</strong>
+                        <small>
+                          {isInternational
+                            ? "We will contact shortly"
+                            : `${formatMoney(option.amount, option.currencyCode)} delivery charge`}
+                        </small>
+                      </span>
+                    </label>
+                  );
+                })}
               </div>
             </div>
           ) : null}
@@ -533,7 +544,9 @@ export function CheckoutForm({
                 <span>Delivery</span>
                 <strong>
                   {selectedShippingOption
-                    ? formatMoney(selectedShippingOption.amount, cart.currencyCode.toUpperCase())
+                    ? internationalDelivery
+                      ? "No charge added"
+                      : formatMoney(selectedShippingOption.amount, cart.currencyCode.toUpperCase())
                     : paymentMethod
                       ? "Choose delivery area"
                       : "Choose payment method"}
@@ -548,7 +561,11 @@ export function CheckoutForm({
                   )}
                 </strong>
               </div>
-              <p>The selected delivery charge is included in this estimated total.</p>
+              <p>
+                {internationalDelivery
+                  ? "International delivery will be arranged after we contact you."
+                  : "The selected delivery charge is included in this estimated total."}
+              </p>
             </div>
           </>
         ) : (

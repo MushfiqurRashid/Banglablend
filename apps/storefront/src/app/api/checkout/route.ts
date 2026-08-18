@@ -9,6 +9,7 @@ import { createSslCommerzSession } from "@/lib/payments/sslcommerz";
 import { siteConfig } from "@/config/site";
 import { sendTransactionalEmail } from "@/lib/email/server";
 import { buildOrderEmails } from "@/lib/email/order-messages";
+import { INTERNATIONAL_SHIPPING_OPTION_ID } from "@/config/shipping";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -61,6 +62,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Checkout is closed until the production release approvals are recorded." }, { status: 503 });
   }
   const market = await getActiveMarket();
+  const internationalDelivery =
+    parsed.data.shippingOptionId === INTERNATIONAL_SHIPPING_OPTION_ID;
   if (!market.domestic && process.env.ENABLE_INTERNATIONAL_CHECKOUT !== "true") {
     return NextResponse.json({ error: `Checkout is not yet enabled for ${market.label}.` }, { status: 409 });
   }
@@ -70,7 +73,10 @@ export async function POST(request: Request) {
   if (market.domestic && parsed.data.paymentMethod === "international") {
     return NextResponse.json({ error: "Choose Cash on Delivery or SSLCOMMERZ for Bangladesh." }, { status: 400 });
   }
-  if (parsed.data.shippingAddress.countryCode.toUpperCase() !== market.code.toUpperCase()) {
+  if (
+    !internationalDelivery &&
+    parsed.data.shippingAddress.countryCode.toUpperCase() !== market.code.toUpperCase()
+  ) {
     return NextResponse.json({ error: `The delivery country must match the selected ${market.label} destination.` }, { status: 409 });
   }
   if (parsed.data.paymentMethod === "cod" && process.env.COD_ENABLED !== "true") {
@@ -136,6 +142,7 @@ export async function POST(request: Request) {
         metadata: {
           market: market.code,
           payment_method: parsed.data.paymentMethod,
+          international_delivery: internationalDelivery,
           is_gift: parsed.data.isGift,
           recipient: parsed.data.isGift ? parsed.data.recipient : undefined,
         },
