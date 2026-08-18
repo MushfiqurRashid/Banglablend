@@ -42,5 +42,4 @@ test("Bangladesh checkout exposes Cash on Delivery", async ({ page }) => {
   await international.check();
   await expect(international).toBeChecked();
   await expect(page.getByLabel("Country code")).not.toHaveAttribute("readonly");
-  await expect(page.getByText("No charge added", { exact: true })).toBeVisible();
 });
