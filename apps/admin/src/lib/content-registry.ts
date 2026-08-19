@@ -1,9 +1,8 @@
 // Registry-driven content editor. Rather than 21 bespoke pages for the 21 content document types
 // (see supabase/migrations/2026...content_*.sql), one generic list/create/edit engine reads this
 // registry and renders itself -- the only way to cover the full content model without spending
-// disproportionate time on repetitive CRUD screens. Complex nested collections (recipe
-// ingredients/steps, and the various *_farmers/*_related_products join tables) are intentionally
-// out of scope for this generic editor and would need bespoke UI as a follow-up.
+// disproportionate time on repetitive CRUD screens. Recipe ingredients and steps are handled by
+// the structured recipe editor mounted alongside this generic record form.
 
 export type FieldKind = "text" | "textarea" | "richtext" | "boolean" | "select" | "number" | "date" | "foreignKey" | "array" | "json";
 
@@ -146,15 +145,33 @@ export const contentRegistry: ContentTypeDef[] = [
   ]},
   { table: "recipes", label: "Recipes", area: "content", hasVerification: true, hasLanguage: true, titleColumn: "title", slugColumn: "slug", fields: [
     ...publishableFields(),
+    { name: "bangla_title", label: "Bangla title", kind: "text" },
+    { name: "story", label: "Recipe introduction", kind: "textarea", helpText: "A concise editorial note about the dish, its technique or place at the table." },
+    { name: "category", label: "Category", kind: "select", options: ["Fish & seafood", "Meat & poultry", "Vegetarian", "Pantry"] },
+    { name: "cuisine", label: "Cuisine", kind: "text" },
     { name: "author_id", label: "Author", kind: "foreignKey", foreignTable: "authors", foreignLabelColumn: "name" },
+    { name: "author_display", label: "Display author", kind: "text" },
     { name: "region_division_id", label: "Region division", kind: "foreignKey", foreignTable: "geo_divisions", foreignLabelColumn: "title" },
     { name: "region_region_id", label: "Region", kind: "foreignKey", foreignTable: "geo_regions", foreignLabelColumn: "title" },
     { name: "servings", label: "Servings", kind: "number", required: true },
     { name: "prep_minutes", label: "Prep minutes", kind: "number" },
     { name: "cook_minutes", label: "Cook minutes", kind: "number" },
+    { name: "total_minutes", label: "Total minutes", kind: "number" },
+    { name: "inactive_minutes", label: "Inactive minutes", kind: "number" },
+    { name: "yield_text", label: "Yield label", kind: "text", helpText: "For example: 6 pieces, serving 4." },
     { name: "difficulty", label: "Difficulty", kind: "select", options: ["easy", "moderate", "advanced"] },
     { name: "library_sections", label: "Library sections (comma separated)", kind: "array", helpText: "traditional, everyday-cooking" },
     { name: "dietary_tags", label: "Dietary tags (comma separated)", kind: "array" },
+    { name: "serving_suggestions", label: "Serving suggestions (comma separated)", kind: "array" },
+    { name: "tips", label: "Cook's tips (comma separated)", kind: "array" },
+    { name: "storage_notes", label: "Storage notes", kind: "textarea" },
+    { name: "safety_notes", label: "Safety notes", kind: "textarea" },
+    { name: "image_wide", label: "Wide image (JSON: url, alt)", kind: "json" },
+    { name: "image_square", label: "Square image (JSON: url, alt)", kind: "json" },
+    { name: "image_credit", label: "Image credit", kind: "text" },
+    { name: "published_at", label: "Published at", kind: "date" },
+    { name: "featured", label: "Featured recipe", kind: "boolean" },
+    { name: "sort_order", label: "Sort order", kind: "number" },
   ]},
   { table: "journal_articles", label: "Journal Articles", area: "content", hasVerification: true, hasLanguage: true, titleColumn: "title", slugColumn: "slug", fields: [
     ...publishableFields(),

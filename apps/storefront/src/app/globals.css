@@ -1332,6 +1332,11 @@ body:has(.cookie-banner) .faq-chat-widget { bottom: 6.5rem; }
     --page-gutter: 1.1rem;
   }
 
+  /* The consent panel occupies the mobile safe area; remove the secondary floating action. */
+  body:has(.cookie-banner) .faq-chat-widget {
+    display: none;
+  }
+
   .announcement-bar {
     min-height: 2.1rem;
     padding-block: 0.42rem;

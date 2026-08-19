@@ -33,6 +33,10 @@ export interface Database {
       cart_set_line_item_quantity: { Args: { p_cart_id: string; p_line_id: string; p_quantity: number }; Returns: void };
       cart_remove_line_item: { Args: { p_cart_id: string; p_line_id: string }; Returns: void };
       complete_cart: { Args: { p_cart_id: string }; Returns: Record<string, Json> };
+      replace_recipe_structure: {
+        Args: { target_recipe_id: string; ingredient_rows: Json; step_rows: Json };
+        Returns: void;
+      };
     };
     Enums: Record<string, string>;
   };

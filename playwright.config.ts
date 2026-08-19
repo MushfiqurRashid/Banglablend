@@ -23,7 +23,9 @@ export default defineConfig({
     ? undefined
     : {
         command: "node apps/storefront/node_modules/next/dist/bin/next dev apps/storefront --turbopack --port 3010",
-        url: "http://localhost:3010",
+        // Wait for a real App Router page, not only the dev server socket, so Turbopack has
+        // completed route discovery before the first navigation.
+        url: "http://localhost:3010/recipes",
         reuseExistingServer: false,
         timeout: 120_000,
         gracefulShutdown: { signal: "SIGTERM", timeout: 1_000 },

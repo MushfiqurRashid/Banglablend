@@ -59,6 +59,7 @@ const routes = [
   "/homepage",
   "/pages",
   "/content",
+  "/content/recipes",
   "/reports",
   "/payment-audits",
   "/audit-log",
@@ -91,6 +92,21 @@ try {
     if (!response?.ok()) throw new Error(`${route} returned HTTP ${response?.status() ?? "unknown"}.`);
     if ((await page.locator("h1").count()) === 0) throw new Error(`${route} did not render a page heading.`);
     if (/application error|server error|could not be found/i.test(await page.locator("body").innerText())) throw new Error(`${route} rendered an error state.`);
+  }
+
+  await page.goto(`${baseUrl}/content/recipes`, { waitUntil: "networkidle" });
+  const firstRecipe = page.locator("table.data-table tbody a").first();
+  if (!(await firstRecipe.isVisible())) throw new Error("The recipe CMS did not contain an editable launch draft.");
+  await Promise.all([
+    page.waitForURL(/\/content\/recipes\/[^/]+$/),
+    firstRecipe.click(),
+  ]);
+  await page.waitForLoadState("networkidle");
+  if (!(await page.getByRole("heading", { name: "Ingredients & method" }).isVisible())) {
+    throw new Error(`The structured recipe editor did not render at ${page.url()}.`);
+  }
+  if ((await page.getByRole("option").count()) < 1) {
+    throw new Error("The structured recipe editor did not load its ingredient control.");
   }
 
   await page.setViewportSize({ width: 390, height: 844 });

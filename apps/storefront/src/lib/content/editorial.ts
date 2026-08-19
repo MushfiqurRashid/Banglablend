@@ -1,7 +1,8 @@
 import "server-only";
 import type { ComponentProps } from "react";
 import type { PortableText } from "@portabletext/react";
-import { articles as previewArticles, recipes as previewRecipes } from "./fallback-content";
+import { launchRecipes, type LaunchRecipe } from "@/data/launch-recipes";
+import { articles as previewArticles } from "./fallback-content";
 import { contentClient, logContentFetchFailure } from "./client";
 import { estimateReadingTime } from "./queries";
 
@@ -26,6 +27,7 @@ export interface EditorialArticle {
 
 export interface RecipeIngredient {
   amount?: number;
+  displayAmount?: string;
   unit?: string;
   imperialAmount?: number;
   imperialUnit?: string;
@@ -34,19 +36,62 @@ export interface RecipeIngredient {
   banglaName?: string;
 }
 
+export interface RecipeIngredientGroup {
+  title: string;
+  ingredients: RecipeIngredient[];
+}
+
+export interface RecipeStep {
+  instruction: string;
+  timerMinutes?: number;
+}
+
+export interface RecipeStepSection {
+  title: string;
+  steps: RecipeStep[];
+}
+
+export interface RecipeProduct {
+  title: string;
+  handle: string;
+  image?: string;
+  note?: string;
+}
+
 export interface EditorialRecipe {
   title: string;
+  banglaTitle?: string;
   slug: string;
   excerpt: string;
+  story?: string;
   region: string;
+  category?: string;
+  cuisine?: string;
   prepTime: number;
   cookTime: number;
-  servings: number;
+  totalTime: number;
+  inactiveTime?: number;
+  servings?: number;
+  yield: string;
   difficulty: string;
   image: string;
+  imageWide: string;
+  imageSquare: string;
   imageAlt: string;
+  imageCredit?: string;
   ingredients: RecipeIngredient[];
-  steps: { instruction: string; timerMinutes?: number }[];
+  ingredientGroups: RecipeIngredientGroup[];
+  steps: RecipeStep[];
+  stepSections: RecipeStepSection[];
+  servingSuggestions: string[];
+  tips: string[];
+  storage?: string;
+  safety?: string;
+  dietaryTags: string[];
+  relatedProducts: RecipeProduct[];
+  author: string;
+  publishedAt?: string;
+  featured: boolean;
   hasRegion: boolean;
   hasProducts: boolean;
   librarySections: string[];
@@ -76,30 +121,32 @@ function articlePreview(category?: string): EditorialArticle[] {
     }));
 }
 
-function recipePreview(): EditorialRecipe[] {
-  return previewRecipes.map((recipe) => ({
-    title: recipe.title,
-    slug: recipe.slug,
-    excerpt: recipe.excerpt,
-    region: recipe.region,
-    prepTime: recipe.prepTime,
-    cookTime: recipe.cookTime,
-    servings: recipe.servings,
-    difficulty: recipe.difficulty,
-    image: recipe.image,
-    imageAlt: `Illustrative preview for ${recipe.title}`,
-    ingredients: recipe.ingredients.map((ingredient) => ({
-      name: ingredient.english,
-      banglaName: ingredient.bangla,
-      note: `${ingredient.metric} / ${ingredient.imperial}`,
+function normalizeLaunchRecipe(recipe: LaunchRecipe): EditorialRecipe {
+  const ingredientGroups = recipe.ingredientGroups.map((group) => ({
+    title: group.title,
+    ingredients: group.ingredients.map((ingredient) => ({
+      displayAmount: ingredient.amount,
+      name: ingredient.name,
+      note: ingredient.note,
     })),
-    steps: recipe.steps.map((instruction) => ({ instruction })),
-    hasRegion: true,
-    hasProducts: false,
-    librarySections: recipe.slug === "shorisha-ilish" ? ["traditional"] : ["everyday-cooking"],
-    verified: false,
   }));
+  const stepSections = recipe.stepSections.map((section) => ({
+    title: section.title,
+    steps: section.steps,
+  }));
+  return {
+    ...recipe,
+    cuisine: "Bangladeshi",
+    ingredients: ingredientGroups.flatMap((group) => group.ingredients),
+    ingredientGroups,
+    steps: stepSections.flatMap((section) => section.steps),
+    stepSections,
+    hasRegion: recipe.region !== "Bangladesh",
+    hasProducts: recipe.relatedProducts.length > 0,
+  };
 }
+
+const launchRecipeLibrary = launchRecipes.map(normalizeLaunchRecipe);
 
 const ARTICLE_SELECT = `
   title, slug, summary, published_at, body,
@@ -182,52 +229,83 @@ export async function getArticle(category: string, slug: string): Promise<Editor
 }
 
 const RECIPE_SELECT = `
-  title, slug, summary, servings, prep_minutes, cook_minutes, difficulty, library_sections,
-  hero_image,
+  title, bangla_title, slug, summary, story, category, cuisine, servings, prep_minutes,
+  cook_minutes, total_minutes, inactive_minutes, yield_text, difficulty, library_sections,
+  dietary_tags, serving_suggestions, tips, storage_notes, safety_notes, featured,
+  published_at, author_display, hero_image, image_wide, image_square, image_credit,
+  author:authors ( name ),
   region_division:geo_divisions!recipes_region_division_id_fkey ( title ),
   region_region:geo_regions!recipes_region_region_id_fkey ( title ),
-  recipe_ingredients ( amount, unit, imperial_amount, imperial_unit, note, sort_order, ingredient:ingredients ( title, bangla_name ) ),
-  recipe_steps ( instruction, timer_minutes, sort_order ),
-  recipe_related_products ( product_id )
+  recipe_ingredients ( display_amount, amount, unit, imperial_amount, imperial_unit, note, group_label, group_sort_order, sort_order, ingredient:ingredients ( title, bangla_name ) ),
+  recipe_steps ( instruction, timer_minutes, section_label, section_sort_order, sort_order ),
+  recipe_related_products ( sort_order, product:products ( title, handle, thumbnail_url ) )
 ` as const;
 
 interface RecipeRow {
   title: string;
+  bangla_title: string | null;
   slug: string;
   summary: string | null;
+  story: string | null;
+  category: string | null;
+  cuisine: string | null;
   servings: number;
   prep_minutes: number | null;
   cook_minutes: number | null;
+  total_minutes: number | null;
+  inactive_minutes: number | null;
+  yield_text: string | null;
   difficulty: string | null;
   library_sections: string[] | null;
+  dietary_tags: string[] | null;
+  serving_suggestions: string[] | null;
+  tips: string[] | null;
+  storage_notes: string | null;
+  safety_notes: string | null;
+  featured: boolean | null;
+  published_at: string | null;
+  author_display: string | null;
   hero_image: ImageField;
+  image_wide: ImageField;
+  image_square: ImageField;
+  image_credit: string | null;
+  author: { name: string } | { name: string }[] | null;
   region_division: { title: string } | { title: string }[] | null;
   region_region: { title: string } | { title: string }[] | null;
   recipe_ingredients: Array<{
+    display_amount: string | null;
     amount: number | null;
     unit: string | null;
     imperial_amount: number | null;
     imperial_unit: string | null;
     note: string | null;
+    group_label: string | null;
+    group_sort_order: number;
     sort_order: number;
     ingredient: { title: string; bangla_name: string | null } | { title: string; bangla_name: string | null }[] | null;
   }> | null;
-  recipe_steps: Array<{ instruction: string; timer_minutes: number | null; sort_order: number }> | null;
-  recipe_related_products: Array<{ product_id: string }> | null;
+  recipe_steps: Array<{ instruction: string; timer_minutes: number | null; section_label: string | null; section_sort_order: number; sort_order: number }> | null;
+  recipe_related_products: Array<{
+    sort_order: number;
+    product: { title: string; handle: string; thumbnail_url: string | null } | { title: string; handle: string; thumbnail_url: string | null }[] | null;
+  }> | null;
 }
 
 function normalizeRecipeRow(row: RecipeRow): EditorialRecipe | null {
-  const steps = (row.recipe_steps ?? [])
+  const sortedSteps = (row.recipe_steps ?? [])
     .slice()
-    .sort((a, b) => a.sort_order - b.sort_order)
+    .sort((a, b) => a.section_sort_order - b.section_sort_order || a.sort_order - b.sort_order);
+  const steps = sortedSteps
     .map((step) => ({ instruction: step.instruction, timerMinutes: step.timer_minutes ?? undefined }));
-  const ingredients = (row.recipe_ingredients ?? [])
+  const sortedIngredients = (row.recipe_ingredients ?? [])
     .slice()
-    .sort((a, b) => a.sort_order - b.sort_order)
+    .sort((a, b) => a.group_sort_order - b.group_sort_order || a.sort_order - b.sort_order);
+  const ingredients = sortedIngredients
     .map((entry) => {
       const ingredient = Array.isArray(entry.ingredient) ? entry.ingredient[0] : entry.ingredient;
       return {
         amount: entry.amount ?? undefined,
+        displayAmount: entry.display_amount ?? undefined,
         unit: entry.unit ?? undefined,
         imperialAmount: entry.imperial_amount ?? undefined,
         imperialUnit: entry.imperial_unit ?? undefined,
@@ -239,28 +317,77 @@ function normalizeRecipeRow(row: RecipeRow): EditorialRecipe | null {
   if (!row.summary || !row.hero_image?.url || !ingredients.length || !steps.length) return null;
   const regionRegion = Array.isArray(row.region_region) ? row.region_region[0] : row.region_region;
   const regionDivision = Array.isArray(row.region_division) ? row.region_division[0] : row.region_division;
+  const author = Array.isArray(row.author) ? row.author[0] : row.author;
+  const ingredientGroups = [...new Set(sortedIngredients.map((entry) => entry.group_label ?? "Ingredients"))].map((title) => ({
+    title,
+    ingredients: sortedIngredients.filter((entry) => (entry.group_label ?? "Ingredients") === title).map((entry) => {
+      const ingredient = Array.isArray(entry.ingredient) ? entry.ingredient[0] : entry.ingredient;
+      return {
+        amount: entry.amount ?? undefined,
+        displayAmount: entry.display_amount ?? undefined,
+        unit: entry.unit ?? undefined,
+        imperialAmount: entry.imperial_amount ?? undefined,
+        imperialUnit: entry.imperial_unit ?? undefined,
+        note: entry.note ?? undefined,
+        name: ingredient?.title ?? "",
+        banglaName: ingredient?.bangla_name ?? undefined,
+      };
+    }),
+  }));
+  const stepSections = [...new Set(sortedSteps.map((step) => step.section_label ?? "Method"))].map((title) => ({
+    title,
+    steps: sortedSteps.filter((step) => (step.section_label ?? "Method") === title).map((step) => ({
+      instruction: step.instruction,
+      timerMinutes: step.timer_minutes ?? undefined,
+    })),
+  }));
+  const relatedProducts = (row.recipe_related_products ?? []).slice().sort((a, b) => a.sort_order - b.sort_order).flatMap((entry) => {
+    const product = Array.isArray(entry.product) ? entry.product[0] : entry.product;
+    return product ? [{ title: product.title, handle: product.handle, image: product.thumbnail_url ?? undefined }] : [];
+  });
   return {
     title: row.title,
+    banglaTitle: row.bangla_title ?? undefined,
     slug: row.slug,
     excerpt: row.summary,
+    story: row.story ?? undefined,
     region: regionRegion?.title ?? regionDivision?.title ?? "Bangladesh",
+    category: row.category ?? "Bangladeshi recipe",
+    cuisine: row.cuisine ?? "Bangladeshi",
     prepTime: row.prep_minutes ?? 0,
     cookTime: row.cook_minutes ?? 0,
+    totalTime: row.total_minutes ?? (row.prep_minutes ?? 0) + (row.cook_minutes ?? 0),
+    inactiveTime: row.inactive_minutes ?? undefined,
     servings: row.servings,
+    yield: row.yield_text ?? `${row.servings} servings`,
     difficulty: row.difficulty ?? "",
     image: row.hero_image.url,
+    imageWide: row.image_wide?.url ?? row.hero_image.url,
+    imageSquare: row.image_square?.url ?? row.hero_image.url,
     imageAlt: row.hero_image.alt ?? `Prepared ${row.title}`,
+    imageCredit: row.image_credit ?? undefined,
     ingredients,
+    ingredientGroups,
     steps,
+    stepSections,
+    servingSuggestions: row.serving_suggestions ?? [],
+    tips: row.tips ?? [],
+    storage: row.storage_notes ?? undefined,
+    safety: row.safety_notes ?? undefined,
+    dietaryTags: row.dietary_tags ?? [],
+    relatedProducts,
+    author: row.author_display ?? author?.name ?? "Bangla Blend Kitchen",
+    publishedAt: row.published_at ?? undefined,
+    featured: row.featured ?? false,
     hasRegion: Boolean(row.region_division),
-    hasProducts: (row.recipe_related_products?.length ?? 0) > 0,
+    hasProducts: relatedProducts.length > 0,
     librarySections: row.library_sections ?? [],
     verified: true,
   };
 }
 
 export async function getRecipes(): Promise<EditorialRecipe[]> {
-  if (!contentClient) return developmentFallbacksEnabled() ? recipePreview() : [];
+  if (!contentClient) return launchRecipeLibrary;
   try {
     const { data } = await contentClient
       .from("recipes")
@@ -271,15 +398,21 @@ export async function getRecipes(): Promise<EditorialRecipe[]> {
     const approved = (data ?? [])
       .map((row) => normalizeRecipeRow(row as unknown as RecipeRow))
       .filter((recipe): recipe is EditorialRecipe => Boolean(recipe));
-    return approved.length || !developmentFallbacksEnabled() ? approved : recipePreview();
+    const approvedBySlug = new Map(approved.map((recipe) => [recipe.slug, recipe]));
+    const launchSlugs = new Set(launchRecipeLibrary.map((recipe) => recipe.slug));
+    return [
+      ...launchRecipeLibrary.map((recipe) => approvedBySlug.get(recipe.slug) ?? recipe),
+      ...approved.filter((recipe) => !launchSlugs.has(recipe.slug)),
+    ];
   } catch (error) {
     logContentFetchFailure(error);
-    return developmentFallbacksEnabled() ? recipePreview() : [];
+    return launchRecipeLibrary;
   }
 }
 
 export async function getRecipe(slug: string): Promise<EditorialRecipe | null> {
-  if (!contentClient) return developmentFallbacksEnabled() ? (recipePreview().find((r) => r.slug === slug) ?? null) : null;
+  const launchRecipe = launchRecipeLibrary.find((recipe) => recipe.slug === slug) ?? null;
+  if (!contentClient) return launchRecipe;
   try {
     const { data } = await contentClient
       .from("recipes")
@@ -289,10 +422,9 @@ export async function getRecipe(slug: string): Promise<EditorialRecipe | null> {
       .eq("verified", true)
       .maybeSingle();
     const approved = data ? normalizeRecipeRow(data as unknown as RecipeRow) : null;
-    if (approved || !developmentFallbacksEnabled()) return approved;
-    return recipePreview().find((recipe) => recipe.slug === slug) ?? null;
+    return approved ?? launchRecipe;
   } catch (error) {
     logContentFetchFailure(error);
-    return developmentFallbacksEnabled() ? (recipePreview().find((r) => r.slug === slug) ?? null) : null;
+    return launchRecipe;
   }
 }

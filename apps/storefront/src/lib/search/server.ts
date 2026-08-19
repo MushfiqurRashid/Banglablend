@@ -2,6 +2,7 @@ import "server-only";
 import type { MarketCode, SearchDocument } from "@bangla-blend/types";
 import { createSupabasePublicClient } from "@bangla-blend/supabase-client";
 import { getStoreProducts } from "@/lib/commerce/server";
+import { launchRecipes } from "@/data/launch-recipes";
 
 const SEARCH_LIMIT = 24;
 const synonymGroups = [
@@ -89,6 +90,17 @@ export async function searchStorefront(query: string, market: MarketCode) {
     eligibleMarkets: product.eligibleMarkets,
   }));
 
+  for (const recipe of launchRecipes) {
+    documents.push({
+      id: `recipe_launch_${recipe.slug}`,
+      type: "recipe",
+      title: recipe.title,
+      slug: recipe.slug,
+      excerpt: [recipe.banglaTitle, recipe.excerpt, recipe.region, recipe.category].join(" "),
+      image: recipe.image,
+    });
+  }
+
   const contentSources: Array<[SearchDocument["type"], ContentRow[]]> = [
     ["recipe", recipes],
     ["article", articles],
@@ -100,7 +112,7 @@ export async function searchStorefront(query: string, market: MarketCode) {
   for (const [type, rows] of contentSources) {
     for (const row of rows) {
       const document = contentDocument(type, row);
-      if (document) documents.push(document);
+      if (document && !documents.some((entry) => entry.type === type && entry.slug === document.slug)) documents.push(document);
     }
   }
 
