@@ -1,6 +1,12 @@
 import "server-only";
 import type { ComponentProps } from "react";
 import type { PortableText } from "@portabletext/react";
+import {
+  launchArticles,
+  type LaunchArticle,
+  type StorySection,
+  type StorySource,
+} from "@/data/launch-articles";
 import { launchRecipes, type LaunchRecipe } from "@/data/launch-recipes";
 import { articles as previewArticles } from "./fallback-content";
 import { contentClient, logContentFetchFailure } from "./client";
@@ -19,9 +25,16 @@ export interface EditorialArticle {
   readingTime: number;
   image: string;
   imageAlt: string;
+  imageCredit?: string;
   author: string;
   body?: PortableValue;
   previewParagraphs?: string[];
+  intro?: string[];
+  sections?: StorySection[];
+  sources?: StorySource[];
+  editorialNote?: string;
+  featured: boolean;
+  sortOrder: number;
   verified: boolean;
 }
 
@@ -117,8 +130,39 @@ function articlePreview(category?: string): EditorialArticle[] {
       imageAlt: "",
       author: "Bangla Blend Editorial",
       previewParagraphs: article.body,
+      featured: false,
+      sortOrder: 999,
       verified: false,
     }));
+}
+
+function storyReadingTime(article: Pick<LaunchArticle, "intro" | "sections">) {
+  const words = [
+    ...article.intro,
+    ...article.sections.flatMap((section) => [
+      section.title,
+      ...section.paragraphs,
+      section.pullQuote ?? "",
+      ...(section.highlights ?? []),
+    ]),
+  ]
+    .join(" ")
+    .trim()
+    .split(/\s+/).length;
+  return Math.max(1, Math.ceil(words / 210));
+}
+
+function normalizeLaunchArticle(article: LaunchArticle): EditorialArticle {
+  return {
+    ...article,
+    readingTime: storyReadingTime(article),
+  };
+}
+
+const launchArticleLibrary = launchArticles.map(normalizeLaunchArticle);
+
+function launchArticlePreview(category?: string) {
+  return launchArticleLibrary.filter((article) => !category || article.categorySlug === category);
 }
 
 function normalizeLaunchRecipe(recipe: LaunchRecipe): EditorialRecipe {
@@ -149,8 +193,8 @@ function normalizeLaunchRecipe(recipe: LaunchRecipe): EditorialRecipe {
 const launchRecipeLibrary = launchRecipes.map(normalizeLaunchRecipe);
 
 const ARTICLE_SELECT = `
-  title, slug, summary, published_at, body,
-  hero_image,
+  title, slug, summary, published_at, body, intro, story_sections, sources,
+  editorial_note, hero_image, image_credit, featured, sort_order,
   author:authors!inner ( name ),
   category:journal_categories!inner ( title, slug )
 ` as const;
@@ -161,7 +205,14 @@ interface ArticleRow {
   summary: string | null;
   published_at: string | null;
   body: PortableValue | null;
+  intro: string[] | null;
+  story_sections: StorySection[] | null;
+  sources: StorySource[] | null;
+  editorial_note: string | null;
   hero_image: ImageField;
+  image_credit: string | null;
+  featured: boolean | null;
+  sort_order: number | null;
   author: { name: string } | { name: string }[] | null;
   category: { title: string; slug: string } | { title: string; slug: string }[] | null;
 }
@@ -177,17 +228,27 @@ function normalizeArticleRow(row: ArticleRow): EditorialArticle | null {
     categorySlug: category.slug,
     excerpt: row.summary,
     publishedAt: row.published_at,
-    readingTime: Math.max(1, estimateReadingTime(row.body)),
+    readingTime: row.story_sections?.length
+      ? storyReadingTime({ intro: row.intro ?? [], sections: row.story_sections })
+      : Math.max(1, estimateReadingTime(row.body)),
     image: row.hero_image.url,
     imageAlt: row.hero_image.alt ?? "",
+    imageCredit: row.image_credit ?? undefined,
     author: author?.name ?? "Bangla Blend Editorial",
     body: row.body ?? undefined,
+    intro: row.intro ?? undefined,
+    sections: row.story_sections ?? undefined,
+    sources: row.sources ?? undefined,
+    editorialNote: row.editorial_note ?? undefined,
+    featured: row.featured ?? false,
+    sortOrder: row.sort_order ?? 999,
     verified: true,
   };
 }
 
 export async function getArticles(category?: string): Promise<EditorialArticle[]> {
-  if (!contentClient) return developmentFallbacksEnabled() ? articlePreview(category) : [];
+  const launch = launchArticlePreview(category);
+  if (!contentClient) return launch.length ? launch : developmentFallbacksEnabled() ? articlePreview(category) : [];
   try {
     let request = contentClient
       .from("journal_articles")
@@ -201,15 +262,21 @@ export async function getArticles(category?: string): Promise<EditorialArticle[]
     const approved = (data ?? [])
       .map((row) => normalizeArticleRow(row as unknown as ArticleRow))
       .filter((article): article is EditorialArticle => Boolean(article));
-    return approved.length || !developmentFallbacksEnabled() ? approved : articlePreview(category);
+    const approvedBySlug = new Map(approved.map((article) => [article.slug, article]));
+    const launchSlugs = new Set(launch.map((article) => article.slug));
+    return [
+      ...launch.map((article) => approvedBySlug.get(article.slug) ?? article),
+      ...approved.filter((article) => !launchSlugs.has(article.slug)),
+    ].sort((a, b) => Number(b.featured) - Number(a.featured) || a.sortOrder - b.sortOrder || b.publishedAt.localeCompare(a.publishedAt));
   } catch (error) {
     logContentFetchFailure(error);
-    return developmentFallbacksEnabled() ? articlePreview(category) : [];
+    return launch.length ? launch : developmentFallbacksEnabled() ? articlePreview(category) : [];
   }
 }
 
 export async function getArticle(category: string, slug: string): Promise<EditorialArticle | null> {
-  if (!contentClient) return developmentFallbacksEnabled() ? (articlePreview(category).find((a) => a.slug === slug) ?? null) : null;
+  const launchArticle = launchArticlePreview(category).find((article) => article.slug === slug) ?? null;
+  if (!contentClient) return launchArticle ?? (developmentFallbacksEnabled() ? (articlePreview(category).find((a) => a.slug === slug) ?? null) : null);
   try {
     const { data } = await contentClient
       .from("journal_articles")
@@ -220,11 +287,12 @@ export async function getArticle(category: string, slug: string): Promise<Editor
       .eq("verified", true)
       .maybeSingle();
     const approved = data ? normalizeArticleRow(data as unknown as ArticleRow) : null;
-    if (approved || !developmentFallbacksEnabled()) return approved;
-    return articlePreview(category).find((article) => article.slug === slug) ?? null;
+    if (approved) return approved;
+    if (launchArticle) return launchArticle;
+    return developmentFallbacksEnabled() ? (articlePreview(category).find((article) => article.slug === slug) ?? null) : null;
   } catch (error) {
     logContentFetchFailure(error);
-    return developmentFallbacksEnabled() ? (articlePreview(category).find((a) => a.slug === slug) ?? null) : null;
+    return launchArticle ?? (developmentFallbacksEnabled() ? (articlePreview(category).find((a) => a.slug === slug) ?? null) : null);
   }
 }
 

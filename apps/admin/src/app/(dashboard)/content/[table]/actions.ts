@@ -30,6 +30,11 @@ function coerceField(field: FieldDef, raw: FormDataEntryValue | null): unknown {
       .split(",")
       .map((item) => item.trim())
       .filter(Boolean);
+  if (field.kind === "paragraphs")
+    return value
+      .split(/\n\s*\n/)
+      .map((item) => item.trim())
+      .filter(Boolean);
   if (field.kind === "richtext") return plainTextToPortableText(value);
   if (field.kind === "json") {
     try {
@@ -53,7 +58,42 @@ function buildRow(table: string, formData: FormData): Record<string, unknown> {
       throw error instanceof Error ? error : new Error("Invalid field value.");
     }
   }
+  if (table === "journal_articles") validateArticleRow(row);
   return row;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function validateArticleRow(row: Record<string, unknown>) {
+  const hero = row.hero_image;
+  if (!isRecord(hero) || typeof hero.url !== "string" || !hero.url.trim()) throw new Error("Add a hero image before saving the article.");
+  if (typeof hero.alt !== "string" || !hero.alt.trim()) throw new Error("Add alternative text for the hero image.");
+
+  const sections = row.story_sections;
+  if (!Array.isArray(sections)) throw new Error("Story chapters must be a valid list.");
+  sections.forEach((section, index) => {
+    if (!isRecord(section) || typeof section.title !== "string" || !section.title.trim()) throw new Error(`Chapter ${index + 1} needs a title.`);
+    if (!Array.isArray(section.paragraphs) || !section.paragraphs.some((paragraph) => typeof paragraph === "string" && paragraph.trim())) throw new Error(`Chapter ${index + 1} needs at least one paragraph.`);
+    if (isRecord(section.image) && typeof section.image.url === "string" && section.image.url.trim() && (typeof section.image.alt !== "string" || !section.image.alt.trim())) throw new Error(`Chapter ${index + 1} image needs alternative text.`);
+  });
+
+  const sources = row.sources;
+  if (Array.isArray(sources)) sources.forEach((source, index) => {
+    if (!isRecord(source) || typeof source.label !== "string" || !source.label.trim() || typeof source.url !== "string" || !source.url.trim()) throw new Error(`Source ${index + 1} needs both a label and URL.`);
+    try {
+      const url = new URL(source.url);
+      if (url.protocol !== "https:" && url.protocol !== "http:") throw new Error("Unsupported protocol");
+    } catch {
+      throw new Error(`Source ${index + 1} must use a complete HTTP or HTTPS URL.`);
+    }
+  });
+
+  if (row.verification_status === "verified") {
+    if (row.verified !== true) throw new Error("Set Verified when the verification status is verified.");
+    if (!sections.length) throw new Error("A verified article needs at least one chapter.");
+  }
 }
 
 export async function createContentAction(table: string, _prevState: ContentActionState | undefined, formData: FormData): Promise<ContentActionState> {

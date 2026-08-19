@@ -1,0 +1,471 @@
+export interface StoryImage {
+  url: string;
+  alt: string;
+  caption?: string;
+  credit?: string;
+  position?: string;
+}
+
+export interface StorySection {
+  id: string;
+  eyebrow?: string;
+  title: string;
+  paragraphs: string[];
+  image?: StoryImage;
+  pullQuote?: string;
+  highlights?: string[];
+}
+
+export interface StorySource {
+  label: string;
+  url: string;
+}
+
+export interface LaunchArticle {
+  title: string;
+  slug: string;
+  category: string;
+  categorySlug: "food-heritage" | "ingredient-stories";
+  excerpt: string;
+  publishedAt: string;
+  image: string;
+  imageAlt: string;
+  imageCredit: string;
+  author: string;
+  intro: string[];
+  sections: StorySection[];
+  sources: StorySource[];
+  editorialNote: string;
+  featured: boolean;
+  sortOrder: number;
+  verified: true;
+}
+
+const suppliedCredit = "Image supplied with the original Bangla Blend manuscript";
+
+export const launchArticles: LaunchArticle[] = [
+  {
+    title: "Inside the Bangladeshi Pantry: Six Ingredients, Six Stories",
+    slug: "six-ingredients-that-shape-the-bangladeshi-kitchen",
+    category: "Ingredient Stories",
+    categorySlug: "ingredient-stories",
+    excerpt:
+      "From golden turmeric and Hathazari red chilli to ginger, garlic, mustard and onion, follow the ingredients that build the flavour of everyday Bangladeshi cooking.",
+    publishedAt: "2026-08-19T00:00:00.000Z",
+    image: "/images/stories/ingredient-stories/ingredients-hero.webp",
+    imageAlt: "A market table filled with chillies, turmeric, garlic, onions and whole spices",
+    imageCredit: suppliedCredit,
+    author: "Bangla Blend Editorial",
+    intro: [
+      "Bangladeshi cooking begins long before a pan reaches the stove. It begins in fields, courtyards and markets, where ingredients are grown, dried, sorted and chosen with care.",
+      "This collection follows six pantry foundations from harvest to kitchen. Each one brings its own colour, aroma and technique; together, they create the layered flavour that makes a Bangladeshi meal feel familiar.",
+    ],
+    sections: [
+      {
+        id: "binni-holud",
+        eyebrow: "01 · Turmeric",
+        title: "Binni Holud: a golden thread through the everyday kitchen",
+        paragraphs: [
+          "Turmeric is among the first spices to enter many fish, meat, lentil and vegetable dishes. The name Binni Holud is associated with turmeric prized for a saturated golden colour, an earthy fragrance and the warmth it lends without overwhelming other ingredients.",
+          "Turmeric rhizomes develop below ground. After harvest they are cleaned, cured, dried and polished before being sold whole or ground. Good handling matters: excess moisture dulls both aroma and keeping quality, while careful drying preserves the ingredient's character.",
+          "At home, look for a clean, earthy aroma and an even natural colour. Keep ground turmeric airtight and away from light and humidity; buy in quantities that will stay lively rather than lingering for years at the back of a cupboard.",
+        ],
+        image: {
+          url: "/images/stories/ingredient-stories/binni-holud-harvest.webp",
+          alt: "A farmer lifting fresh turmeric rhizomes beside a harvest basket",
+          caption: "Fresh turmeric begins as a knobbly rhizome beneath the soil.",
+          credit: suppliedCredit,
+        },
+        highlights: ["Earthy and warm", "Builds golden colour", "Store away from light and moisture"],
+      },
+      {
+        id: "hathazari-red-chilli",
+        eyebrow: "02 · Red chilli",
+        title: "Hathazari Red Chilli: colour, warmth and regional identity",
+        paragraphs: [
+          "Chilli arrived in South Asia through early modern trade and became inseparable from the region's food. Around Chattogram, the name Hathazari Red Chilli has come to signal the vivid colour and balanced warmth valued in local cooking.",
+          "Ripe chillies are picked, cleaned and dried until their moisture is low enough for storage or grinding. The best powder smells fresh and fruity as well as hot; heat alone is not a measure of quality.",
+          "Use it to build colour and warmth in fish curry, bhuna, dal, vegetables, bhorta and achar. Whole chillies offer slower, rounder heat, while powder disperses quickly through a masala. Both should be stored airtight, dry and away from direct sun.",
+        ],
+        image: {
+          url: "/images/stories/ingredient-stories/hathazari-field.webp",
+          alt: "Rows of ripe red chillies growing in a field at sunset",
+          caption: "Chillies are harvested when their colour and flavour have fully developed.",
+          credit: suppliedCredit,
+        },
+        highlights: ["Vivid red colour", "Fruit-forward warmth", "Whole, crushed or ground"],
+      },
+      {
+        id: "ginger",
+        eyebrow: "03 · Fresh rhizome",
+        title: "Ginger: the bright, aromatic foundation",
+        paragraphs: [
+          "Ginger brings warmth, citrus lift and an earthy edge. Crushed with garlic, it forms an aromatic base for countless curries and marinades; sliced or bruised, it can stay more distinct in the finished dish.",
+          "Bangladesh grows ginger as a warm-season spice crop, including in hilly and highland areas where drainage suits the rhizome. Once lifted, it is cleaned and sorted for fresh sale or drying.",
+          "Choose pieces that feel firm and heavy, with taut skin and a lively aroma when cut. Refrigerate fresh ginger in a breathable or loosely wrapped container and trim only what you need.",
+        ],
+        image: {
+          url: "/images/stories/ingredient-stories/ginger-fields.webp",
+          alt: "Green ginger plants covering a hillside at sunrise",
+          caption: "Ginger thrives where warmth, rainfall and well-drained soil meet.",
+          credit: suppliedCredit,
+        },
+        highlights: ["Warm and citrusy", "Pairs naturally with garlic", "Use fresh for the clearest aroma"],
+      },
+      {
+        id: "garlic",
+        eyebrow: "04 · Allium",
+        title: "Garlic: savoury depth in every layer",
+        paragraphs: [
+          "Garlic quietly gives structure to Bangladeshi cooking. Raw or lightly cooked it is assertive; browned slowly, it becomes rounded and sweet. That change is why the same ingredient can anchor dal, fish curry, meat bhuna, bhorta and pickle in very different ways.",
+          "Garlic is a cool-season crop in Bangladesh. Mature bulbs are lifted when the leaves begin to dry, then cured so the papery skins can protect the cloves in storage.",
+          "Select dry, compact bulbs with firm cloves and no soft patches. Airflow is more useful than refrigeration for whole bulbs: keep them cool, dark and well ventilated.",
+        ],
+        highlights: ["Pungent when raw", "Sweetens as it browns", "Keep whole bulbs ventilated"],
+      },
+      {
+        id: "mustard-paste",
+        eyebrow: "05 · Seed to paste",
+        title: "Mustard paste: Bengal's unmistakable pungency",
+        paragraphs: [
+          "Mustard seed becomes something entirely different when soaked and ground. The resulting paste is sharp, aromatic and faintly bitter, with a heat that rises through the nose rather than simply burning on the tongue.",
+          "It is central to shorshe-style fish, prawns, vegetables and marinades. A little salt and water help the seeds grind smoothly; gentle cooking keeps the flavour expressive. Household methods vary, and many cooks combine yellow and darker seeds to tune the balance of colour and pungency.",
+          "Fresh paste is perishable. Refrigerate it in a clean sealed container, follow the maker's storage guidance and use it while its aroma remains vivid.",
+        ],
+        highlights: ["Sharp and aromatic", "Suited to fish and vegetables", "Refrigerate fresh paste"],
+      },
+      {
+        id: "onion",
+        eyebrow: "06 · Allium",
+        title: "Onion: the patient architecture of a bhuna",
+        paragraphs: [
+          "Onion provides the body beneath many Bangladeshi gravies. Sliced onion can stay fresh and crisp, soften into a pale base, or cook slowly to a deep brown sweetness. Each stage produces a different dish.",
+          "Bangladesh grows onion mainly as a cool-season spice crop. After harvest, the bulbs need careful drying and ventilation; trapped moisture encourages spoilage before they ever reach a kitchen.",
+          "Choose firm bulbs with dry skins and no sprouting or soft spots. At home, give them air and shade. When cooking, judge by colour and aroma rather than the clock—the pan, moisture and size of the cut all change the timing.",
+        ],
+        pullQuote: "In a patient bhuna, onion is not background. It is the structure that carries every spice around it.",
+        highlights: ["Fresh, softened or browned", "Builds body and sweetness", "Store cool, dry and ventilated"],
+      },
+    ],
+    sources: [
+      { label: "Banglapedia — Crop seasons and spice crops", url: "https://en.banglapedia.org/index.php?title=Crop" },
+      { label: "Banglapedia — Food habits in Bangladesh", url: "https://en.banglapedia.org/index.php/Food_Habits" },
+      { label: "Banglapedia — Land resource technology", url: "https://en.banglapedia.org/index.php/Land_Resource_Technology" },
+    ],
+    editorialNote:
+      "Adapted from the supplied Ingredient Stories manuscript. Specific farm, supplier and protected-origin claims were removed where supporting records were not included; cultivation details are presented as broad context rather than a guarantee of provenance.",
+    featured: true,
+    sortOrder: 10,
+    verified: true,
+  },
+  {
+    title: "Bangladesh's Spice Heritage: How Regional Masalas Shape a Cuisine",
+    slug: "bangladesh-spice-heritage-regional-masala",
+    category: "Food Heritage",
+    categorySlug: "food-heritage",
+    excerpt:
+      "A journey from Bengal's trading history to the kitchens of Chattogram, Sylhet, Rajshahi and Old Dhaka, told through the craft of the masala.",
+    publishedAt: "2026-08-19T00:00:00.000Z",
+    image: "/images/stories/spice-heritage/spice-heritage-hero.webp",
+    imageAlt: "A stone mortar surrounded by bowls of whole and ground spices",
+    imageCredit: suppliedCredit,
+    author: "Bangla Blend Editorial",
+    intro: [
+      "The character of a regional dish rarely comes from a single spice. It comes from proportion: what is toasted, what is ground, what enters the oil first and what is held back until the final minute.",
+      "Across Bangladesh, shared pantry ingredients become distinct local expressions. The masala is both a recipe and a record of place, trade, season and family preference.",
+    ],
+    sections: [
+      {
+        id: "history",
+        eyebrow: "Trade & exchange",
+        title: "A spice history written through Bengal",
+        paragraphs: [
+          "Bengal's river routes and ports connected growers, merchants and cooks over many centuries. Ingredients and techniques moved through those networks, meeting a local pantry already rich in mustard, turmeric, ginger and aromatic leaves.",
+          "Later courtly traditions added perfume, richness and slow-cooking techniques to urban foodways. Yet the cuisine was never simply imported: home cooks adapted what arrived to local fish, rice, pulses, vegetables and the humid delta climate.",
+          "Chilli offers a vivid example. Native to the Americas, it travelled through Portuguese trade before becoming so established that it now feels inseparable from everyday Bangladeshi cooking.",
+        ],
+        image: {
+          url: "/images/stories/spice-heritage/spice-trade.webp",
+          alt: "A historic riverside spice market illustrated in warm brown tones",
+          caption: "River and maritime trade carried ingredients as well as cooking ideas.",
+          credit: suppliedCredit,
+        },
+      },
+      {
+        id: "core-palette",
+        eyebrow: "The shared pantry",
+        title: "A palette built for balance",
+        paragraphs: [
+          "Turmeric brings earthiness and colour; chilli brings warmth; coriander rounds sharper notes; cumin adds nuttiness; and black pepper gives a dry, fragrant heat. Cinnamon, cardamom, clove and bay leaf lend perfume to rice and long-cooked meat dishes.",
+          "Mustard may appear as whole seed, oil or paste, each with its own rhythm. The importance lies less in using every spice than in knowing which few a dish needs—and when to add them.",
+        ],
+        image: {
+          url: "/images/stories/spice-heritage/spice-palette.webp",
+          alt: "An overhead arrangement of whole spices in round bowls",
+          caption: "A common palette can produce very different masalas through proportion and technique.",
+          credit: suppliedCredit,
+        },
+        highlights: ["Toast for aroma", "Grind for release", "Layer rather than overwhelm"],
+      },
+      {
+        id: "chattogram",
+        eyebrow: "Chattogram",
+        title: "The bold spirit of Mezban masala",
+        paragraphs: [
+          "Mezban is a communal feast as much as a dish, and its beef preparation is known for a deep colour, generous heat and a concentrated gravy. Cumin, coriander, chilli, pepper and warm whole spices work with garlic, ginger and slowly cooked onion.",
+          "There is no single household formula. The signature comes from density and balance: spices should enrich the meat and browned base, not sit as a dusty layer above them.",
+        ],
+        image: {
+          url: "/images/stories/spice-heritage/mezban-masala.webp",
+          alt: "A dark Chattogram-style beef curry surrounded by bowls of spices",
+          caption: "Mezban's masala is built for depth, warmth and generous communal service.",
+          credit: suppliedCredit,
+        },
+      },
+      {
+        id: "sylhet",
+        eyebrow: "Sylhet",
+        title: "Where citrus changes the masala",
+        paragraphs: [
+          "Sylhet's shatkora introduces a fragrant bitter-citrus note that cuts through rich meat. The supporting spices stay measured—often coriander, cumin, turmeric, black pepper and green chilli—so the fruit remains legible.",
+          "That restraint is instructive: regional flavour is not always about more spice. Sometimes it is the confidence to leave space around one defining local ingredient.",
+        ],
+        image: {
+          url: "/images/stories/spice-heritage/sylhet-satkara.webp",
+          alt: "A Sylheti beef curry with green citrus beside a tea garden",
+          caption: "Shatkora lends meat dishes a floral, bitter-citrus lift.",
+          credit: suppliedCredit,
+        },
+      },
+      {
+        id: "rajshahi",
+        eyebrow: "Rajshahi",
+        title: "Roasting for warmth, not simply heat",
+        paragraphs: [
+          "Dry-roasting coriander, cumin and pepper until fragrant changes their flavour before they ever reach the pan. The technique deepens nuttiness and allows a smaller quantity of spice to speak clearly.",
+          "In the source manuscript, this craft is associated with Rajshahi's meat and lentil dishes. As with all regional cooking, practices cross district borders and vary between families; technique is a more useful guide than a rigid claim of ownership.",
+        ],
+        image: {
+          url: "/images/stories/spice-heritage/rajshahi-roasting.webp",
+          alt: "Whole spices roasting in a dark pan beside a grinding stone",
+          caption: "Gentle dry-roasting wakes up aroma before grinding.",
+          credit: suppliedCredit,
+        },
+      },
+      {
+        id: "old-dhaka",
+        eyebrow: "Old Dhaka",
+        title: "The perfumed architecture of a Mughlai legacy",
+        paragraphs: [
+          "Old Dhaka's celebrated biryani, korma, roast and kebab traditions favour fragrance and slow infusion. Cardamom, cinnamon, clove, mace, nutmeg and pepper are handled with precision, often alongside yoghurt, ghee and browned onion.",
+          "The goal is not raw intensity. Whole spices perfume fat and steam over time, giving rice and meat a layered aroma that continues to unfold at the table.",
+        ],
+        image: {
+          url: "/images/stories/spice-heritage/old-dhaka-kacchi.webp",
+          alt: "Kacchi biryani in a hammered copper handi with whole spices nearby",
+          caption: "Courtly influences remain visible in Old Dhaka's aromatic rice and meat dishes.",
+          credit: suppliedCredit,
+        },
+      },
+      {
+        id: "preparation",
+        eyebrow: "Kitchen craft",
+        title: "Grinding, blending and the value of freshness",
+        paragraphs: [
+          "Before electric mills, cooks dried, roasted and ground spices with tools such as the shil nora and mortar. Those methods still matter, but freshness—not nostalgia alone—is the practical lesson.",
+          "Whole spices protect their aroma longer than powder. Grinding small quantities, cooling roasted spices before storing them and using clean airtight containers can make a greater difference than buying an elaborate pre-mixed blend.",
+          "Preserving spice heritage means preserving knowledge: the sound of a seed beginning to crackle, the smell that signals roasting should stop, and the proportions a family returns to for a particular dish.",
+        ],
+        image: {
+          url: "/images/stories/spice-heritage/stone-grinding.webp",
+          alt: "A cook grinding red chillies and spices on a traditional stone slab",
+          caption: "Traditional tools make the transformation from whole spice to masala visible and tactile.",
+          credit: suppliedCredit,
+        },
+        pullQuote: "A masala is not a fixed list. It is proportion, sequence and the memory of how a dish should smell.",
+      },
+    ],
+    sources: [
+      { label: "Banglapedia — Food habits in Bangladesh", url: "https://en.banglapedia.org/index.php/Food_Habits" },
+      { label: "Banglapedia — Food products from rice and fish", url: "https://en.banglapedia.org/index.php?title=Food_Product" },
+      { label: "Bangladesh Tourism Board — Food traditions of Old Dhaka", url: "https://parjatan.portal.gov.bd/site/page/b060138d-067b-4295-baeb-977d5bac124e" },
+      { label: "Beautiful Bangladesh — Shatkora in Sylhet", url: "https://www.beautifulbangladesh.gov.bd/newsletter/single/470" },
+    ],
+    editorialNote:
+      "Adapted from the supplied Bangladesh Spice Heritage manuscript. Historical statements were tightened and regional descriptions are presented as living traditions with household variation, not fixed formulas.",
+    featured: true,
+    sortOrder: 10,
+    verified: true,
+  },
+  {
+    title: "Bangladesh, District by District: A Table of Regional Food Traditions",
+    slug: "bangladesh-food-heritage-by-district",
+    category: "Food Heritage",
+    categorySlug: "food-heritage",
+    excerpt:
+      "Fourteen places, fourteen ways of reading Bangladesh through rice, river fish, slow-cooked meat, citrus, bamboo, fermentation and family memory.",
+    publishedAt: "2026-08-18T00:00:00.000Z",
+    image: "/images/stories/district-food/district-food-hero.webp",
+    imageAlt: "A table of colourful Bangladeshi dishes served in earthen bowls",
+    imageCredit: suppliedCredit,
+    author: "Bangla Blend Editorial",
+    intro: [
+      "Bangladesh's food map is shaped by rivers, floodplains, coast, haor and hills. Rice may anchor the table, but ingredients and techniques shift remarkably from one place to the next.",
+      "This is a tasting route, not a set of borders. Dishes travel, names change and neighbouring districts share traditions. These associations point to places where a food has a particularly strong public memory.",
+    ],
+    sections: [
+      {
+        id: "rajshahi",
+        eyebrow: "Rajshahi",
+        title: "Kalai ruti with beef bhuna",
+        paragraphs: [
+          "Dense, earthy kalai ruti made with black gram flour is a natural partner for a dark beef bhuna. The bread's robust flavour and chewy edge stand up to a gravy built from onion, ginger, garlic, cumin, coriander and dried chilli.",
+          "Often enjoyed in cool weather, the pairing speaks to a regional table where pulses, grain and slow-cooked meat meet without unnecessary ornament.",
+        ],
+        image: { url: "/images/stories/district-food/rajshahi-kalai-ruti.webp", alt: "Kalai ruti beside a bowl of beef bhuna", caption: "Rustic kalai ruti is made to scoop up a concentrated bhuna.", credit: suppliedCredit },
+      },
+      {
+        id: "chattogram",
+        eyebrow: "Chattogram",
+        title: "Mezban beef and the generous table",
+        paragraphs: [
+          "Mezban describes a tradition of open-handed communal hospitality. Its famous beef is cooked in quantity, with a bold masala and a gravy reduced until spice, onion and meat taste inseparable.",
+          "The dish belongs to an occasion as much as a recipe: eating together is part of its meaning.",
+        ],
+        image: { url: "/images/stories/district-food/chattogram-mezban.webp", alt: "Dark Chattogram-style mezban beef in an earthen bowl", caption: "Mezban is remembered through both its flavour and its communal scale.", credit: suppliedCredit },
+      },
+      {
+        id: "coxs-bazar",
+        eyebrow: "Cox's Bazar",
+        title: "Loitta shutki bhuna",
+        paragraphs: [
+          "Sun-dried loitta, or Bombay duck, carries the concentrated salinity of the coast. Cooked down with onion, garlic, chilli, turmeric and mustard oil, it becomes an intensely savoury, dry-style bhuna.",
+          "Careful washing and patient cooking round the aroma while preserving the ingredient's distinctive character. Steamed rice is all the accompaniment it needs.",
+        ],
+        image: { url: "/images/stories/district-food/coxs-bazar-loitta.webp", alt: "Loitta shutki bhuna with onions and green chillies", caption: "Drying turns a fragile coastal catch into a powerful pantry ingredient.", credit: suppliedCredit },
+      },
+      {
+        id: "bogura",
+        eyebrow: "Bogura",
+        title: "Alu bori chicken ghonto",
+        paragraphs: [
+          "Chicken, potato and sun-dried lentil bori share one pot in this home-style ghonto. As the bori soften, they absorb the gravy while keeping small pockets of texture.",
+          "The original manuscript labelled this section Kala Bhuna, but described Alu Bori Chicken Ghonto throughout; the heading has been corrected so title and story agree.",
+        ],
+        image: { url: "/images/stories/district-food/bogura-alu-bori.webp", alt: "Potato and lentil bori cooked in a spiced chicken ghonto", caption: "Bori bring preservation, texture and pulse-based richness to the pot.", credit: suppliedCredit },
+      },
+      {
+        id: "sylhet",
+        eyebrow: "Sylhet",
+        title: "Beef with shatkora",
+        paragraphs: [
+          "Shatkora's thick rind releases a floral bitterness and citrus perfume as it simmers with beef. It cuts through richness in a way that lime juice cannot quite reproduce.",
+          "Warm spices and green chilli support the fruit rather than masking it, creating one of Sylhet's most recognisable flavour signatures.",
+        ],
+        image: { url: "/images/stories/district-food/sylhet-shatkora.webp", alt: "Beef with shatkora in a brass bowl", caption: "The defining note is fragrant, bitter citrus rather than sharp acidity.", credit: suppliedCredit },
+      },
+      {
+        id: "khulna",
+        eyebrow: "Khulna",
+        title: "Beef chui jhal",
+        paragraphs: [
+          "Chui jhal is the aromatic stem of a climbing pepper plant used across the south-west. Pieces simmer with beef until their woody warmth moves into the gravy.",
+          "The heat is earthy and lingering, distinct from fresh or dried chilli. The dish is particularly associated with Khulna, Jashore and Satkhira, where chui jhal remains part of both home and restaurant cooking.",
+        ],
+        image: { url: "/images/stories/district-food/khulna-chui-jhal.webp", alt: "Beef chui jhal with pieces of aromatic pepper stem", caption: "Chui jhal contributes both texture and a slow aromatic warmth.", credit: suppliedCredit },
+      },
+      {
+        id: "bandarban",
+        eyebrow: "Bandarban",
+        title: "Chicken cooked in bamboo",
+        paragraphs: [
+          "In hill cooking, fresh bamboo can become both vessel and flavouring. Seasoned chicken is enclosed in a bamboo tube and cooked near a fire, trapping steam while the bamboo lends a clean, green aroma.",
+          "Methods and seasonings differ among communities. The shared idea is resourceful cooking closely tied to the landscape and to collective outdoor preparation.",
+        ],
+        image: { url: "/images/stories/district-food/bandarban-bamboo-chicken.webp", alt: "Seasoned chicken cooking inside a fresh bamboo tube", caption: "The bamboo tube holds moisture and contributes a subtle vegetal aroma.", credit: suppliedCredit },
+      },
+      {
+        id: "jamalpur",
+        eyebrow: "Jamalpur",
+        title: "Pithali, also known as milli",
+        paragraphs: [
+          "Pithali or milli is described in the supplied manuscript as a rice-flour preparation connected with family and community meals in Jamalpur. Mild in itself, it is paired with assertive curries and bhorta.",
+          "Because names and preparations vary locally, this story treats the dish as an invitation to further oral-history documentation rather than a single definitive recipe.",
+        ],
+        image: { url: "/images/stories/district-food/jamalpur-pithali.webp", alt: "A golden rice-flour dish served in an earthen bowl", caption: "Simple rice preparations often carry the strongest memory of gathering.", credit: suppliedCredit },
+      },
+      {
+        id: "rangpur",
+        eyebrow: "Rangpur",
+        title: "Kacchi morich beef bhuna",
+        paragraphs: [
+          "Fresh green chilli gives this beef bhuna a bright fragrance before its heat registers. Onion, ginger, garlic and warm spices are cooked down until the gravy clings to the meat.",
+          "Adding some chillies earlier and some near the end creates two layers: mellow warmth in the masala and a fresher green aroma at service.",
+        ],
+        image: { url: "/images/stories/district-food/rangpur-green-chilli-beef.webp", alt: "Dark beef bhuna garnished with fresh green chillies", caption: "Green chilli can contribute perfume as clearly as heat.", credit: suppliedCredit },
+      },
+      {
+        id: "chandpur",
+        eyebrow: "Chandpur",
+        title: "Ilish curry at the river confluence",
+        paragraphs: [
+          "Chandpur's identity is closely tied to hilsa and to the waterways around the Padma and Meghna. In a restrained curry, mustard oil, turmeric and green chilli frame the fish rather than compete with its natural richness.",
+          "The final paragraph of the source manuscript switched to Barishal; this edition keeps the story centred on Chandpur while recognising that hilsa traditions belong to river communities across Bangladesh.",
+        ],
+        image: { url: "/images/stories/district-food/chandpur-ilish.webp", alt: "Hilsa steaks in a golden mustard and green chilli curry", caption: "A light hand with spice lets hilsa remain the centre of the dish.", credit: suppliedCredit },
+      },
+      {
+        id: "khagrachhari",
+        eyebrow: "Khagrachhari",
+        title: "Fish hebang in banana leaf",
+        paragraphs: [
+          "Fish wrapped with herbs and chilli inside banana leaf cooks in its own moisture, whether steamed or placed near charcoal. Unwrapping the parcel releases an earthy fragrance before the first bite.",
+          "The technique is economical and gentle. It preserves the fish's texture while allowing local herbs to remain distinct.",
+        ],
+        image: { url: "/images/stories/district-food/khagrachhari-hebang.webp", alt: "Banana-leaf parcels of fish hebang on a plate", caption: "The leaf acts as wrapper, steamer and aromatic layer.", credit: suppliedCredit },
+      },
+      {
+        id: "habiganj",
+        eyebrow: "Habiganj",
+        title: "Hash-bash: duck with bamboo shoot",
+        paragraphs: [
+          "Rich duck and fresh bamboo shoot create a natural contrast: fat and depth on one side, gentle bitterness and crunch on the other. Slow cooking allows each to season the other.",
+          "The dish reflects the wetland, forest and Sylheti influences around Habiganj, while individual family versions may vary widely in spice and texture.",
+        ],
+        image: { url: "/images/stories/district-food/habiganj-hash-bash.webp", alt: "Duck curry with pieces of bamboo shoot", caption: "Bamboo shoot lightens the richness of slowly cooked duck.", credit: suppliedCredit },
+      },
+      {
+        id: "kurigram",
+        eyebrow: "Kurigram",
+        title: "Sidol bhorta with roasted chilli",
+        paragraphs: [
+          "Sidol preserves small fish through drying and fermentation, concentrating flavour for seasons when fresh catch is less dependable. Roasted and mashed with chilli, onion, garlic and mustard oil, it becomes a bold bhorta for hot rice.",
+          "Related sidol traditions appear across northern Bangladesh. They speak to resourcefulness: preservation as a source of pleasure and identity, not merely necessity.",
+        ],
+        image: { url: "/images/stories/district-food/kurigram-sidol.webp", alt: "Dark sidol bhorta garnished with a green chilli", caption: "Fermentation gives sidol its concentrated, unmistakable savouriness.", credit: suppliedCredit },
+      },
+      {
+        id: "mymensingh",
+        eyebrow: "Mymensingh",
+        title: "Traditional murgi roast",
+        paragraphs: [
+          "Murgi roast is festive rather than fiery. Yoghurt, onion paste and fragrant whole spices form a pale, rich gravy around tender chicken, with sweetness and perfume held in balance.",
+          "At weddings, Eid meals and family celebrations, the dish often arrives alongside pulao—part of a larger language of welcome and generosity.",
+        ],
+        image: { url: "/images/stories/district-food/mymensingh-murgi-roast.webp", alt: "A burnished whole chicken roast on a serving platter", caption: "Murgi roast favours fragrance, richness and ceremonial presentation.", credit: suppliedCredit },
+        pullQuote: "Food geography is porous: recipes travel with families, while memory gives particular places their strongest associations.",
+      },
+    ],
+    sources: [
+      { label: "Banglapedia — Food habits and geography", url: "https://en.banglapedia.org/index.php/Food_Habits" },
+      { label: "Banglapedia — Food products from rice and fish", url: "https://en.banglapedia.org/index.php?title=Food_Product" },
+      { label: "Beautiful Bangladesh — Shatkora in Sylhet", url: "https://www.beautifulbangladesh.gov.bd/newsletter/single/470" },
+      { label: "Bangladesh Tourism Board — District-wise attractions", url: "https://tourismboard.gov.bd/site/page/2e074183-4409-4bdb-ab95-8aa59df196c7/District-wise-Attractions" },
+    ],
+    editorialNote:
+      "Adapted from the supplied Bangladesh Food Heritage manuscript. The Bogura heading was corrected to match its Alu Bori Chicken Ghonto text, the Chandpur conclusion was made internally consistent, and absolute origin claims were softened where district-level evidence was limited.",
+    featured: true,
+    sortOrder: 20,
+    verified: true,
+  },
+];

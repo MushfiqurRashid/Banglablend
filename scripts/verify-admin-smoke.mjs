@@ -60,6 +60,7 @@ const routes = [
   "/pages",
   "/content",
   "/content/recipes",
+  "/content/journal_articles",
   "/reports",
   "/payment-audits",
   "/audit-log",
@@ -80,7 +81,12 @@ try {
   await page.getByLabel("Work email").fill(email);
   await page.locator("#password").fill(password);
   await page.getByRole("button", { name: "Sign in" }).click();
-  await page.waitForURL((url) => url.href === baseUrl || url.href === `${baseUrl}/`, { timeout: 20_000 });
+  try {
+    await page.waitForURL((url) => url.href === baseUrl || url.href === `${baseUrl}/`, { timeout: 20_000 });
+  } catch {
+    const feedback = (await page.locator("body").innerText()).replace(/\s+/g, " ").slice(0, 400);
+    throw new Error(`Admin login did not complete. Current URL: ${page.url()}. Page: ${feedback}`);
+  }
 
   if (screenshotDir) {
     await mkdir(screenshotDir, { recursive: true });
@@ -109,7 +115,23 @@ try {
     throw new Error("The structured recipe editor did not load its ingredient control.");
   }
 
+  await page.goto(`${baseUrl}/content/journal_articles`, { waitUntil: "networkidle" });
+  const firstArticle = page.locator("table.data-table tbody a").first();
+  if (!(await firstArticle.isVisible())) throw new Error("The article CMS did not contain an editable launch article.");
+  await Promise.all([page.waitForURL(/\/content\/journal_articles\/[^/]+$/), firstArticle.click()]);
+  await page.waitForLoadState("networkidle");
+  for (const heading of ["Hero image", "Story chapters", "Further reading"]) {
+    if (!(await page.getByRole("heading", { name: heading }).isVisible())) throw new Error(`The article editor did not render its ${heading} control.`);
+  }
+  if ((await page.locator(".article-section-card").count()) < 1) throw new Error("The article editor did not load its structured chapters.");
+  if (screenshotDir) await page.screenshot({ path: path.join(screenshotDir, "admin-article-editor-desktop.png"), fullPage: false });
+
   await page.setViewportSize({ width: 390, height: 844 });
+  await page.waitForTimeout(250);
+  const articleWidth = await page.evaluate(() => ({ viewport: window.innerWidth, document: document.documentElement.scrollWidth }));
+  if (articleWidth.document > articleWidth.viewport + 1) throw new Error("The article editor overflows the mobile viewport.");
+  if (screenshotDir) await page.screenshot({ path: path.join(screenshotDir, "admin-article-editor-mobile.png"), fullPage: false });
+
   await page.goto(`${baseUrl}/`, { waitUntil: "networkidle" });
   if (screenshotDir) await page.screenshot({ path: path.join(screenshotDir, "admin-mobile-overview.png"), fullPage: true });
   await page.getByRole("button", { name: "Open navigation" }).click();

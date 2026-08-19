@@ -11,15 +11,6 @@ export interface ComingSoonPageConfig {
 }
 
 export const discoverComingSoonPages = {
-  "food-heritage": {
-    title: "Food Heritage",
-    eyebrow: "Discover Bangladesh",
-    description:
-      "A considered archive of dishes, rituals and living food memory is taking shape. We are gathering every story with the context and care it deserves.",
-    image: "/images/home-hero-hathajari.jpg",
-    imageAlt: "A rich arrangement of Bangladeshi spices and ingredients",
-    parent: { label: "Discover Bangladesh", href: "/discover-bangladesh" },
-  },
   "regional-flavours": {
     title: "Regional Flavours",
     eyebrow: "Discover Bangladesh",
@@ -27,15 +18,6 @@ export const discoverComingSoonPages = {
       "A journey through Bangladesh’s distinct regional kitchens is in preparation, shaped by place, season and the people who keep these flavours alive.",
     image: "/images/bangladesh-river-landscape.webp",
     imageAlt: "A calm river landscape in Bangladesh",
-    parent: { label: "Discover Bangladesh", href: "/discover-bangladesh" },
-  },
-  "ingredient-stories": {
-    title: "Ingredient Stories",
-    eyebrow: "Discover Bangladesh",
-    description:
-      "We are tracing the origins, character and kitchen life of remarkable ingredients, one carefully reviewed story at a time.",
-    image: "/images/hero-spice-still-life.webp",
-    imageAlt: "Bangla Blend jars beside bowls of whole and ground spices",
     parent: { label: "Discover Bangladesh", href: "/discover-bangladesh" },
   },
   "farmer-sourcing-stories": {

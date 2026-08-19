@@ -4,7 +4,7 @@
 // disproportionate time on repetitive CRUD screens. Recipe ingredients and steps are handled by
 // the structured recipe editor mounted alongside this generic record form.
 
-export type FieldKind = "text" | "textarea" | "richtext" | "boolean" | "select" | "number" | "date" | "foreignKey" | "array" | "json";
+export type FieldKind = "text" | "textarea" | "richtext" | "paragraphs" | "boolean" | "select" | "number" | "date" | "foreignKey" | "array" | "json";
 
 export interface FieldDef {
   name: string;
@@ -174,10 +174,23 @@ export const contentRegistry: ContentTypeDef[] = [
     { name: "sort_order", label: "Sort order", kind: "number" },
   ]},
   { table: "journal_articles", label: "Journal Articles", area: "content", hasVerification: true, hasLanguage: true, titleColumn: "title", slugColumn: "slug", fields: [
-    ...publishableFields(),
+    { name: "title", label: "Title", kind: "text", required: true },
+    { name: "slug", label: "Slug", kind: "text", required: true },
+    languageField,
+    { name: "summary", label: "Standfirst / summary", kind: "textarea", required: true, helpText: "A concise promise of what the reader will discover. Also used in search and article cards." },
+    { name: "hero_image", label: "Hero image", kind: "json", required: true },
+    { name: "image_credit", label: "Hero image credit", kind: "text" },
+    { name: "intro", label: "Opening paragraphs", kind: "paragraphs", helpText: "Leave a blank line between paragraphs." },
+    { name: "story_sections", label: "Story chapters", kind: "json", required: true },
+    { name: "sources", label: "Further reading", kind: "json" },
+    { name: "editorial_note", label: "Public editorial note", kind: "textarea", helpText: "Explain material edits, limitations or how the story was reviewed." },
     { name: "author_id", label: "Author", kind: "foreignKey", foreignTable: "authors", foreignLabelColumn: "name", required: true },
     { name: "category_id", label: "Category", kind: "foreignKey", foreignTable: "journal_categories", foreignLabelColumn: "title", required: true },
     { name: "published_at", label: "Published at", kind: "date" },
+    { name: "featured", label: "Featured article", kind: "boolean" },
+    { name: "sort_order", label: "Sort order", kind: "number" },
+    ...verificationFields,
+    { name: "seo", label: "SEO (JSON)", kind: "json" },
   ]},
   { table: "standard_pages", label: "Standard Pages", area: "pages", hasVerification: true, hasLanguage: true, titleColumn: "title", slugColumn: "slug", fields: publishableFields() },
   { table: "legal_pages", label: "Legal Pages", area: "pages", hasVerification: true, hasLanguage: true, titleColumn: "title", slugColumn: "slug", fields: [

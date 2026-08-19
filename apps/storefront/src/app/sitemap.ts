@@ -3,6 +3,7 @@ import { siteConfig } from "@/config/site";
 import { journalCategories } from "@/lib/content/fallback-content";
 import { getApprovedSitemapRoutes } from "@/lib/content/queries";
 import { launchRecipes } from "@/data/launch-recipes";
+import { launchArticles } from "@/data/launch-articles";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes = [
@@ -15,6 +16,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const approved = await getApprovedSitemapRoutes();
   const contentRoutes = [
     ...launchRecipes.map((recipe) => `/recipes/${recipe.slug}`),
+    ...launchArticles.map((article) => `/discover-bangladesh/${article.categorySlug}/${article.slug}`),
     ...(approved?.recipes ?? []).map((slug) => `/recipes/${slug}`),
     ...(approved?.articles ?? []).filter((article) => article.slug && article.category).map((article) => `/discover-bangladesh/${article.category}/${article.slug}`),
     ...(approved?.story ?? []).map((slug) => `/our-story/${slug}`),

@@ -7,30 +7,30 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 
 const featuredStories = [
   {
-    category: "Regional Flavours",
-    title: "The Story of Mezban",
+    category: "Food Heritage",
+    title: "The Masalas That Shape a Cuisine",
     description:
-      "Discover the heritage of Chattogram’s communal feast and the flavours that bring people together.",
-    href: "/discover-bangladesh/regional-flavours",
-    image: "/images/recipe-mezban-gosh.webp",
-    imageAlt: "A brass bowl filled with rich Chattogram mezban beef",
+      "Travel from Bengal's trading history to the distinctive spice traditions of Chattogram, Sylhet, Rajshahi and Old Dhaka.",
+    href: "/discover-bangladesh/food-heritage/bangladesh-spice-heritage-regional-masala",
+    image: "/images/stories/spice-heritage/spice-heritage-hero.webp",
+    imageAlt: "A stone mortar surrounded by bowls of whole and ground spices",
   },
   {
     category: "Ingredient Stories",
-    title: "Hathazari Red Chilli",
+    title: "Six Ingredients, Six Stories",
     description:
-      "Why this chilli is famous for its vivid colour, gentle heat and distinctive aroma.",
-    href: "/discover-bangladesh/ingredient-stories",
-    image: "/images/our-story-standards.webp",
-    imageAlt: "Red chilli and other spices in bowls on a dark wooden table",
+      "Follow turmeric, red chilli, ginger, garlic, mustard and onion from field and market to the family kitchen.",
+    href: "/discover-bangladesh/ingredient-stories/six-ingredients-that-shape-the-bangladeshi-kitchen",
+    image: "/images/stories/ingredient-stories/ingredients-hero.webp",
+    imageAlt: "A market table filled with chillies, turmeric, garlic, onions and whole spices",
   },
   {
     category: "Food Heritage",
-    title: "How Geography Shaped Bengali Cuisine",
-    description: "Rivers, deltas, land and monsoon are the natural forces that shape what we eat.",
-    href: "/discover-bangladesh/food-heritage",
-    image: "/images/bangladesh-river-landscape.webp",
-    imageAlt: "A boat on a river flowing through rural Bangladesh",
+    title: "Bangladesh, District by District",
+    description: "Fourteen places and fourteen ways of reading Bangladesh through food, landscape and family memory.",
+    href: "/discover-bangladesh/food-heritage/bangladesh-food-heritage-by-district",
+    image: "/images/stories/district-food/district-food-hero.webp",
+    imageAlt: "A table of colourful Bangladeshi dishes served in earthen bowls",
   },
   {
     category: "Festivals & Seasons",
